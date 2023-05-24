@@ -11,9 +11,8 @@ import {
     UpdateDateColumn,
 
 } from "typeorm";
-// import { Post } from "../posts/post.entity";
-// import { Movie } from "./movies/movie.entity";
-import { Notification } from "../notifications/notification.entity";
+import { Post } from "../posts/post.entity";
+import { Movie } from "../movies/movie.entity";
 import { User } from "../auth/user.entity";
 
 @Entity()
@@ -29,7 +28,7 @@ export class Like extends BaseEntity {
     @joinColumn({ name: 'postId', referencedColumnName: 'postId' })
     post: Post;
 
-    @ManyToOne(() => Movie, (movie) => movie.likes, { eager: false})
+    @ManyToOne(() => Movie, (movie) => movie.thisMovieLikes, { eager: false})
     @joinColumn({ name: 'movieId', referencedColumnName: 'movieId' })
     movie: Movie;
 }

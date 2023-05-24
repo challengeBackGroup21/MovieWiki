@@ -9,7 +9,7 @@ import {
     UpdateDateColumn,
 
 } from "typeorm";
-// import { Post } from "./Posts/Post.entity";
+import { Post } from "../posts/post.entity";
 import { Notification } from "../notifications/notification.entity";
 import { Like } from "../likes/like.entity";
 
@@ -37,12 +37,15 @@ export class User extends BaseEntity {
     @CreateDateColumn({ type: 'timestamp' })
     createdAt: Date;
 
-    @OneToMany(type => Post, Post => Post.user, { eager: true })
+    @OneToMany(() => Post, Post => Post.user, { eager: true })
     posts: Post[];
 
-    @OneToMany(type => Notification, Notification => Notification.user, { eager: true })
+    @OneToMany(() => Notification, Notification => Notification.user, { eager: true })
     notifications: Notification[];
 
-    @OneToMany(type => Like, like => like.user, { eager: true })
+    @OneToMany(() => Notification, Notification => Notification.reportUser, { eager: true })
+    reportNotifications: Notification[];
+
+    @OneToMany(() => Like, like => like.user, { eager: true })
     likes: Like[];
 }
