@@ -9,7 +9,6 @@ import {
     joinColumn,
     CreateDateColumn,
     UpdateDateColumn,
-
 } from "typeorm";
 import { Post } from "../posts/post.entity";
 import { Movie } from "../movies/movie.entity";

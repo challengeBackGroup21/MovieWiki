@@ -66,5 +66,4 @@ export class Movie extends BaseEntity {
 
     @OneToMany(() => Like, like => like.movie, { eager: true })
     thisMovieLikes: Like[];
-
 }

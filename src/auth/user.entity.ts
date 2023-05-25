@@ -7,7 +7,6 @@ import {
     OneToMany,
     CreateDateColumn,
     UpdateDateColumn,
-
 } from "typeorm";
 import { Post } from "../posts/post.entity";
 import { Notification } from "../notifications/notification.entity";
