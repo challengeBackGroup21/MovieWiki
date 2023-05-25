@@ -1,69 +1,70 @@
 import {
-    BaseEntity,
-    Column,
-    Entity,
-    PrimaryGeneratedColumn,
-    Unique,
-    OneToMany,
-    CreateDateColumn,
-    UpdateDateColumn,
-
-} from "typeorm";
-import { Post } from "../posts/post.entity";
-import { Notification } from "../notifications/notification.entity";
-import { Like } from "../likes/like.entity";
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  Unique,
+  UpdateDateColumn,
+} from 'typeorm';
+import { Like } from '../likes/like.entity';
+import { Notification } from '../notifications/notification.entity';
+import { Post } from '../posts/post.entity';
 
 @Entity()
 @Unique(['email', 'nickname'])
 export class Movie extends BaseEntity {
-    @PrimaryGeneratedColumn()
-    movieId: number;
+  @PrimaryGeneratedColumn()
+  movieId: number;
 
-    @Column()
-    movieCd: string;
+  @Column()
+  movieCd: string;
 
-    @Column()
-    movieNm: string;
+  @Column()
+  movieNm: string;
 
-    @Column()
-    showTm: string;
+  @Column()
+  showTm: string;
 
-    @Column()
-    openDt: string;
+  @Column()
+  openDt: string;
 
-    @Column()
-    typeNm: string;
+  @Column()
+  typeNm: string;
 
-    @Column()
-    nationNm: string;
+  @Column()
+  nationNm: string;
 
-    @Column()
-    genres: string;
+  @Column()
+  genres: string;
 
-    @Column()
-    directors: string;
+  @Column()
+  directors: string;
 
-    @Column()
-    actors: string;
+  @Column()
+  actors: string;
 
-    @Column()
-    watchGradeNm: string;
+  @Column()
+  watchGradeNm: string;
 
-    @Column()
-    likes: number;
+  @Column()
+  likes: number;
 
-    @CreateDateColumn({ type: 'timestamp' })
-    createdAt: Date;
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt: Date;
 
-    @UpdateDateColumn({ type: 'timestamp' })
-    updatedAt: Date;
+  @UpdateDateColumn({ type: 'timestamp' })
+  updatedAt: Date;
 
-    @OneToMany(() => Post, post => post.movie, { eager: true })
-    posts: Post[];
+  @OneToMany(() => Post, (post) => post.movie, { eager: true })
+  posts: Post[];
 
-    @OneToMany(() => Notification, notification => notification.movie, { eager: true })
-    notifications: Notification[];
+  @OneToMany(() => Notification, (notification) => notification.movie, {
+    eager: true,
+  })
+  notifications: Notification[];
 
-    @OneToMany(() => Like, like => like.movie, { eager: true })
-    thisMovieLikes: Like[];
+  @OneToMany(() => Like, (like) => like.movie, { eager: true })
+  thisMovieLikes: Like[];
 }
