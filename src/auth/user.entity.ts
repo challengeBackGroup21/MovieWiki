@@ -1,4 +1,4 @@
-import { IsNumber, IsString } from 'class-validator';
+import { IsDate, IsNumber, IsString } from 'class-validator';
 import {
   BaseEntity,
   Column,
@@ -31,7 +31,8 @@ export class User extends BaseEntity {
   @IsString()
   nickname: string;
 
-  @Column({ type: 'datetime' })
+  @Column()
+  @IsDate()
   limitedAt: Date;
 
   @Column()

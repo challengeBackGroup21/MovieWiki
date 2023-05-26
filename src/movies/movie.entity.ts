@@ -6,7 +6,6 @@ import {
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
-  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 import { Like } from '../likes/like.entity';
@@ -14,7 +13,6 @@ import { Notification } from '../notifications/notification.entity';
 import { Post } from '../posts/post.entity';
 
 @Entity()
-@Unique(['email', 'nickname'])
 export class Movie extends BaseEntity {
   @PrimaryGeneratedColumn()
   @IsNumber()

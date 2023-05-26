@@ -8,7 +8,6 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
-  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../auth/user.entity';
@@ -17,7 +16,6 @@ import { Movie } from '../movies/movie.entity';
 import { Notification } from '../notifications/notification.entity';
 
 @Entity()
-@Unique(['email', 'nickname'])
 export class Post extends BaseEntity {
   @PrimaryGeneratedColumn()
   @IsNumber()
@@ -53,7 +51,7 @@ export class Post extends BaseEntity {
   @JoinColumn({ name: 'userId', referencedColumnName: 'userId' })
   user: User;
 
-  @ManyToOne(() => User, (movie) => movie.posts, { eager: false })
+  @ManyToOne(() => Movie, (movie) => movie.posts, { eager: false })
   @JoinColumn({ name: 'movieId', referencedColumnName: 'movieId' })
   movie: Movie;
 }
