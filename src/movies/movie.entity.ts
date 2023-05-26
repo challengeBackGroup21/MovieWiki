@@ -1,69 +1,81 @@
+import { IsNumber, IsString } from 'class-validator';
 import {
-    BaseEntity,
-    Column,
-    Entity,
-    PrimaryGeneratedColumn,
-    Unique,
-    OneToMany,
-    CreateDateColumn,
-    UpdateDateColumn,
-
-} from "typeorm";
-import { Post } from "../posts/post.entity";
-import { Notification } from "../notifications/notification.entity";
-import { Like } from "../likes/like.entity";
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { Like } from '../likes/like.entity';
+import { Notification } from '../notifications/notification.entity';
+import { Post } from '../posts/post.entity';
 
 @Entity()
-@Unique(['email', 'nickname'])
 export class Movie extends BaseEntity {
-    @PrimaryGeneratedColumn()
-    movieId: number;
+  @PrimaryGeneratedColumn()
+  @IsNumber()
+  movieId: number;
 
-    @Column()
-    movieCd: string;
+  @Column()
+  @IsString()
+  movieCd: string;
 
-    @Column()
-    movieNm: string;
+  @Column()
+  @IsString()
+  movieNm: string;
 
-    @Column()
-    showTm: string;
+  @Column()
+  @IsString()
+  showTm: string;
 
-    @Column()
-    openDt: string;
+  @Column()
+  @IsString()
+  openDt: string;
 
-    @Column()
-    typeNm: string;
+  @Column()
+  @IsString()
+  typeNm: string;
 
-    @Column()
-    nationNm: string;
+  @Column()
+  @IsString()
+  nationNm: string;
 
-    @Column()
-    genres: string;
+  @Column()
+  @IsString()
+  genres: string;
 
-    @Column()
-    directors: string;
+  @Column()
+  @IsString()
+  directors: string;
 
-    @Column()
-    actors: string;
+  @Column()
+  @IsString()
+  actors: string;
 
-    @Column()
-    watchGradeNm: string;
+  @Column()
+  @IsString()
+  watchGradeNm: string;
 
-    @Column()
-    likes: number;
+  @IsNumber()
+  @Column()
+  likes: number;
 
-    @CreateDateColumn({ type: 'timestamp' })
-    createdAt: Date;
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt: Date;
 
-    @UpdateDateColumn({ type: 'timestamp' })
-    updatedAt: Date;
+  @UpdateDateColumn({ type: 'timestamp' })
+  updatedAt: Date;
 
-    @OneToMany(() => Post, post => post.movie, { eager: true })
-    posts: Post[];
+  @OneToMany(() => Post, (post) => post.movie, { eager: true })
+  posts: Post[];
 
-    @OneToMany(() => Notification, notification => notification.movie, { eager: true })
-    notifications: Notification[];
+  @OneToMany(() => Notification, (notification) => notification.movie, {
+    eager: true,
+  })
+  notifications: Notification[];
 
-    @OneToMany(() => Like, like => like.movie, { eager: true })
-    thisMovieLikes: Like[];
+  @OneToMany(() => Like, (like) => like.movie, { eager: true })
+  thisMovieLikes: Like[];
 }
