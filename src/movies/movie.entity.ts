@@ -1,3 +1,4 @@
+import { IsNumber, IsString } from 'class-validator';
 import {
   BaseEntity,
   Column,
@@ -16,38 +17,50 @@ import { Post } from '../posts/post.entity';
 @Unique(['email', 'nickname'])
 export class Movie extends BaseEntity {
   @PrimaryGeneratedColumn()
+  @IsNumber()
   movieId: number;
 
   @Column()
+  @IsString()
   movieCd: string;
 
   @Column()
+  @IsString()
   movieNm: string;
 
   @Column()
+  @IsString()
   showTm: string;
 
   @Column()
+  @IsString()
   openDt: string;
 
   @Column()
+  @IsString()
   typeNm: string;
 
   @Column()
+  @IsString()
   nationNm: string;
 
   @Column()
+  @IsString()
   genres: string;
 
   @Column()
+  @IsString()
   directors: string;
 
   @Column()
+  @IsString()
   actors: string;
 
   @Column()
+  @IsString()
   watchGradeNm: string;
 
+  @IsNumber()
   @Column()
   likes: number;
 

@@ -1,26 +1,30 @@
+import { IsNumber, IsString } from 'class-validator';
 import {
   BaseEntity,
   Column,
-  Entity,
-  PrimaryGeneratedColumn,
   CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
+  Entity,
   JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
-import { Post } from '../posts/post.entity';
-import { Movie } from '../movies/movie.entity';
 import { User } from '../auth/user.entity';
+import { Movie } from '../movies/movie.entity';
+import { Post } from '../posts/post.entity';
 
 @Entity()
 export class Notification extends BaseEntity {
   @PrimaryGeneratedColumn()
+  @IsNumber()
   notiId: number;
 
   @Column()
+  @IsString()
   notificationContent: string;
 
   @Column()
+  @IsString()
   status: string;
 
   @CreateDateColumn({ type: 'timestamp' })

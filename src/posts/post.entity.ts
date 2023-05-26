@@ -1,3 +1,4 @@
+import { IsNumber, IsString } from 'class-validator';
 import {
   BaseEntity,
   Column,
@@ -19,15 +20,19 @@ import { Notification } from '../notifications/notification.entity';
 @Unique(['email', 'nickname'])
 export class Post extends BaseEntity {
   @PrimaryGeneratedColumn()
+  @IsNumber()
   postId: number;
 
   @Column()
+  @IsString()
   content: string;
 
   @Column()
+  @IsString()
   comment: string;
 
   @Column()
+  @IsNumber()
   version: number;
 
   @CreateDateColumn({ type: 'timestamp' })
