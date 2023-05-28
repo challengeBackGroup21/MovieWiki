@@ -44,7 +44,7 @@ export class Movie extends BaseEntity {
 
   @Column()
   @IsString()
-  genres: string;
+  genreAlt: string;
 
   @Column()
   @IsString()

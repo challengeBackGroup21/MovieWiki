@@ -12,6 +12,10 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   // httpExceptionFilter 적용
   app.useGlobalFilters(new HttpExceptionFilter());
+  app.enableCors({
+    origin: true,
+    credentials: true,
+  });
   await app.listen(port);
   Logger.log(`Application running on port ${port}`);
 }

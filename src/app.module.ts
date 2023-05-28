@@ -15,7 +15,6 @@ import { PostsModule } from './posts/posts.module';
       isGlobal: true,
     }),
     TypeOrmModule.forRoot(typeORMConfig),
-
     AuthModule,
     LikesModule,
     MoviesModule,
