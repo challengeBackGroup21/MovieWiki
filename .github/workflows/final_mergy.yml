@@ -3,6 +3,7 @@
 
 name: nest pull_request submitted
 
+# pull_request를 수용했을 때 동작
 on:
   pull_request_review:
     types: [submitted]
@@ -28,6 +29,7 @@ jobs:
     - run: npm run build --if-present
     - run: npm test
   
+  # docker image로 build하고 github container registry에 push
   build:
     needs: test
     name: Build
