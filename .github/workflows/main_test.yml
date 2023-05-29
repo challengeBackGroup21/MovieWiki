@@ -5,14 +5,9 @@ name: nest main_test
 
 on:
   push:
-    branches: [cicd_test]
+    branches: [develop]
   pull_request:
     branches: [develop]
-
-env:
-  DOCKER_IMAGE: ghcr.io/${{ github.actor }}/nest_github_action
-  VERSION: ${{ github.sha }}
-  NAME: nest_github_action
 
 jobs:
   test:

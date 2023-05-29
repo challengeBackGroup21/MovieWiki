@@ -5,12 +5,12 @@ name: nest pull_request submitted
 
 on:
   push:
-    branches: [develop]
+    branches: [main]
 
 env:
-  DOCKER_IMAGE: ghcr.io/${{ github.actor }}/moviewiki_test
+  DOCKER_IMAGE: ghcr.io/${{ github.actor }}/moviewiki
   VERSION: ${{ github.sha }}
-  NAME: moviewiki_test
+  NAME: moviewiki
 
 jobs:
   test:
