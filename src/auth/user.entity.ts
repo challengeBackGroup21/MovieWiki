@@ -1,35 +1,42 @@
+import { IsDate, IsNumber, IsString } from 'class-validator';
 import {
   BaseEntity,
   Column,
+  CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
-  OneToMany,
-  CreateDateColumn,
 } from 'typeorm';
-import { Post } from '../posts/post.entity';
-import { Notification } from '../notifications/notification.entity';
 import { Like } from '../likes/like.entity';
+import { Notification } from '../notifications/notification.entity';
+import { Post } from '../posts/post.entity';
 
 @Entity()
 @Unique(['email', 'nickname'])
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
+  @IsNumber()
   userId: number;
 
   @Column()
+  @IsString()
   email: string;
 
   @Column()
+  @IsString()
   password: string;
 
   @Column()
+  @IsString()
   nickname: string;
 
-  @Column({ type: 'datetime' })
+  @Column()
+  @IsDate()
   limitedAt: Date;
 
   @Column()
+  @IsNumber()
   banCount: number;
 
   @CreateDateColumn({ type: 'timestamp' })

@@ -1,53 +1,57 @@
+import { IsNumber, IsString } from 'class-validator';
 import {
-    BaseEntity,
-    Column,
-    Entity,
-    PrimaryGeneratedColumn,
-    Unique,
-    OneToMany,
-    CreateDateColumn,
-    UpdateDateColumn,
-    ManyToOne,
-    joinColumn
-
-} from "typeorm";
-import { Notification } from "../notifications/notification.entity";
-import { Like } from "../likes/like.entity";
-import { User } from "../auth/user.entity";
-import { Movie } from "../movies/movie.entity";
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { User } from '../auth/user.entity';
+import { Like } from '../likes/like.entity';
+import { Movie } from '../movies/movie.entity';
+import { Notification } from '../notifications/notification.entity';
 
 @Entity()
-@Unique(['email', 'nickname'])
 export class Post extends BaseEntity {
-    @PrimaryGeneratedColumn()
-    postId: number;
+  @PrimaryGeneratedColumn()
+  @IsNumber()
+  postId: number;
 
-    @Column()
-    content: string;
+  @Column()
+  @IsString()
+  content: string;
 
-    @Column()
-    comment: string;
+  @Column()
+  @IsString()
+  comment: string;
 
-    @Column()
-    version: number;
+  @Column()
+  @IsNumber()
+  version: number;
 
-    @CreateDateColumn({ type: 'timestamp' })
-    createdAt: Date;
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt: Date;
 
-    @UpdateDateColumn({ type: 'timestamp' })
-    updatedAt: Date;
+  @UpdateDateColumn({ type: 'timestamp' })
+  updatedAt: Date;
 
-    @OneToMany(type => Notification, Notification => Notification.post, { eager: true })
-    notifications: Notification[];
+  @OneToMany((type) => Notification, (Notification) => Notification.post, {
+    eager: true,
+  })
+  notifications: Notification[];
 
-    @OneToMany(type => Like, like => like.post, { eager: true })
-    likes: Like[];
+  @OneToMany((type) => Like, (like) => like.post, { eager: true })
+  likes: Like[];
 
-    @ManyToOne(() => User, (user) => user.posts, { eager: false})
-    @joinColumn({ name: 'userId', referencedColumnName: 'userId' })
-    user: User;
+  @ManyToOne(() => User, (user) => user.posts, { eager: false })
+  @JoinColumn({ name: 'userId', referencedColumnName: 'userId' })
+  user: User;
 
-    @ManyToOne(() => User, (movie) => movie.posts, { eager: false})
-    @joinColumn({ name: 'movieId', referencedColumnName: 'movieId' })
-    movie: Movie;
+  @ManyToOne(() => Movie, (movie) => movie.posts, { eager: false })
+  @JoinColumn({ name: 'movieId', referencedColumnName: 'movieId' })
+  movie: Movie;
 }
