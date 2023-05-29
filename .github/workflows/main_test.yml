@@ -4,8 +4,6 @@
 name: nest main_test
 
 on:
-  push:
-    branches: [develop]
   pull_request:
     branches: [develop]
 
