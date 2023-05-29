@@ -8,9 +8,9 @@ on:
     types: [submitted]
 
 env:
-  DOCKER_IMAGE: ghcr.io/${{ github.actor }}/nest_github_action
+  DOCKER_IMAGE: ghcr.io/${{ github.actor }}/moviewiki_test
   VERSION: ${{ github.sha }}
-  NAME: nest_github_action
+  NAME: moviewiki_test
 
 jobs:
   test:
