@@ -5,8 +5,8 @@ name: nest pull_request submitted
 
 # pull_request를 수용했을 때 동작
 on:
-  pull_request_review:
-    types: [submitted]
+  push:
+    branches: [develop]
 
 env:
   DOCKER_IMAGE: ghcr.io/${{ github.actor }}/moviewiki_test
