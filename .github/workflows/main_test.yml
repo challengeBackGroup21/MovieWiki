@@ -5,9 +5,9 @@ name: nest main_test
 
 on:
   push:
-    branches: [ main ]
+    branches: [develop]
   pull_request:
-    branches: [ main ]
+    branches: [develop]
 
 env:
   DOCKER_IMAGE: ghcr.io/${{ github.actor }}/nest_github_action
@@ -16,16 +16,15 @@ env:
 
 jobs:
   test:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Setup node.js 18.x
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present # 이거까지 있어야 할까? 한 번 알아보자.
-    - run: npm test
+      - uses: actions/checkout@v3
+      - name: Setup node.js 18.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build --if-present # 이거까지 있어야 할까? 한 번 알아보자.
+      - run: npm test
