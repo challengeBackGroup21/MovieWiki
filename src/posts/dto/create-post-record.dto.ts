@@ -1,4 +1,4 @@
 export class CreatePostRecordDto {
-  content: Text;
+  content: string;
   comment: string;
 }

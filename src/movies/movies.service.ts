@@ -8,7 +8,7 @@ export class MoviesService {
   async getLikedMovieList(likedListLength: number) {
     try {
       const Movies = this.movieRepositry.getLikedMovieList(likedListLength);
-      return { Movies };
+      return Movies;
     } catch (error) {
       throw new HttpException('인기 리스트 조회에 실패했습니다.', 400);
     }

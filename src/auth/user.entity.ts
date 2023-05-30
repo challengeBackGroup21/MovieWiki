@@ -31,7 +31,7 @@ export class User extends BaseEntity {
   @IsString()
   nickname: string;
 
-  @Column()
+  @Column({ nullable: true })
   @IsDate()
   limitedAt: Date;
 

@@ -1,4 +1,4 @@
-import { IsNumber, IsString } from 'class-validator';
+import { IsDate, IsNumber, IsString } from 'class-validator';
 import {
   BaseEntity,
   Column,
@@ -30,8 +30,8 @@ export class Post extends BaseEntity {
   comment: string;
 
   @Column()
-  @IsNumber()
-  version: number;
+  @IsDate()
+  version: Date;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

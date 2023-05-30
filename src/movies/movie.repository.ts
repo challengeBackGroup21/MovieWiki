@@ -8,11 +8,11 @@ export class MovieRepository extends Repository<Movie> {
     super(Movie, dataSource.createEntityManager());
   }
 
-  findOneMoive(movieId: number) {
-    return this.findOne({ where: { movieId } });
+  async findOneMoive(movieId: number) {
+    return await this.findOne({ where: { movieId } });
   }
 
-  getLikedMovieList(likedListLength: number) {
-    return this.find({ order: { likes: 'DESC' }, take: likedListLength });
+  async getLikedMovieList(likedListLength: number) {
+    return await this.find({ order: { likes: 'DESC' }, take: likedListLength });
   }
 }

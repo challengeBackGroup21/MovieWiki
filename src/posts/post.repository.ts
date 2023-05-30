@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Movie } from 'src/movies/movie.entity';
 import { DataSource, Repository } from 'typeorm';
 import { CreatePostRecordDto } from '../posts/dto/create-post-record.dto';
 import { Post } from './post.entity';
@@ -9,23 +10,39 @@ export class PostRepository extends Repository<Post> {
     super(Post, dataSource.createEntityManager());
   }
 
-  async createMovieRecord(
+  async createPostRecord(
     createPostRecordDto: CreatePostRecordDto,
-    movieId: number,
+    movie: Movie,
     // req.user.userId, 유저 정보
   ) {
-    return this.create({
-      ...createPostRecordDto,
-      movieId,
-      // req.user.userId 유저 정보 추가
-    });
+    const post = new Post();
+    post.comment = createPostRecordDto.comment;
+    post.content = createPostRecordDto.content;
+    post.movie = movie;
+    post.version = new Date();
+    try {
+      return await this.save(post);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async getOnePostRecord(movieId: number, postId: number) {
-    return this.findOne({ where: { movieId: movieId, postId: postId } });
+    const post = await this.createQueryBuilder('Post')
+      .leftJoinAndSelect('Post.movie', 'movie')
+      .where('movie.movieId = :movieId', { movieId: movieId })
+      .andWhere('Post.postId = :postId', { postId: postId })
+      .getOne();
+    console.log(post);
+    return post;
   }
 
   async getPostRecords(movieId: number) {
-    return this.find({ where: { movieId } });
+    const posts = await this.createQueryBuilder('Post')
+      .leftJoinAndSelect('Post.movie', 'movie')
+      .where('movie.movieId = :movieId', { movieId: movieId })
+      .getMany();
+    console.log(posts);
+    return posts;
   }
 }

@@ -21,7 +21,7 @@ export class PostController {
     @Param('movieId') movieId: number,
     // @Req() req,
   ) {
-    return this.postService.createMovieRecord(
+    return this.postService.createPostRecord(
       createMovieRecordDto,
       movieId,
       // req.user.userId, 유저 정보

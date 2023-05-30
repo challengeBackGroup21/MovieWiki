@@ -9,16 +9,18 @@ export class PostService {
     private postRepository: PostRepository,
     private readonly movieRepository: MovieRepository,
   ) {}
-  async createMovieRecord(
+  async createPostRecord(
     createPostRecordDto: CreatePostRecordDto,
     movieId: number,
     // req.user.userId, 유저 정보
   ) {
     try {
-      await this.postRepository.createMovieRecord(createPostRecordDto, movieId); // req.user.userId 추가 예정
+      const movie = await this.movieRepository.findOneMoive(movieId);
+      console.log(movie);
+      await this.postRepository.createPostRecord(createPostRecordDto, movie); // req.user.userId 추가 예정
       return { message: '영화 수정 기록 생성에 성공했습니다.' };
     } catch (error) {
-      throw new HttpException('수정 기록 조회에 실패했습니다', 400);
+      throw new HttpException('수정 기록 생성에 실패했습니다', 400);
     }
   }
 
@@ -30,7 +32,7 @@ export class PostService {
       }
 
       const result = this.postRepository.getOnePostRecord(movieId, postId);
-      return { result };
+      return result;
     } catch (error) {
       throw new HttpException('수정 기록 조회에 실패했습니다.', 400);
     }
@@ -44,7 +46,7 @@ export class PostService {
       }
 
       const result = this.postRepository.getPostRecords(movieId);
-      return { result };
+      return result;
     } catch (error) {
       throw new HttpException('수정 기록 조회에 실패했습니다.', 400);
     }
