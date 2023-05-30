@@ -40,27 +40,36 @@ export class Movie extends BaseEntity {
 
   @Column()
   @IsString()
-  nationNm: string;
+  nationAlt: string;
 
   @Column()
   @IsString()
   genreAlt: string;
 
-  @Column()
+  @Column('jsonb')
   @IsString()
-  directors: string;
+  directors: { peopleNm: string }[];
 
-  @Column()
+  @Column('jsonb')
   @IsString()
-  actors: string;
+  actors: {
+    cast: string;
+    castEn: string;
+    peopleNm: string;
+    peopleNmEn: string;
+  }[];
 
-  @Column()
+  @Column({ nullable: true })
   @IsString()
   watchGradeNm: string;
 
+  @Column({ default: 0 })
   @IsNumber()
-  @Column()
   likes: number;
+
+  @Column({ default: 0 })
+  @IsNumber()
+  views: number;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
