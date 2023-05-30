@@ -7,6 +7,11 @@ export class AuthCredentialsDto {
   email: string;
 
   @IsString()
+  @MinLength(2)
+  @MaxLength(20)
+  nickname: string;
+
+  @IsString()
   @MinLength(4)
   @MaxLength(20)
   @Matches(/^[a-zA-Z0-9]*$/, {
