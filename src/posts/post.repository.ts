@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
+import { CreatePostRecordDto } from '../posts/dto/create-post-record.dto';
 import { Post } from './post.entity';
 
 @Injectable()
@@ -8,23 +9,23 @@ export class PostRepository extends Repository<Post> {
     super(Post, dataSource.createEntityManager());
   }
 
-  //   async createMovieRecord(
-  //     createPostRecordDto: CreatePostRecordDto,
-  //     movieId: number,
-  //     // req.user.userId, 유저 정보
-  //   ) {
-  //     return this.create({
-  //       ...createPostRecordDto,
-  //       movieId,
-  //       // req.user.userId 유저 정보 추가
-  //     });
-  //   }
+  async createMovieRecord(
+    createPostRecordDto: CreatePostRecordDto,
+    movieId: number,
+    // req.user.userId, 유저 정보
+  ) {
+    return this.create({
+      ...createPostRecordDto,
+      movieId,
+      // req.user.userId 유저 정보 추가
+    });
+  }
 
-  //   async getOnePostRecord(movieId: number, postId: number) {
-  //     return this.findOne({ where: { movieId: movieId, postId: postId } });
-  //   }
+  async getOnePostRecord(movieId: number, postId: number) {
+    return this.findOne({ where: { movieId: movieId, postId: postId } });
+  }
 
-  //   async getPostRecords(movieId: number) {
-  //     return this.find({ where: { movieId } });
-  //   }
+  async getPostRecords(movieId: number) {
+    return this.find({ where: { movieId } });
+  }
 }

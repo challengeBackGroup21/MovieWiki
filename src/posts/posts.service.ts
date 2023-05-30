@@ -1,51 +1,52 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { MovieRepository } from 'src/movies/movie.repository';
+import { CreatePostRecordDto } from '../posts/dto/create-post-record.dto';
 import { PostRepository } from './post.repository';
 
 @Injectable()
 export class PostService {
   constructor(
     private postRepository: PostRepository,
-    private movieRepository: MovieRepository,
+    private readonly movieRepository: MovieRepository,
   ) {}
-  //   async createMovieRecord(
-  //     createPostRecordDto: CreatePostRecordDto,
-  //     movieId: number,
-  //     // req.user.userId, 유저 정보
-  //   ) {
-  //     try {
-  //       await this.postRepository.createMovieRecord(createPostRecordDto, movieId); // req.user.userId 추가 예정
-  //       return { message: '영화 수정 기록 생성에 성공했습니다.' };
-  //     } catch (error) {
-  //       throw new HttpException('수정 기록 조회에 실패했습니다', 400);
-  //     }
-  //   }
+  async createMovieRecord(
+    createPostRecordDto: CreatePostRecordDto,
+    movieId: number,
+    // req.user.userId, 유저 정보
+  ) {
+    try {
+      await this.postRepository.createMovieRecord(createPostRecordDto, movieId); // req.user.userId 추가 예정
+      return { message: '영화 수정 기록 생성에 성공했습니다.' };
+    } catch (error) {
+      throw new HttpException('수정 기록 조회에 실패했습니다', 400);
+    }
+  }
 
-  //   async getOnePostRecord(movieId: number, postId: number) {
-  //     try {
-  //       const isExistMovie = await this.movieRepository.findOneMoive(movieId);
-  //       if (!isExistMovie) {
-  //         throw new HttpException('영화가 존재하지 않습니다.', 403);
-  //       }
+  async getOnePostRecord(movieId: number, postId: number) {
+    try {
+      const isExistMovie = await this.movieRepository.findOneMoive(movieId);
+      if (!isExistMovie) {
+        throw new HttpException('영화가 존재하지 않습니다.', 403);
+      }
 
-  //       const result = this.postRepository.getOnePostRecord(movieId, postId);
-  //       return { result };
-  //     } catch (error) {
-  //       throw new HttpException('수정 기록 조회에 실패했습니다.', 400);
-  //     }
-  //   }
+      const result = this.postRepository.getOnePostRecord(movieId, postId);
+      return { result };
+    } catch (error) {
+      throw new HttpException('수정 기록 조회에 실패했습니다.', 400);
+    }
+  }
 
-  //   async getPostRecords(movieId: number) {
-  //     try {
-  //       const isExistMovie = await this.movieRepository.findOneMoive(movieId);
-  //       if (!isExistMovie) {
-  //         throw new HttpException('영화가 존재하지 않습니다.', 403);
-  //       }
+  async getPostRecords(movieId: number) {
+    try {
+      const isExistMovie = await this.movieRepository.findOneMoive(movieId);
+      if (!isExistMovie) {
+        throw new HttpException('영화가 존재하지 않습니다.', 403);
+      }
 
-  //       const result = this.postRepository.getPostRecords(movieId);
-  //       return { result };
-  //     } catch (error) {
-  //       throw new HttpException('수정 기록 조회에 실패했습니다.', 400);
-  //     }
-  //   }
+      const result = this.postRepository.getPostRecords(movieId);
+      return { result };
+    } catch (error) {
+      throw new HttpException('수정 기록 조회에 실패했습니다.', 400);
+    }
+  }
 }
