@@ -8,7 +8,7 @@ on:
     branches: [main]
 
 env:
-  DOCKER_IMAGE: ghcr.io/${{ github.github.repository_owner }}/moviewiki
+  DOCKER_IMAGE: ghcr.io/${{ github.repository_owner }}/moviewiki
   VERSION: ${{ github.sha }}
   NAME: moviewiki
 
