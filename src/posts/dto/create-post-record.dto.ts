@@ -1,4 +1,4 @@
-export class CreateMovieRecordDto {
+export class CreatePostRecordDto {
   content: Text;
   comment: string;
 }
