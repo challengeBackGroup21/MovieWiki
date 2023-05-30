@@ -33,13 +33,13 @@ export class Notification extends BaseEntity {
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 
-  @ManyToOne(() => User, (user) => user.notifications, { eager: false })
-  @JoinColumn({ name: 'userId', referencedColumnName: 'userId' })
-  user: User;
+  @ManyToOne(() => User, (user) => user.notifications, { eager: true })
+  @JoinColumn({ name: 'reporterId', referencedColumnName: 'userId' })
+  reporter: User;
 
-  @ManyToOne(() => User, (user) => user.reportNotifications, { eager: false })
-  @JoinColumn({ name: 'reportUserId', referencedColumnName: 'userId' })
-  reportUser: User;
+  @ManyToOne(() => User, (user) => user.reportNotifications, { eager: true })
+  @JoinColumn({ name: 'reportedId', referencedColumnName: 'userId' })
+  reported: User;
 
   @ManyToOne(() => Post, (post) => post.notifications, { eager: false })
   @JoinColumn({ name: 'postId', referencedColumnName: 'postId' })
