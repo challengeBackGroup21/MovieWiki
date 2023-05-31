@@ -63,6 +63,9 @@ export class AuthController {
     console.log('user', user);
   }
 
+  // thunder client의 Bearer에 토큰을 넣어주고 요청을 보내면
+  // 1. UseGuards에서 토큰을 파싱해서 요청(req)에 user 객체를 넣어준다.(userId, email, nickname)
+  // 2. GetCurrentUser()에서 요청(req)에서 user를 추출해서 반환해준다.
   @UseGuards(AccessTokenGuard)
   @Get('/test')
   test2(@GetCurrentUser() user) {
