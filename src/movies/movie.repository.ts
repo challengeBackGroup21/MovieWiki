@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { Movie } from './movie.entity';
-import { UpdateMovieDto } from './dto/update-movie-dto';
 
 @Injectable()
 export class MovieRepository extends Repository<Movie> {
