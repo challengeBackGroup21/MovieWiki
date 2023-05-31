@@ -1,13 +1,12 @@
 name: Code Review
 
-permissions: write-all
-
 on:
   pull_request:
     types: [opened, synchronize]
 
 jobs:
   test:
+    permissions: write-all
     runs-on: ubuntu-latest
     steps:
       - uses: anc95/ChatGPT-CodeReview@main
@@ -15,3 +14,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           LANGUAGE: Korean
+# cr test
