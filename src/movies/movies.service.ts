@@ -1,10 +1,13 @@
 import { HttpException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { MovieRepository } from './movie.repository';
 
 @Injectable()
 export class MoviesService {
-  constructor(private movieRepositry: MovieRepository) {}
-
+  constructor(
+    @InjectRepository(MovieRepository)
+    private movieRepositry: MovieRepository,
+  ) {}
   async getLikedMovieList(likedListLength: number) {
     try {
       const Movies = this.movieRepositry.getLikedMovieList(likedListLength);
