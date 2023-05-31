@@ -41,8 +41,19 @@ export class MovieRepository extends Repository<Movie> {
   }
 
   async movieNmSearch(option: string, query: string): Promise<Movie[]> {
-    const movies = await await this.find({
+    const movies = await this.find({
       where: { movieNm: query },
+    });
+
+    return movies;
+  }
+
+  async moviesSearch(): Promise<Movie[]> {
+    const movies = await this.find({
+      order: {
+        movieId: 'ASC',
+      },
+      take: 20,
     });
 
     return movies;

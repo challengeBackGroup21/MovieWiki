@@ -24,7 +24,6 @@ export class MoviesService {
             400,
           );
         }
-
         return movies;
       }
 
@@ -79,19 +78,11 @@ export class MoviesService {
 
         return movies;
       }
+      if (option === 'total') {
+        const movies = await this.movieRepositry.moviesSearch();
 
-      // if (!option) {
-      //   const movies = await this.movieRepositry.find({
-      //     order: {
-      //       movieId: 'ASC',
-      //     },
-      //     take: 20,
-      //   });
-
-      //   return movies;
-      // } else {
-      //   throw new HttpException('영화 조회에 실패하였습니다', 400);
-      // }
+        return movies;
+      }
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
