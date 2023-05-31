@@ -61,4 +61,12 @@ export class MovieRepository extends Repository<Movie> {
     await this.save(updateMovie);
     return updateMovie;
   }
+
+  async findOneMoive(movieId: number) {
+    return await this.findOne({ where: { movieId } });
+  }
+
+  async getLikedMovieList(likedListLength: number) {
+    return await this.find({ order: { likes: 'DESC' }, take: likedListLength });
+  }
 }

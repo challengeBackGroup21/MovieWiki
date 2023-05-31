@@ -1,7 +1,7 @@
-import { Injectable, HttpException } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { MovieRepository } from './movie.repository';
 import { Movie } from './movie.entity';
-import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateMovieDto } from './dto/update-movie-dto';
 
 @Injectable()
@@ -124,5 +124,14 @@ export class MoviesService {
     const updateMovie = { ...movie, ...updateMovieDto };
 
     return await this.movieRepositry.save(updateMovie);
+  }
+
+  async getLikedMovieList(likedListLength: number) {
+    try {
+      const Movies = this.movieRepositry.getLikedMovieList(likedListLength);
+      return Movies;
+    } catch (error) {
+      throw new HttpException('인기 리스트 조회에 실패했습니다.', 400);
+    }
   }
 }

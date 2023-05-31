@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
-import { PostsController } from './posts.controller';
-import { PostsService } from './posts.service';
+import { MovieRepository } from 'src/movies/movie.repository';
+import { PostRepository } from './post.repository';
+import { PostController } from './posts.controller';
+import { PostService } from './posts.service';
 
 @Module({
-  controllers: [PostsController],
-  providers: [PostsService],
+  controllers: [PostController],
+  providers: [PostService, PostRepository, MovieRepository],
 })
 export class PostsModule {}

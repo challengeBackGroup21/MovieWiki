@@ -41,4 +41,9 @@ export class MoviesController {
   ): Promise<Movie> {
     return this.moviesService.updateMovieData(movieId, updateMovieData);
   }
+  // 인기 영화 리스트 조회
+  @Get('/like')
+  getLikedMovieList(@Query('cnt', ParseIntPipe) likedListLength: number) {
+    return this.moviesService.getLikedMovieList(likedListLength);
+  }
 }
