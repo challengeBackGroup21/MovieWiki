@@ -6,16 +6,19 @@ import {
   HttpStatus,
   Post,
   Put,
+  Req,
+  Res,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthCredentialsDto } from './dto/auth-credential.dto';
+import { SignUpDto, LoginDto } from './dto/auth-credential.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from './get-user.decorator';
 import { User } from './user.entity';
-import { RefreshTokenGuard } from './guards';
+import { AccessTokenGuard, RefreshTokenGuard } from './guards';
 import { GetCurrentUser, GetCurrentUserId } from './common/decorators';
+import { Tokens } from './types';
 
 @Controller('auth')
 export class AuthController {
@@ -23,18 +26,16 @@ export class AuthController {
 
   @Post('signup')
   @HttpCode(HttpStatus.CREATED)
-  signUp(
-    @Body(ValidationPipe) authCredentialsDto: AuthCredentialsDto,
-  ): Promise<void> {
-    return this.authService.signUp(authCredentialsDto);
+  signUp(@Body(ValidationPipe) signUpDto: SignUpDto): Promise<void> {
+    return this.authService.signUp(signUpDto);
   }
 
   @Post('/login')
   @HttpCode(HttpStatus.OK)
-  login(
-    @Body(ValidationPipe) authCredentialsDto: AuthCredentialsDto,
-  ): Promise<{ accessToken: string }> {
-    return this.authService.login(authCredentialsDto);
+  login(@Body(ValidationPipe) loginDto: LoginDto): Promise<Tokens> {
+    const tokens = this.authService.login(loginDto);
+    // res.cookie('tokens', tokens, { httpOnly: true });
+    return tokens;
   }
 
   @Put('/logout')
@@ -56,14 +57,15 @@ export class AuthController {
 
   // @UseGuards 데코레이터를 사용하면 요청에 대해 가드를 적용하겠다는 말이고, AuthGuard()는 인가를 똑바로 하는지 판단하는 함수 같음.
   // @Controller 위에 @UseGuards를 적용하면 해당 컨트롤러의 모든 요청에 가드를 적용하게 됨.
-  @Post('/authtest')
+  @Get('/authtest')
   @UseGuards(AuthGuard())
   test(@GetUser() user: User) {
     console.log('user', user);
   }
 
-  @Get('test')
-  test2() {
-    return 'auth_test 2';
+  @UseGuards(AccessTokenGuard)
+  @Get('/test')
+  test2(@GetCurrentUser() user) {
+    console.log('user', user);
   }
 }

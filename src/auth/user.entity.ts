@@ -31,11 +31,11 @@ export class User extends BaseEntity {
   @IsString()
   nickname: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, default: null })
   @IsDate()
   limitedAt: Date;
 
-  @Column()
+  @Column({ default: 0 })
   @IsNumber()
   banCount: number;
 

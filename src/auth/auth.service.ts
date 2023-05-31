@@ -4,7 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { UserRepository } from './user.repository';
-import { AuthCredentialsDto } from './dto/auth-credential.dto';
+import { LoginDto, SignUpDto } from './dto/auth-credential.dto';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { User } from './user.entity';
@@ -18,26 +18,28 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signUp(authCredentialsDto: AuthCredentialsDto): Promise<void> {
-    return this.userRepository.createUser(authCredentialsDto);
+  async signUp(signUpDto: SignUpDto): Promise<void> {
+    return this.userRepository.createUser(signUpDto);
   }
 
   /**
    로그인 메소드
-   일단 지금 해야 할 일이 무엇인지 생각해보자.
+   1. 해당 유저인지 확인
+   2. token 생성
+   3. userTable에 refreshToken 넣어주기
    */
-  async login(
-    authCredentialsDto: AuthCredentialsDto,
-  ): Promise<{ accessToken: string }> {
-    const { email, password } = authCredentialsDto;
-    // email로 찾아옴. 그래서 뭐 어쩌게
+  async login(loginDto: LoginDto): Promise<Tokens> {
+    const { email, password } = loginDto;
     const user = await this.userRepository.findUserByEmail(email);
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      const payload = { userId: user.userId, email };
-      const accessToken = await this.jwtService.sign(payload);
-
-      return { accessToken };
+      const tokens = await this.getTokens(user);
+      const hashedRefreshToken = await this.hash(tokens.refreshToken);
+      await this.userRepository.updateRefreshToken(
+        user.userId,
+        hashedRefreshToken,
+      );
+      return tokens;
     } else {
       throw new UnauthorizedException('login failed');
     }
@@ -68,7 +70,7 @@ export class AuthService {
       throw new UnauthorizedException(`Refresh token does not match`);
     }
 
-    const accessToken = await this.getAccessToken(user.userId, user.email);
+    const accessToken = await this.getAccessToken(user);
 
     return { accessToken };
   }
@@ -80,11 +82,13 @@ export class AuthService {
     return await bcrypt.hash(target, salt);
   }
 
-  async getAccessToken(userId: number, email: string): Promise<string> {
+  async getAccessToken(user: User): Promise<string> {
+    const { userId, email, nickname } = user;
     return await this.jwtService.signAsync(
       {
-        sub: userId,
+        userId,
         email,
+        nickname,
       },
       {
         secret: jwtConstants.atSecret,
@@ -93,11 +97,13 @@ export class AuthService {
     );
   }
 
-  async getRefreshToken(userId: number, email: string): Promise<string> {
+  async getRefreshToken(user: User): Promise<string> {
+    const { userId, email, nickname } = user;
     return await this.jwtService.signAsync(
       {
-        sub: userId,
+        userId,
         email,
+        nickname,
       },
       {
         secret: jwtConstants.rtSecret,
@@ -107,15 +113,19 @@ export class AuthService {
   }
 
   // 액세스 토큰과 리프레시 토큰을 발급받아 반환하는 메소드
-  async getTokens(userId: number, email: string): Promise<Tokens> {
+  async getTokens(user: User): Promise<Tokens> {
     const [accessToken, refreshToken] = [
-      await this.getAccessToken(userId, email),
-      await this.getRefreshToken(userId, email),
+      await this.getAccessToken(user),
+      await this.getRefreshToken(user),
     ];
 
     return {
       accessToken,
       refreshToken,
     };
+  }
+
+  async getUsers() {
+    return await this.userRepository.find();
   }
 }
