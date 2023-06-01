@@ -5,9 +5,12 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { CreatePostRecordDto } from '../posts/dto/create-post-record.dto';
 import { PostService } from './posts.service';
+import { GetCurrentUser } from 'src/auth/common/decorators';
+import { AccessTokenGuard } from 'src/auth/guards';
 
 @Controller('post')
 export class PostController {
@@ -41,5 +44,11 @@ export class PostController {
   @Get('/:movieId/record')
   getPostRecords(@Param('movieId', ParseIntPipe) movieId: number) {
     return this.postService.getPostRecords(movieId);
+  }
+
+  @Get('/post-test')
+  @UseGuards(AccessTokenGuard)
+  postTest(@GetCurrentUser() user) {
+    console.log('user', user);
   }
 }
