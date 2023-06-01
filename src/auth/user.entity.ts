@@ -39,6 +39,12 @@ export class User extends BaseEntity {
   @IsNumber()
   banCount: number;
 
+  @Column()
+  auth: string;
+
+  @Column()
+  token: string;
+
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 

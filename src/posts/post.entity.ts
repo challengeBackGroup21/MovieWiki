@@ -44,7 +44,7 @@ export class Post extends BaseEntity {
   })
   notifications: Notification[];
 
-  @OneToMany((type) => Like, (like) => like.post, { eager: true })
+  @OneToMany((type) => Like, (like) => like.postId, { eager: true })
   likes: Like[];
 
   @ManyToOne(() => User, (user) => user.posts, { eager: false })
