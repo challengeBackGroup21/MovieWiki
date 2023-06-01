@@ -1,11 +1,13 @@
-import { Injectable, BadRequestException, HttpException } from '@nestjs/common';
+import { Injectable, HttpException } from '@nestjs/common';
 import { LikeRepository } from './like.repository';
+import { MovieRepository } from '../movies/movie.repository';
 import { DataSource } from 'typeorm';
 
 @Injectable()
 export class LikeService {
     constructor(
         private readonly likeRepository: LikeRepository,
+        private readonly movieRepository: MovieRepository,
         private readonly dataSource: DataSource
     ) { }
 
@@ -20,12 +22,12 @@ export class LikeService {
 
             if (!like) {
                 await this.likeRepository.createLike(movieId, userId);
-                await this.likeRepository.incrementMovieLike(movieId);
+                await this.movieRepository.incrementMovieLike(movieId);
                 await queryRunner.commitTransaction();
                 return '해당 영화에 좋아요를 등록하였습니다.';
             } else {
                 await this.likeRepository.destroyLike(movieId, userId);
-                await this.likeRepository.decrementMovieLike(movieId);
+                await this.movieRepository.decrementMovieLike(movieId);
                 await queryRunner.commitTransaction();
                 return '해당 영화에 좋아요를 취소하였습니다.';
             }

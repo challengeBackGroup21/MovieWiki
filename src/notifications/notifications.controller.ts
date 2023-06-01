@@ -9,8 +9,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { GetCurrentUser } from 'src/auth/common/decorators';
-import { AccessTokenGuard } from 'src/auth/guards/';
+import { AuthGuard } from '@nestjs/passport';
 import { User } from 'src/auth/user.entity';
 import { Notification } from 'src/notifications/notification.entity';
 import { NotificationsService } from 'src/notifications/notifications.service';
@@ -18,16 +17,16 @@ import { NotificationStatus } from './notification-status.enum';
 import { NotificationStatusValidationPipe } from './pipe/notification-status-validation.pipe';
 
 @Controller('notifications')
+@UseGuards(AuthGuard())
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
   // 신고하기
-  @UseGuards(AccessTokenGuard)
   @Post('/:postId')
   async postNotification(
     @Body() body,
     @Param('postId', ParseIntPipe) postId: number,
-    @GetCurrentUser() user: any,
+    @GetUser() user: User,
   ): Promise<any> {
     const reporterId = user.userId;
     const notificationContent = body.notificationContent;
@@ -40,11 +39,10 @@ export class NotificationsController {
   }
 
   // 신고 취소
-  @UseGuards(AccessTokenGuard)
   @Delete('/:postId/cancel')
   async cancelNotification(
     @Param('postId', ParseIntPipe) postId: number,
-    @GetCurrentUser() user: User,
+    @GetUser() user: User,
   ): Promise<string> {
     const reporterId = user.userId;
 
@@ -73,9 +71,8 @@ export class NotificationsController {
 
   // 전체신고조회(어드민 계정만)
   @Get()
-  @UseGuards(AccessTokenGuard)
   async getAllNotification(
-    @GetCurrentUser() user: User,
+    @GetUser() user: User,
   ): Promise<Notification[] | any> {
     const auth = user.auth;
 
@@ -84,10 +81,9 @@ export class NotificationsController {
 
   // 신고 접수(어드민 계정만)
   @Patch(':notiId/accept')
-  @UseGuards(AccessTokenGuard)
   async acceptNotification(
     @Param('notiId', ParseIntPipe) notiId: number,
-    @GetCurrentUser() user: User,
+    @GetUser() user: User,
     @Body('status', NotificationStatusValidationPipe)
     status: NotificationStatus,
   ): Promise<any> {
@@ -101,11 +97,10 @@ export class NotificationsController {
   }
 
   // 신고 거부(어드민 계정만)
-  @UseGuards(AccessTokenGuard)
   @Patch(':notiId/reject')
   async rejectNotification(
     @Param('notiId', ParseIntPipe) notiId: number,
-    @GetCurrentUser() user: User,
+    @GetUser() user: User,
     @Body('status', NotificationStatusValidationPipe)
     status: NotificationStatus,
   ): Promise<any> {
