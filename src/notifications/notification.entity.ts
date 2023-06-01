@@ -12,6 +12,7 @@ import {
 import { User } from '../auth/user.entity';
 import { Movie } from '../movies/movie.entity';
 import { Post } from '../posts/post.entity';
+import { NotificationStatus } from './notification-status.enum'
 
 @Entity()
 export class Notification extends BaseEntity {
@@ -23,9 +24,13 @@ export class Notification extends BaseEntity {
   @IsString()
   notificationContent: string;
 
-  @Column()
+  @Column({
+    type: 'enum',
+    enum: NotificationStatus,
+    default: NotificationStatus.AWAIT
+  })
   @IsString()
-  status: string;
+  status: NotificationStatus;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
@@ -35,17 +40,17 @@ export class Notification extends BaseEntity {
 
   @ManyToOne(() => User, (user) => user.notifications, { eager: true })
   @JoinColumn({ name: 'reporterId', referencedColumnName: 'userId' })
-  reporter: User;
+  reporterId: number;
 
   @ManyToOne(() => User, (user) => user.reportNotifications, { eager: true })
   @JoinColumn({ name: 'reportedId', referencedColumnName: 'userId' })
-  reported: User;
+  reportedId: number;
 
   @ManyToOne(() => Post, (post) => post.notifications, { eager: false })
   @JoinColumn({ name: 'postId', referencedColumnName: 'postId' })
-  post: Post;
+  postId: number;
 
-  @ManyToOne(() => Movie, (movie) => movie.notifications, { eager: false })
+  @ManyToOne(() => Movie, (movie) => movie.notiMovieId, { eager: false })
   @JoinColumn({ name: 'movieId', referencedColumnName: 'movieId' })
-  movie: Movie;
+  movieId: number;
 }
