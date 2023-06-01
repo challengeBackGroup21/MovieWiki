@@ -7,10 +7,10 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { CreatePostRecordDto } from '../posts/dto/create-post-record.dto';
-import { PostService } from './posts.service';
 import { GetCurrentUser } from 'src/auth/common/decorators';
 import { AccessTokenGuard } from 'src/auth/guards';
+import { CreatePostRecordDto } from '../posts/dto/create-post-record.dto';
+import { PostService } from './posts.service';
 import { RevertPostRecordDto } from './dto/revert-post-record.dto';
 
 @Controller('post')
@@ -20,15 +20,16 @@ export class PostController {
   // @UseGuards() 로그인 가드 사용
   // 영화 상세 수정 기록 생성
   @Post('/:movieId/record')
+  @UseGuards(AccessTokenGuard)
   createPostRecord(
     @Body() createMovieRecordDto: CreatePostRecordDto,
     @Param('movieId') movieId: number,
-    // @Req() req,
+    @GetCurrentUser() user: any,
   ) {
     return this.postService.createPostRecord(
       createMovieRecordDto,
       movieId,
-      // req.user.userId, 유저 정보
+      user.userId,
     );
   }
 

@@ -6,19 +6,17 @@ import {
   HttpStatus,
   Post,
   Put,
-  Req,
   Res,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { SignUpDto, LoginDto } from './dto/auth-credential.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { User } from './user.entity';
-import { AccessTokenGuard, RefreshTokenGuard } from './guards';
-import { GetCurrentUser, GetCurrentUserId } from './common/decorators';
-import { Tokens } from './types';
 import { Response } from 'express';
+import { AuthService } from './auth.service';
+import { GetCurrentUser, GetCurrentUserId } from './common/decorators';
+import { LoginDto, SignUpDto } from './dto/auth-credential.dto';
+import { AccessTokenGuard, RefreshTokenGuard } from './guards';
+import { Tokens } from './types';
 
 @Controller('auth')
 export class AuthController {

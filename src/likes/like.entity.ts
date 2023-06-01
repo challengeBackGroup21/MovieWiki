@@ -24,13 +24,13 @@ export class Like extends BaseEntity {
 
   @ManyToOne(() => User, (user) => user.likes, { eager: false })
   @JoinColumn({ name: 'userId', referencedColumnName: 'userId' })
-  user: User;
+  userId: number;
 
   @ManyToOne(() => Post, (post) => post.likes, { eager: false })
   @JoinColumn({ name: 'postId', referencedColumnName: 'postId' })
-  post: Post;
+  postId: number;
 
   @ManyToOne(() => Movie, (movie) => movie.thisMovieLikes, { eager: false })
   @JoinColumn({ name: 'movieId', referencedColumnName: 'movieId' })
-  movie: Movie;
+  movieId: number;
 }

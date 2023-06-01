@@ -20,6 +20,7 @@ export class AccessTokenStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   validate(payload: any) {
+    // userRepository에 접근 한 후 payload에 넣어준다.
     return payload;
   }
 }

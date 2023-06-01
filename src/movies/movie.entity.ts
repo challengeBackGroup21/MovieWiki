@@ -80,11 +80,11 @@ export class Movie extends BaseEntity {
   @OneToMany(() => Post, (post) => post.movie, { eager: true })
   posts: Post[];
 
-  @OneToMany(() => Notification, (notification) => notification.movie, {
+  @OneToMany(() => Notification, (notification) => notification.movieId, {
     eager: true,
   })
-  notifications: Notification[];
+  notiMovieId: number;
 
-  @OneToMany(() => Like, (like) => like.movie, { eager: true })
-  thisMovieLikes: Like[];
+  @OneToMany(() => Like, (like) => like.movieId, { eager: true })
+  thisMovieLikes: Like;
 }
