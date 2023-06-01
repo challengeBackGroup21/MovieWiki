@@ -83,12 +83,13 @@ export class AuthService {
   }
 
   async getAccessToken(user: User): Promise<string> {
-    const { userId, email, nickname } = user;
+    const { userId, email, nickname, auth } = user;
     return await this.jwtService.signAsync(
       {
         userId,
         email,
         nickname,
+        auth,
       },
       {
         secret: jwtConstants.atSecret,
@@ -98,12 +99,13 @@ export class AuthService {
   }
 
   async getRefreshToken(user: User): Promise<string> {
-    const { userId, email, nickname } = user;
+    const { userId, email, nickname, auth } = user;
     return await this.jwtService.signAsync(
       {
         userId,
         email,
         nickname,
+        auth,
       },
       {
         secret: jwtConstants.rtSecret,
