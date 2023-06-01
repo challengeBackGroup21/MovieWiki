@@ -11,13 +11,13 @@ import {
 } from '@nestjs/common';
 import { NotificationsService } from 'src/notifications/notifications.service';
 import { Notification } from 'src/notifications/notification.entity';
-import { AuthGuard } from '@nestjs/passport';
-import { User } from 'src/auth/user.entity';
 import { NotificationStatus } from './notification-status.enum';
 import { NotificationStatusValidationPipe } from './pipe/notification-status-validation.pipe';
+import { AccessTokenGuard } from 'src/auth/guards';
+import { GetCurrentUser } from 'src/auth/common/decorators/get-current-user.decorator';
 
 @Controller('notifications')
-@UseGuards(AuthGuard())
+@UseGuards(AccessTokenGuard)
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
@@ -26,7 +26,7 @@ export class NotificationsController {
   async postNotification(
     @Body() body,
     @Param('postId', ParseIntPipe) postId: number,
-    @GetUser() user: User,
+    @GetCurrentUser() user,
   ): Promise<any> {
     const reporterId = user.userId;
     const notificationContent = body.notificationContent;
@@ -42,7 +42,7 @@ export class NotificationsController {
   @Delete('/:postId/cancel')
   async cancelNotification(
     @Param('postId', ParseIntPipe) postId: number,
-    @GetUser() user: User,
+    @GetCurrentUser() user,
   ): Promise<string> {
     const reporterId = user.userId;
 
@@ -71,7 +71,7 @@ export class NotificationsController {
   // 전체신고조회(어드민 계정만)
   @Get()
   async getAllNotification(
-    @GetUser() user: User,
+    @GetCurrentUser() user,
   ): Promise<Notification[] | any> {
     const auth = user.auth;
 
@@ -82,7 +82,7 @@ export class NotificationsController {
   @Patch(':notiId/accept')
   async acceptNotification(
     @Param('notiId', ParseIntPipe) notiId: number,
-    @GetUser() user: User,
+    @GetCurrentUser() user,
     @Body('status', NotificationStatusValidationPipe)
     status: NotificationStatus,
   ): Promise<any> {
@@ -99,7 +99,7 @@ export class NotificationsController {
   @Patch(':notiId/reject')
   async rejectNotification(
     @Param('notiId', ParseIntPipe) notiId: number,
-    @GetUser() user: User,
+    @GetCurrentUser() user,
     @Body('status', NotificationStatusValidationPipe)
     status: NotificationStatus,
   ): Promise<any> {
