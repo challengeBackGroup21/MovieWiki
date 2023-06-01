@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { MovieRepository } from 'src/movies/movie.repository';
 import { CreatePostRecordDto } from '../posts/dto/create-post-record.dto';
 import { PostRepository } from './post.repository';
+import { RevertPostRecordDto } from './dto/revert-post-record.dto';
 
 @Injectable()
 export class PostService {
@@ -57,6 +58,20 @@ export class PostService {
       return result;
     } catch (error) {
       throw new HttpException('수정 기록 조회에 실패했습니다.', 400);
+    }
+  }
+  // 게시글 이전 버전으로 다시 생성
+  async revertPostRecord(
+    revertPostRecordDto: RevertPostRecordDto,
+    movieId: number,
+    postId: number,
+  ) {
+    const result = await this.getOnePostRecord(movieId, postId);
+    try {
+      await this.postRepository.revertPostRecord(revertPostRecordDto, result);
+      return { message: '기록 생성에 성공하였습니다' };
+    } catch (error) {
+      throw new HttpException('기록 생성에 실패하였습니다', 400);
     }
   }
 }

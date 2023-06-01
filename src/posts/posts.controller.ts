@@ -11,6 +11,7 @@ import { GetCurrentUser } from 'src/auth/common/decorators';
 import { AccessTokenGuard } from 'src/auth/guards';
 import { CreatePostRecordDto } from '../posts/dto/create-post-record.dto';
 import { PostService } from './posts.service';
+import { RevertPostRecordDto } from './dto/revert-post-record.dto';
 
 @Controller('post')
 export class PostController {
@@ -47,9 +48,17 @@ export class PostController {
     return this.postService.getPostRecords(movieId);
   }
 
-  @Get('/post-test')
-  @UseGuards(AccessTokenGuard)
-  postTest(@GetCurrentUser() user) {
-    console.log('user', user);
+  // 영화 기록 이전 버전 다시 생성
+  @Post('/:movieId/record/:postId')
+  revertPostRecord(
+    @Body() revertPostRecordDto: RevertPostRecordDto,
+    @Param('movieId', ParseIntPipe) movieId: number,
+    @Param('postId', ParseIntPipe) postId: number,
+  ) {
+    return this.postService.revertPostRecord(
+      revertPostRecordDto,
+      movieId,
+      postId,
+    );
   }
 }
