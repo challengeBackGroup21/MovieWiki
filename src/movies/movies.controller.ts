@@ -37,9 +37,10 @@ export class MoviesController {
   @Patch('/:movieId')
   updateMovieData(
     @Param('movieId', ParseIntPipe) movieId: number,
-    @Body() updateMovieData: UpdateMovieDto,
+    @Body() updateMovieDto: UpdateMovieDto,
   ): Promise<Movie> {
-    return this.moviesService.updateMovieData(movieId, updateMovieData);
+    console.log(updateMovieDto);
+    return this.moviesService.updateMovieData(movieId, updateMovieDto);
   }
   // 인기 영화 리스트 조회
   @Get('/like')

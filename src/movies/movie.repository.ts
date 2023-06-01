@@ -39,7 +39,7 @@ export class MovieRepository extends Repository<Movie> {
 
     return movies;
   }
-
+  // 동일한 제목의 영화 존재할 수 도 있어서 find로 검색
   async movieNmSearch(option: string, query: string): Promise<Movie[]> {
     const movies = await this.find({
       where: { movieNm: query },

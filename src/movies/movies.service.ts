@@ -67,7 +67,6 @@ export class MoviesService {
       }
 
       if (option === 'movieNm') {
-        // 동일한 제목의 영화 존재할 수 도 있어서 find로 검색
         const movies = await this.movieRepositry.movieNmSearch(option, query);
         if (movies.length === 0) {
           throw new HttpException(
@@ -114,7 +113,7 @@ export class MoviesService {
     const movie = await this.getMovieById(movieId);
     const updateMovie = { ...movie, ...updateMovieDto };
 
-    return await this.movieRepositry.save(updateMovie);
+    return await this.movieRepositry.updateMovieData(updateMovie);
   }
 
   async getLikedMovieList(likedListLength: number) {
