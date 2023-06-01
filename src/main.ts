@@ -1,9 +1,9 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import * as config from 'config';
+import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/exceptions/http-exception-filter';
-import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -22,3 +22,4 @@ async function bootstrap() {
   Logger.log(`Application running on port ${port}`);
 }
 bootstrap();
+// cr-bot test
