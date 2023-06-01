@@ -14,11 +14,11 @@ import {
 import { AuthService } from './auth.service';
 import { SignUpDto, LoginDto } from './dto/auth-credential.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { GetUser } from './get-user.decorator';
 import { User } from './user.entity';
 import { AccessTokenGuard, RefreshTokenGuard } from './guards';
 import { GetCurrentUser, GetCurrentUserId } from './common/decorators';
 import { Tokens } from './types';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -32,15 +32,19 @@ export class AuthController {
 
   @Post('/login')
   @HttpCode(HttpStatus.OK)
-  login(@Body(ValidationPipe) loginDto: LoginDto): Promise<Tokens> {
+  login(
+    @Body(ValidationPipe) loginDto: LoginDto,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<Tokens> {
     const tokens = this.authService.login(loginDto);
     // res.cookie('tokens', tokens, { httpOnly: true });
+    response.cookie('tokens', tokens);
     return tokens;
   }
 
   @Put('/logout')
   @HttpCode(HttpStatus.OK)
-  logout(@GetUser() user: User) {
+  logout(@GetCurrentUser() user) {
     this.authService.logout(user);
     return 'logout';
   }
@@ -59,7 +63,7 @@ export class AuthController {
   // @Controller 위에 @UseGuards를 적용하면 해당 컨트롤러의 모든 요청에 가드를 적용하게 됨.
   @Get('/authtest')
   @UseGuards(AuthGuard())
-  test(@GetUser() user: User) {
+  test(@GetCurrentUser() user) {
     console.log('user', user);
   }
 
