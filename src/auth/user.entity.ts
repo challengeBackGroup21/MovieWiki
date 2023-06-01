@@ -53,16 +53,16 @@ export class User extends BaseEntity {
   @OneToMany(() => Post, (post) => post.user, { eager: false })
   posts: Post[];
 
-  @OneToMany(() => Notification, (notification) => notification.reporter, {
+  @OneToMany(() => Notification, (notification) => notification.reporterId, {
     eager: false,
   })
   notifications: Notification[];
 
-  @OneToMany(() => Notification, (notification) => notification.reported, {
+  @OneToMany(() => Notification, (notification) => notification.reportedId, {
     eager: false,
   })
   reportNotifications: Notification[];
 
-  @OneToMany(() => Like, (like) => like.user, { eager: false })
+  @OneToMany(() => Like, (like) => like.userId, { eager: false })
   likes: Like[];
 }

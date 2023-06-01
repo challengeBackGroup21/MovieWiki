@@ -39,7 +39,7 @@ export class Post extends BaseEntity {
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 
-  @OneToMany((type) => Notification, (Notification) => Notification.post, {
+  @OneToMany((type) => Notification, (Notification) => Notification.postId, {
     eager: true,
   })
   notifications: Notification[];
