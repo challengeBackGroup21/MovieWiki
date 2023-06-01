@@ -91,7 +91,7 @@ export class MoviesService {
     }
   }
 
-  // 영화 상세 정보 검색하기
+  // 영화 상세 정보 조회
   async getMovieById(movieId: number): Promise<Movie> {
     const isExistMovie = await this.movieRepositry.getMovieById(movieId);
 
@@ -106,14 +106,20 @@ export class MoviesService {
   async updateMovieData(
     movieId: number,
     updateMovieDto: UpdateMovieDto,
+    user: any,
   ): Promise<Movie> {
     if (Object.keys(updateMovieDto).length === 0) {
       throw new HttpException('변경할 영화 정보를 입력해주세요', 400);
     }
     const movie = await this.getMovieById(movieId);
-    const updateMovie = { ...movie, ...updateMovieDto };
-
-    return await this.movieRepositry.updateMovieData(updateMovie);
+    try {
+      if (user.auth === 'admin') {
+        const updateMovie = { ...movie, ...updateMovieDto };
+        return await this.movieRepositry.updateMovieData(updateMovie);
+      }
+    } catch (error) {
+      throw new HttpException('영화 수정에 실패하였습니다', 400);
+    }
   }
 
   async getLikedMovieList(likedListLength: number) {

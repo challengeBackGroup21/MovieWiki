@@ -6,10 +6,13 @@ import {
   Param,
   ParseIntPipe,
   Body,
+  UseGuards,
 } from '@nestjs/common';
 import { MoviesService } from './movies.service';
 import { Movie } from './movie.entity';
 import { UpdateMovieDto } from './dto/update-movie-dto';
+import { AccessTokenGuard } from 'src/auth/guards';
+import { GetCurrentUser } from 'src/auth/common/decorators';
 
 @Controller('movies')
 export class MoviesController {
@@ -33,14 +36,15 @@ export class MoviesController {
   }
 
   // 영화 상세 정보 수정
-  // @UserGuards()
   @Patch('/:movieId')
+  @UseGuards(AccessTokenGuard)
   updateMovieData(
     @Param('movieId', ParseIntPipe) movieId: number,
     @Body() updateMovieDto: UpdateMovieDto,
+    @GetCurrentUser() user: any,
   ): Promise<Movie> {
     console.log(updateMovieDto);
-    return this.moviesService.updateMovieData(movieId, updateMovieDto);
+    return this.moviesService.updateMovieData(movieId, updateMovieDto, user);
   }
   // 인기 영화 리스트 조회
   @Get('/like')

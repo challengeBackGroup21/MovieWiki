@@ -50,15 +50,18 @@ export class PostController {
 
   // 영화 기록 이전 버전 다시 생성
   @Post('/:movieId/record/:postId')
+  @UseGuards(AccessTokenGuard)
   revertPostRecord(
     @Body() revertPostRecordDto: RevertPostRecordDto,
     @Param('movieId', ParseIntPipe) movieId: number,
     @Param('postId', ParseIntPipe) postId: number,
+    @GetCurrentUser() user: any,
   ) {
     return this.postService.revertPostRecord(
       revertPostRecordDto,
       movieId,
       postId,
+      user.userId,
     );
   }
 }

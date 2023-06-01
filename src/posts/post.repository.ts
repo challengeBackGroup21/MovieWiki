@@ -45,16 +45,16 @@ export class PostRepository extends Repository<Post> {
     return posts;
   }
 
-  async revertPostRecord(revertPostRecordDto: RevertPostRecordDto, result) {
+  async revertPostRecord(
+    revertPostRecordDto: RevertPostRecordDto,
+    result,
+    userId: any,
+  ) {
     const post = new Post();
     post.comment = revertPostRecordDto.comment;
     post.content = result.content;
     post.movie = result.movie;
+    post.user = userId;
     post.version = new Date();
-    try {
-      return await this.save(post);
-    } catch (error) {
-      console.log(error);
-    }
   }
 }

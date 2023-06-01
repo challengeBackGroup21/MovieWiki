@@ -59,10 +59,13 @@ export class MovieRepository extends Repository<Movie> {
     return movies;
   }
 
+  // 영화 상세 정보 조회,최신 post 연결
   async getMovieById(movieId: number): Promise<Movie> {
-    const isExistMovie = await this.findOne({
-      where: { movieId },
-    });
+    const isExistMovie = await this.createQueryBuilder('movie')
+      .leftJoinAndSelect('movie.posts', 'post')
+      .where('movie.movieId = :movieId', { movieId })
+      .orderBy('post.createdAt', 'DESC')
+      .getOne();
 
     return isExistMovie;
   }

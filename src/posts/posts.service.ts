@@ -65,10 +65,15 @@ export class PostService {
     revertPostRecordDto: RevertPostRecordDto,
     movieId: number,
     postId: number,
+    userId: any,
   ) {
     const result = await this.getOnePostRecord(movieId, postId);
     try {
-      await this.postRepository.revertPostRecord(revertPostRecordDto, result);
+      await this.postRepository.revertPostRecord(
+        revertPostRecordDto,
+        result,
+        userId,
+      );
       return { message: '기록 생성에 성공하였습니다' };
     } catch (error) {
       throw new HttpException('기록 생성에 실패하였습니다', 400);
