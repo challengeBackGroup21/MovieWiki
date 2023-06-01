@@ -13,12 +13,14 @@ export class PostRepository extends Repository<Post> {
   async createPostRecord(
     createPostRecordDto: CreatePostRecordDto,
     joinnedMovie: Movie,
+    userId: any,
     // req.user.userId, 유저 정보
   ) {
     const post = new Post();
     post.comment = createPostRecordDto.comment;
     post.content = createPostRecordDto.content;
     post.movie = joinnedMovie;
+    post.user = userId;
     post.version = new Date();
     return await this.save(post);
   }

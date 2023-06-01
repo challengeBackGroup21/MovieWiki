@@ -15,6 +15,7 @@ export class PostService {
   async createPostRecord(
     createPostRecordDto: CreatePostRecordDto,
     movieId: number,
+    userId: any,
     // req.user.userId, 유저 정보
   ) {
     try {
@@ -22,6 +23,7 @@ export class PostService {
       await this.postRepository.createPostRecord(
         createPostRecordDto,
         joinnedMovie,
+        userId,
       ); // req.user.userId 추가 예정
       return { message: '영화 수정 기록 생성에 성공했습니다.' };
     } catch (error) {
