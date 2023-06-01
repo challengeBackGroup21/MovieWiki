@@ -5,9 +5,12 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { CreatePostRecordDto } from '../posts/dto/create-post-record.dto';
 import { PostService } from './posts.service';
+import { GetCurrentUser } from 'src/auth/common/decorators';
+import { AccessTokenGuard } from 'src/auth/guards';
 import { RevertPostRecordDto } from './dto/revert-post-record.dto';
 
 @Controller('post')

@@ -29,7 +29,7 @@ export class Post extends BaseEntity {
   @IsString()
   comment: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, default: null })
   @IsDate()
   version: Date;
 
