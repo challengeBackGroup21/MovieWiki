@@ -53,4 +53,5 @@ export class Notification extends BaseEntity {
   @ManyToOne(() => Movie, (movie) => movie.notiMovieId, { eager: false })
   @JoinColumn({ name: 'movieId', referencedColumnName: 'movieId' })
   movieId: number;
+  post: any;
 }

@@ -2,8 +2,8 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MovieRepository } from 'src/movies/movie.repository';
 import { CreatePostRecordDto } from '../posts/dto/create-post-record.dto';
-import { PostRepository } from './post.repository';
 import { RevertPostRecordDto } from './dto/revert-post-record.dto';
+import { PostRepository } from './post.repository';
 
 @Injectable()
 export class PostService {
@@ -20,10 +20,9 @@ export class PostService {
     // req.user.userId, 유저 정보
   ) {
     try {
-      const joinnedMovie = await this.movieRepository.findOneMoive(movieId);
       await this.postRepository.createPostRecord(
         createPostRecordDto,
-        joinnedMovie,
+        movieId,
         userId,
       ); // req.user.userId 추가 예정
       return { message: '영화 수정 기록 생성에 성공했습니다.' };
@@ -39,7 +38,18 @@ export class PostService {
         throw new HttpException('영화가 존재하지 않습니다.', 403);
       }
 
-      const result = this.postRepository.getOnePostRecord(movieId, postId);
+      const allData = await this.postRepository.getOnePostRecord(
+        movieId,
+        postId,
+      );
+      const result = {
+        userId: allData.userId.userId,
+        content: allData.content,
+        commnet: allData.comment,
+        createdAt: allData.createdAt,
+        version: allData.version,
+      };
+
       return result;
     } catch (error) {
       throw new HttpException('수정 기록 조회에 실패했습니다.', 400);
@@ -54,7 +64,17 @@ export class PostService {
         throw new HttpException('영화가 존재하지 않습니다.', 403);
       }
 
-      const result = this.postRepository.getPostRecords(movieId);
+      const allData = await this.postRepository.getPostRecords(movieId);
+      const result = allData.map((data) => {
+        return {
+          userId: data.userId?.userId || '',
+          content: data.content,
+          commnet: data.comment,
+          createdAt: data.createdAt,
+          version: data.version,
+        };
+      });
+
       return result;
     } catch (error) {
       throw new HttpException('수정 기록 조회에 실패했습니다.', 400);
