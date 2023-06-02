@@ -81,10 +81,10 @@ export class MovieRepository extends Repository<Movie> {
   }
 
   async incrementMovieLike(movieId: number) {
-    await this.increment({ movieId }, "likes", 1);
+    await this.increment({ movieId }, 'likes', 1);
   }
 
   async decrementMovieLike(movieId: number) {
-    await this.decrement({ movieId }, "likes", 1);
+    await this.decrement({ movieId }, 'likes', 1);
   }
 }

@@ -1,8 +1,8 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MovieRepository } from './movie.repository';
-import { Movie } from './movie.entity';
 import { UpdateMovieDto } from './dto/update-movie-dto';
+import { Movie } from './movie.entity';
+import { MovieRepository } from './movie.repository';
 
 @Injectable()
 export class MoviesService {
@@ -93,14 +93,28 @@ export class MoviesService {
   }
 
   // 영화 상세 정보 검색하기
-  async getMovieById(movieId: number): Promise<Movie> {
+  async getMovieById(movieId: number): Promise<any> {
     const isExistMovie = await this.movieRepositry.getMovieById(movieId);
 
     if (!isExistMovie) {
       throw new HttpException('존재하지 않는 영화입니다', 400);
     }
 
-    return isExistMovie;
+    const movieInfo = {
+      movieId: isExistMovie.movieId,
+      movieNm: isExistMovie.movieNm,
+      showTm: isExistMovie.showTm,
+      openDt: isExistMovie.openDt,
+      nationAlt: isExistMovie.nationAlt,
+      genreAlt: isExistMovie.genreAlt,
+      directors: isExistMovie.directors.map((dir) => dir.peopleNm),
+      actors: isExistMovie.actors.map((actor) => actor.peopleNm),
+      watchGradeNm: isExistMovie.watchGradeNm,
+      likes: isExistMovie.likes,
+      views: isExistMovie.views,
+    };
+
+    return movieInfo;
   }
 
   // 영화 상세 정보 수정하기
@@ -119,7 +133,9 @@ export class MoviesService {
 
   async getLikedMovieList(likedListLength: number) {
     try {
-      const Movies = this.movieRepositry.getLikedMovieList(likedListLength);
+      const Movies = await this.movieRepositry.getLikedMovieList(
+        likedListLength,
+      );
       return Movies;
     } catch (error) {
       throw new HttpException('인기 리스트 조회에 실패했습니다.', 400);
