@@ -1,15 +1,15 @@
 import {
   BaseEntity,
-  Entity,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  JoinColumn,
   CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Post } from '../posts/post.entity';
-import { Movie } from '../movies/movie.entity';
 import { User } from '../auth/user.entity';
+import { Movie } from '../movies/movie.entity';
+import { Post } from '../posts/post.entity';
 
 @Entity()
 export class Like extends BaseEntity {

@@ -47,7 +47,6 @@ export class PostController {
   getPostRecords(@Param('movieId', ParseIntPipe) movieId: number) {
     return this.postService.getPostRecords(movieId);
   }
-
   // 영화 기록 이전 버전 다시 생성
   @Post('/:movieId/record/:postId')
   @UseGuards(AccessTokenGuard)

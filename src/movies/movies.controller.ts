@@ -24,8 +24,6 @@ export class MoviesController {
     @Query('option') option: string,
     @Query('query') query: string,
   ): Promise<Movie[]> {
-    if (option == 'directors') {
-    }
     return this.moviesService.search(option, query);
   }
 

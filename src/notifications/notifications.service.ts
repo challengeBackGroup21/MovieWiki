@@ -1,7 +1,7 @@
-import { Injectable, HttpException } from '@nestjs/common';
-import { NotificationRepository } from './notification.repository';
+import { HttpException, Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { NotificationStatus } from './notification-status.enum';
+import { NotificationRepository } from './notification.repository';
 
 @Injectable()
 export class NotificationsService {

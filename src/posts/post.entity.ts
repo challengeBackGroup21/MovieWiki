@@ -49,9 +49,9 @@ export class Post extends BaseEntity {
 
   @ManyToOne(() => User, (user) => user.posts, { eager: false })
   @JoinColumn({ name: 'userId', referencedColumnName: 'userId' })
-  user: User;
+  userId: User;
 
   @ManyToOne(() => Movie, (movie) => movie.posts, { eager: false })
   @JoinColumn({ name: 'movieId', referencedColumnName: 'movieId' })
-  movie: Movie;
+  movieId: number;
 }
