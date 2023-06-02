@@ -7,7 +7,7 @@ export class MovieRepository extends Repository<Movie> {
   constructor(private dataSource: DataSource) {
     super(Movie, dataSource.createEntityManager());
   }
-  async directorsSearch(option: string, query: string): Promise<Movie[]> {
+  async directorsSearch(query: string): Promise<Movie[]> {
     const movies = await this.createQueryBuilder('movie')
       .where('movie.directors @> :directors', {
         directors: JSON.stringify([{ peopleNm: query }]),
@@ -16,7 +16,7 @@ export class MovieRepository extends Repository<Movie> {
     return movies;
   }
 
-  async genreAltSearch(option: string, query: string): Promise<Movie[]> {
+  async genreAltSearch(query: string): Promise<Movie[]> {
     const movies = await this.createQueryBuilder('movie')
       .where('movie.genreAlt LIKE :genreAlt', { genreAlt: `%${query}%` })
       .getMany();
@@ -24,7 +24,7 @@ export class MovieRepository extends Repository<Movie> {
     return movies;
   }
 
-  async nationAltSearch(option: string, query: string): Promise<Movie[]> {
+  async nationAltSearch(query: string): Promise<Movie[]> {
     const movies = await this.createQueryBuilder('movie')
       .where('movie.nationAlt LIKE :nationAlt', { nationAlt: `%${query}%` })
       .getMany();
@@ -32,7 +32,7 @@ export class MovieRepository extends Repository<Movie> {
     return movies;
   }
 
-  async openDtSearch(option: string, query: string): Promise<Movie[]> {
+  async openDtSearch(query: string): Promise<Movie[]> {
     const movies = await this.createQueryBuilder('movie')
       .where('movie.openDt LIKE :openDt', { openDt: `${query}%` })
       .getMany();
@@ -40,7 +40,7 @@ export class MovieRepository extends Repository<Movie> {
     return movies;
   }
   // 동일한 제목의 영화 존재할 수 도 있어서 find로 검색
-  async movieNmSearch(option: string, query: string): Promise<Movie[]> {
+  async movieNmSearch(query: string): Promise<Movie[]> {
     const movies = await this.find({
       where: { movieNm: query },
     });
@@ -60,7 +60,7 @@ export class MovieRepository extends Repository<Movie> {
   }
 
   // 영화 상세 정보 조회,최신 post 연결
-  async getMovieById(movieId: number): Promise<Movie> {
+  async getMovieById(movieId: number): Promise<any> {
     const isExistMovie = await this.createQueryBuilder('movie')
       .leftJoinAndSelect('movie.posts', 'post')
       .where('movie.movieId = :movieId', { movieId })
@@ -84,10 +84,10 @@ export class MovieRepository extends Repository<Movie> {
   }
 
   async incrementMovieLike(movieId: number) {
-    await this.increment({ movieId }, "likes", 1);
+    await this.increment({ movieId }, 'likes', 1);
   }
 
   async decrementMovieLike(movieId: number) {
-    await this.decrement({ movieId }, "likes", 1);
+    await this.decrement({ movieId }, 'likes', 1);
   }
 }

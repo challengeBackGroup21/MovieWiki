@@ -24,14 +24,14 @@ export class MoviesController {
     @Query('option') option: string,
     @Query('query') query: string,
   ): Promise<Movie[]> {
+    if (option == 'directors') {
+    }
     return this.moviesService.search(option, query);
   }
 
-  // 영화 상세 정보 검색
+  // 영화 상세 정보 조회
   @Get('/:movieId')
-  getMovieById(
-    @Param('movieId', ParseIntPipe) movieId: number,
-  ): Promise<Movie> {
+  getMovieById(@Param('movieId', ParseIntPipe) movieId: number): Promise<any> {
     return this.moviesService.getMovieById(movieId);
   }
 
@@ -42,9 +42,12 @@ export class MoviesController {
     @Param('movieId', ParseIntPipe) movieId: number,
     @Body() updateMovieDto: UpdateMovieDto,
     @GetCurrentUser() user: any,
-  ): Promise<Movie> {
-    console.log(updateMovieDto);
-    return this.moviesService.updateMovieData(movieId, updateMovieDto, user);
+  ): Promise<any> {
+    return this.moviesService.updateMovieData(
+      movieId,
+      updateMovieDto,
+      user.auth,
+    );
   }
   // 인기 영화 리스트 조회
   @Get('/like')
