@@ -12,7 +12,7 @@ import {
 import { User } from '../auth/user.entity';
 import { Movie } from '../movies/movie.entity';
 import { Post } from '../posts/post.entity';
-import { NotificationStatus } from './notification-status.enum'
+import { NotificationStatus } from './notification-status.enum';
 
 @Entity()
 export class Notification extends BaseEntity {
@@ -27,7 +27,7 @@ export class Notification extends BaseEntity {
   @Column({
     type: 'enum',
     enum: NotificationStatus,
-    default: NotificationStatus.AWAIT
+    default: NotificationStatus.AWAIT,
   })
   @IsString()
   status: NotificationStatus;
@@ -53,4 +53,5 @@ export class Notification extends BaseEntity {
   @ManyToOne(() => Movie, (movie) => movie.notiMovieId, { eager: false })
   @JoinColumn({ name: 'movieId', referencedColumnName: 'movieId' })
   movieId: number;
+  post: any;
 }
