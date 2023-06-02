@@ -2,11 +2,15 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { NotificationStatus } from './notification-status.enum';
 import { NotificationRepository } from './notification.repository';
+import { PostRepository } from '../posts/post.repository';
+import { UserRepository } from '../auth/user.repository';
 
 @Injectable()
 export class NotificationsService {
   constructor(
     private readonly notificationRepository: NotificationRepository,
+    private readonly postRepository: PostRepository,
+    private readonly userRepository: UserRepository,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -26,7 +30,7 @@ export class NotificationsService {
           postId,
           reporterId,
         );
-      const reportedId = await this.notificationRepository.findReportedId(
+      const reportedId = await this.postRepository.findReportedId(
         postId,
       );
       await queryRunner.commitTransaction();
@@ -43,6 +47,7 @@ export class NotificationsService {
         return '해당 게시물 신고 이력이 존재합니다.';
       }
     } catch (error) {
+      console.error(error);
       await queryRunner.rollbackTransaction();
       throw new HttpException('해당 게시물 신고에 실패하였습니다.', 400);
     } finally {
@@ -115,18 +120,32 @@ export class NotificationsService {
     notiId: number,
     status: NotificationStatus,
   ) {
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction('READ COMMITTED');
+
     try {
       if (auth === 'admin' && status === 'ACCEPT') {
-        return await this.notificationRepository.updateStatusNotification(
+        const userId = await this.notificationRepository.findOneNotificationBynotiId(notiId);
+        await this.notificationRepository.updateStatusNotification(
           notiId,
           status,
         );
+        await this.userRepository.incrementUserBanCount(userId);
+        await queryRunner.commitTransaction();
+
+        return '관리자 권한으로 신고 승인이 완료되었습니다.'
       } else {
+        await queryRunner.rollbackTransaction();
         return '신고 승인 권한이 없습니다.';
       }
     } catch (error) {
+      await queryRunner.rollbackTransaction();
       throw new HttpException('신고 승인 처리에 실패했습니다.', 400);
-    }
+    } finally {
+      await queryRunner.release();
+    };
   }
 
   async rejectNotification(
