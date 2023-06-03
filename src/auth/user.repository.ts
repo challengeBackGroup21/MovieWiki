@@ -48,4 +48,8 @@ export class UserRepository extends Repository<User> {
   async findUserById(userId: number): Promise<User> {
     return await this.findOne({ where: { userId } });
   }
+
+  async incrementUserBanCount(userId: number) {
+    await this.increment({ userId }, "banCount", 1);
+  }
 }

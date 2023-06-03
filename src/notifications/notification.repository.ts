@@ -18,14 +18,6 @@ export class NotificationRepository {
         });
     };
 
-    async findReportedId(postId: number) {
-        const notificationPost = await this.notificationRepository.findOne({
-            where: { postId }
-        });
-
-        return notificationPost.reportedId;
-    };
-
     async createNotification(
         postId: number,
         notificationContent: string,
@@ -76,5 +68,13 @@ export class NotificationRepository {
             { notiId: notiId},
             { status: status },
         );
+    };
+
+    async findOneNotificationBynotiId(notiId: number) {
+        const result =  await this.notificationRepository.findOne({
+            where: {notiId}
+        });
+
+        return result.reportedId
     };
 };
