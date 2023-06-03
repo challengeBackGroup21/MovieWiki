@@ -18,12 +18,12 @@ import { NotificationStatus } from './notification-status.enum';
 import { NotificationStatusValidationPipe } from './pipe/notification-status-validation.pipe';
 
 @Controller('notifications')
+@UseGuards(AccessTokenGuard)
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
   // 신고하기
   @Post('/:postId')
-  @UseGuards(AccessTokenGuard)
   async postNotification(
     @Body() body,
     @Param('postId', ParseIntPipe) postId: number,
@@ -41,7 +41,6 @@ export class NotificationsController {
 
   // 신고 취소
   @Delete('/:postId/cancel')
-  @UseGuards(AccessTokenGuard)
   async cancelNotification(
     @Param('postId', ParseIntPipe) postId: number,
     @GetCurrentUser() user: User,
@@ -55,24 +54,27 @@ export class NotificationsController {
   }
 
   // 로그인 한 유저가 신고한 목록 조회
-  @Get('/:reporterId')
+  @Get('/reporter')
   async getReporterNotification(
-    @Param('reporterId', ParseIntPipe) reporterId: number,
+    @GetCurrentUser() user: User,
   ): Promise<Notification[] | any> {
+    const reporterId = user.userId;
+
     return await this.notificationsService.getReporterNotification(reporterId);
   }
 
   // 로그인 한 유저가 신고당한 목록 조회
-  @Get('/:reportedId')
+  @Get('/reported')
   async getReportedNotification(
-    @Param('reportedId', ParseIntPipe) reportedId: number,
+    @GetCurrentUser() user: User,
   ): Promise<Notification[] | any> {
+    const reportedId = user.userId;
+
     return await this.notificationsService.getReportedNotification(reportedId);
   }
 
   // 전체신고조회(어드민 계정만)
   @Get()
-  @UseGuards(AccessTokenGuard)
   async getAllNotification(
     @GetCurrentUser() user: User,
   ): Promise<Notification[] | any> {
@@ -83,7 +85,6 @@ export class NotificationsController {
 
   // 신고 접수(어드민 계정만)
   @Patch(':notiId/accept')
-  @UseGuards(AccessTokenGuard)
   async acceptNotification(
     @Param('notiId', ParseIntPipe) notiId: number,
     @GetCurrentUser() user: User,
@@ -101,7 +102,6 @@ export class NotificationsController {
 
   // 신고 거부(어드민 계정만)
   @Patch(':notiId/reject')
-  @UseGuards(AccessTokenGuard)
   async rejectNotification(
     @Param('notiId', ParseIntPipe) notiId: number,
     @GetCurrentUser() user: User,

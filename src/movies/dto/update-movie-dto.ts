@@ -1,15 +1,32 @@
+import { IsOptional } from 'class-validator';
+
 export class UpdateMovieDto {
-  showTm?: string;
-  openDt?: string;
-  typeNm?: string;
+  @IsOptional()
+  showTm: string;
+
+  @IsOptional()
+  openDt: string;
+
+  @IsOptional()
+  typeNm: string;
+
+  @IsOptional()
   nationAlt: string;
+
+  @IsOptional()
   genreAlt: string;
-  directors: { peopleNm: string }[];
-  actors?: {
-    cast?: string;
-    castEn?: string;
-    peopleNm?: string;
-    peopleNmEn?: string;
+
+  @IsOptional()
+  directors: { peopleNm?: string }[];
+
+  @IsOptional()
+  actors: {
+    cast: string;
+    castEn: string;
+    peopleNm: string;
+    peopleNmEn: string;
   }[];
-  watchGradeNm?: string;
+
+  @IsOptional()
+  watchGradeNm: string;
 }
