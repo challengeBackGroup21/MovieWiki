@@ -73,4 +73,9 @@ export class AuthController {
   test2(@GetCurrentUser() user) {
     console.log('user', user);
   }
+
+  @Get('/deploytest')
+  deployTest() {
+    return 'Deploy Success!';
+  }
 }

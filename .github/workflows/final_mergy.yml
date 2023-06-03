@@ -8,7 +8,7 @@ on:
     branches: [main]
 
 env:
-  DOCKER_IMAGE: ghcr.io/${{ github.repository_owner }}/moviewiki
+  DOCKER_IMAGE: ghcr.io/challengebackgroup21/moviewiki
   VERSION: ${{ github.sha }}
   NAME: moviewiki
 
@@ -50,7 +50,7 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
+          username: challengebackgroup21
           password: ${{ secrets.MOVIEWIKI_TOKEN }}
       - name: Build and push
         id: docker_build
@@ -69,7 +69,7 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
+          username: challengebackgroup21
           password: ${{ secrets.MOVIEWIKI_TOKEN }}
       - name: Docker run
         run: |

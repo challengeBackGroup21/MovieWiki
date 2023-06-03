@@ -16,4 +16,4 @@ COPY . .
 RUN npm run build
 
 # 어플리케이션 실행을 위한 명령어
-CMD [ "nest", "start" ]
+CMD [ "npm", "run", "start:prod" ]
