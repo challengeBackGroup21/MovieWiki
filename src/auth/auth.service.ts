@@ -8,8 +8,8 @@ import { LoginDto, SignUpDto } from './dto/auth-credential.dto';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { User } from './user.entity';
-import { jwtConstants } from './constans';
 import { Tokens } from './types';
+import * as config from 'config';
 
 @Injectable()
 export class AuthService {
@@ -83,6 +83,7 @@ export class AuthService {
   }
 
   async getAccessToken(user: User): Promise<string> {
+    const jwtConfig = config.get('jwt');
     const { userId, email, nickname, auth } = user;
     return await this.jwtService.signAsync(
       {
@@ -92,13 +93,14 @@ export class AuthService {
         auth,
       },
       {
-        secret: jwtConstants.atSecret,
-        expiresIn: jwtConstants.atExpiresIn,
+        secret: jwtConfig.atSecret,
+        expiresIn: jwtConfig.atExpiresIn,
       },
     );
   }
 
   async getRefreshToken(user: User): Promise<string> {
+    const jwtConfig = config.get('jwt');
     const { userId, email, nickname, auth } = user;
     return await this.jwtService.signAsync(
       {
@@ -108,8 +110,8 @@ export class AuthService {
         auth,
       },
       {
-        secret: jwtConstants.rtSecret,
-        expiresIn: jwtConstants.rtExpiresIn,
+        secret: jwtConfig.rtSecret,
+        expiresIn: jwtConfig.rtExpiresIn,
       },
     );
   }
