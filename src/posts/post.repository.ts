@@ -43,17 +43,19 @@ export class PostRepository extends Repository<Post> {
     return posts;
   }
 
-  async revertPostRecord(revertPostRecordDto: RevertPostRecordDto, result) {
+  async revertPostRecord(
+    revertPostRecordDto: RevertPostRecordDto,
+    result,
+    movieId,
+    userId: any,
+  ) {
     const post = new Post();
     post.comment = revertPostRecordDto.comment;
     post.content = result.content;
-    post.movieId = result.movieId.movieId;
+    post.movieId = movieId;
+    post.userId = userId;
     post.version = new Date();
-    try {
-      return await this.save(post);
-    } catch (error) {
-      console.log(error);
-    }
+    return await this.save(post);
   }
 
   // 신고할 때 해당 post 작성자 id를 찾기 위해 post 테이블에서 postId를 기준으로 userId를 찾는다.

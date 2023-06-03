@@ -4,10 +4,13 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  UseGuards,
   Patch,
   Query,
 } from '@nestjs/common';
 import { UpdateMovieDto } from './dto/update-movie-dto';
+import { AccessTokenGuard } from 'src/auth/guards';
+import { GetCurrentUser } from 'src/auth/common/decorators';
 import { Movie } from './movie.entity';
 import { MoviesService } from './movies.service';
 
@@ -30,19 +33,24 @@ export class MoviesController {
     return this.moviesService.getLikedMovieList(likedListLength);
   }
 
-  // 영화 상세 정보 검색
+  // 영화 상세 정보 조회
   @Get('/:movieId')
   getMovieById(@Param('movieId', ParseIntPipe) movieId: number): Promise<any> {
     return this.moviesService.getMovieById(movieId);
   }
 
   // 영화 상세 정보 수정
-  // @UserGuards()
   @Patch('/:movieId')
+  @UseGuards(AccessTokenGuard)
   updateMovieData(
     @Param('movieId', ParseIntPipe) movieId: number,
-    @Body() updateMovieData: UpdateMovieDto,
-  ): Promise<Movie> {
-    return this.moviesService.updateMovieData(movieId, updateMovieData);
+    @Body() updateMovieDto: UpdateMovieDto,
+    @GetCurrentUser() user: any,
+  ): Promise<any> {
+    return this.moviesService.updateMovieData(
+      movieId,
+      updateMovieDto,
+      user.auth,
+    );
   }
 }
