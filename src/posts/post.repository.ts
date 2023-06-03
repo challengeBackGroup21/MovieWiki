@@ -30,6 +30,7 @@ export class PostRepository extends Repository<Post> {
       where: { postId, movieId },
       relations: ['movieId', 'userId'],
     });
+    console.log(post);
     return post;
   }
 

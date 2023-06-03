@@ -39,7 +39,7 @@ export class User extends BaseEntity {
   @IsNumber()
   banCount: number;
 
-  @Column({ length: 4, default: 'USER' })
+  @Column({ length: 5, default: 'USER' })
   @IsString()
   auth: string;
 

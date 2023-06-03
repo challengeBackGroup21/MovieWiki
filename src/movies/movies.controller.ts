@@ -1,15 +1,15 @@
 import {
+  Body,
   Controller,
   Get,
-  Query,
-  Patch,
   Param,
   ParseIntPipe,
-  Body,
+  Patch,
+  Query,
 } from '@nestjs/common';
-import { MoviesService } from './movies.service';
-import { Movie } from './movie.entity';
 import { UpdateMovieDto } from './dto/update-movie-dto';
+import { Movie } from './movie.entity';
+import { MoviesService } from './movies.service';
 
 @Controller('movies')
 export class MoviesController {
@@ -24,11 +24,15 @@ export class MoviesController {
     return this.moviesService.search(option, query);
   }
 
+  // 인기 영화 리스트 조회
+  @Get('/like')
+  getLikedMovieList(@Query('cnt', ParseIntPipe) likedListLength: number) {
+    return this.moviesService.getLikedMovieList(likedListLength);
+  }
+
   // 영화 상세 정보 검색
   @Get('/:movieId')
-  getMovieById(
-    @Param('movieId', ParseIntPipe) movieId: number,
-  ): Promise<Movie> {
+  getMovieById(@Param('movieId', ParseIntPipe) movieId: number): Promise<any> {
     return this.moviesService.getMovieById(movieId);
   }
 
@@ -40,10 +44,5 @@ export class MoviesController {
     @Body() updateMovieData: UpdateMovieDto,
   ): Promise<Movie> {
     return this.moviesService.updateMovieData(movieId, updateMovieData);
-  }
-  // 인기 영화 리스트 조회
-  @Get('/like')
-  getLikedMovieList(@Query('cnt', ParseIntPipe) likedListLength: number) {
-    return this.moviesService.getLikedMovieList(likedListLength);
   }
 }
