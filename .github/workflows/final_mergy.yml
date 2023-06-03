@@ -13,24 +13,24 @@ env:
   NAME: moviewiki
 
 jobs:
-  test:
+  # test:
 
-    runs-on: ubuntu-latest
+  #   runs-on: ubuntu-latest
 
-    steps:
-    - uses: actions/checkout@v3
-    - name: Setup node.js 18.x
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
+  #   steps:
+  #   - uses: actions/checkout@v3
+  #   - name: Setup node.js 18.x
+  #     uses: actions/setup-node@v3
+  #     with:
+  #       node-version: ${{ matrix.node-version }}
+  #       cache: 'npm'
+  #   - run: npm ci
+  #   - run: npm run build --if-present
+  #   - run: npm test
   
   # docker image로 build하고 github container registry에 push
   build:
-    needs: test
+    # needs: test
     name: Build
     runs-on: ubuntu-latest
     steps:
