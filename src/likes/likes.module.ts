@@ -1,9 +1,15 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { LikesController } from './likes.controller';
-import { LikesService } from './likes.service';
+import { LikeService } from './likes.service';
+import { LikeRepository } from './like.repository';
+import { MovieRepository } from '../movies/movie.repository';
+import { Like } from './like.entity';
 
 @Module({
+  imports: [TypeOrmModule.forFeature([Like])],
   controllers: [LikesController],
-  providers: [LikesService]
+  providers: [LikeService, LikeRepository, MovieRepository],
+  exports: [LikeService, LikeRepository],
 })
 export class LikesModule {}

@@ -1,15 +1,15 @@
 import {
   BaseEntity,
-  Entity,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  JoinColumn,
   CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Post } from '../posts/post.entity';
-import { Movie } from '../movies/movie.entity';
 import { User } from '../auth/user.entity';
+import { Movie } from '../movies/movie.entity';
+import { Post } from '../posts/post.entity';
 
 @Entity()
 export class Like extends BaseEntity {
@@ -24,13 +24,13 @@ export class Like extends BaseEntity {
 
   @ManyToOne(() => User, (user) => user.likes, { eager: false })
   @JoinColumn({ name: 'userId', referencedColumnName: 'userId' })
-  user: User;
+  userId: number;
 
   @ManyToOne(() => Post, (post) => post.likes, { eager: false })
   @JoinColumn({ name: 'postId', referencedColumnName: 'postId' })
-  post: Post;
+  postId: number;
 
   @ManyToOne(() => Movie, (movie) => movie.thisMovieLikes, { eager: false })
   @JoinColumn({ name: 'movieId', referencedColumnName: 'movieId' })
-  movie: Movie;
+  movieId: number;
 }

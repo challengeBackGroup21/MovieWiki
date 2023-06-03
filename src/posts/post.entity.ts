@@ -1,4 +1,4 @@
-import { IsNumber, IsString } from 'class-validator';
+import { IsDate, IsNumber, IsString } from 'class-validator';
 import {
   BaseEntity,
   Column,
@@ -29,9 +29,9 @@ export class Post extends BaseEntity {
   @IsString()
   comment: string;
 
-  @Column()
-  @IsNumber()
-  version: number;
+  @Column({ nullable: true, default: null })
+  @IsDate()
+  version: Date;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
@@ -39,19 +39,19 @@ export class Post extends BaseEntity {
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 
-  @OneToMany((type) => Notification, (Notification) => Notification.post, {
+  @OneToMany((type) => Notification, (Notification) => Notification.postId, {
     eager: true,
   })
   notifications: Notification[];
 
-  @OneToMany((type) => Like, (like) => like.post, { eager: true })
+  @OneToMany((type) => Like, (like) => like.postId, { eager: true })
   likes: Like[];
 
   @ManyToOne(() => User, (user) => user.posts, { eager: false })
   @JoinColumn({ name: 'userId', referencedColumnName: 'userId' })
-  user: User;
+  userId: User;
 
   @ManyToOne(() => Movie, (movie) => movie.posts, { eager: false })
   @JoinColumn({ name: 'movieId', referencedColumnName: 'movieId' })
-  movie: Movie;
+  movieId: number;
 }
