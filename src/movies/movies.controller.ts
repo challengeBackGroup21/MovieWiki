@@ -1,18 +1,18 @@
 import {
+  Body,
   Controller,
   Get,
-  Query,
-  Patch,
   Param,
   ParseIntPipe,
-  Body,
   UseGuards,
+  Patch,
+  Query,
 } from '@nestjs/common';
-import { MoviesService } from './movies.service';
-import { Movie } from './movie.entity';
 import { UpdateMovieDto } from './dto/update-movie-dto';
 import { AccessTokenGuard } from 'src/auth/guards';
 import { GetCurrentUser } from 'src/auth/common/decorators';
+import { Movie } from './movie.entity';
+import { MoviesService } from './movies.service';
 
 @Controller('movies')
 export class MoviesController {
@@ -25,6 +25,12 @@ export class MoviesController {
     @Query('query') query: string,
   ): Promise<Movie[]> {
     return this.moviesService.search(option, query);
+  }
+
+  // 인기 영화 리스트 조회
+  @Get('/like')
+  getLikedMovieList(@Query('cnt', ParseIntPipe) likedListLength: number) {
+    return this.moviesService.getLikedMovieList(likedListLength);
   }
 
   // 영화 상세 정보 조회
@@ -46,10 +52,5 @@ export class MoviesController {
       updateMovieDto,
       user.auth,
     );
-  }
-  // 인기 영화 리스트 조회
-  @Get('/like')
-  getLikedMovieList(@Query('cnt', ParseIntPipe) likedListLength: number) {
-    return this.moviesService.getLikedMovieList(likedListLength);
   }
 }

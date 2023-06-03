@@ -30,6 +30,7 @@ export class PostRepository extends Repository<Post> {
       where: { postId, movieId },
       relations: ['movieId', 'userId'],
     });
+    console.log(post);
     return post;
   }
 
@@ -54,11 +55,7 @@ export class PostRepository extends Repository<Post> {
     post.movieId = movieId;
     post.userId = userId;
     post.version = new Date();
-    try {
-      return await this.save(post);
-    } catch (error) {
-      console.log(error);
-    }
+    return await this.save(post);
   }
 
   // 신고할 때 해당 post 작성자 id를 찾기 위해 post 테이블에서 postId를 기준으로 userId를 찾는다.

@@ -49,9 +49,9 @@ export class PostService {
         createdAt: allData.createdAt,
         version: allData.version,
       };
-
       return result;
     } catch (error) {
+      console.log(error);
       throw new HttpException('수정 기록 조회에 실패했습니다.', 400);
     }
   }
@@ -65,11 +65,13 @@ export class PostService {
       }
 
       const allData = await this.postRepository.getPostRecords(movieId);
+
       const result = allData.map((data) => {
         return {
+          postId: data.postId,
           userId: data.userId?.userId || '',
           content: data.content,
-          commnet: data.comment,
+          comment: data.comment,
           createdAt: data.createdAt,
           version: data.version,
         };
