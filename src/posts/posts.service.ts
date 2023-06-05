@@ -4,6 +4,8 @@ import { MovieRepository } from 'src/movies/movie.repository';
 import { CreatePostRecordDto } from '../posts/dto/create-post-record.dto';
 import { RevertPostRecordDto } from './dto/revert-post-record.dto';
 import { PostRepository } from './post.repository';
+import { UpdatePostRecordDto } from './dto/update-post-record.dto';
+import { ProcessedPost } from './types/process-post.type';
 
 @Injectable()
 export class PostService {
@@ -25,15 +27,60 @@ export class PostService {
         movieId,
         userId,
       ); // req.user.userId 추가 예정
-      return { message: '영화 수정 기록 생성에 성공했습니다.' };
+      return { message: '영화 기록 생성에 성공했습니다.' };
     } catch (error) {
-      throw new HttpException('수정 기록 생성에 실패했습니다', 400);
+      throw new HttpException('기록 생성에 실패했습니다', 400);
     }
   }
 
-  async getOnePostRecord(movieId: number, postId: number) {
+  async updatePostRecord(
+    updatePostRecordDto: UpdatePostRecordDto,
+    movieId: number,
+    userId: any,
+  ) {
     try {
-      const isExistMovie = await this.movieRepository.findOneMoive(movieId);
+      await this.postRepository.updatePostRecord(
+        updatePostRecordDto,
+        movieId,
+        userId,
+      );
+      return { message: '영화 수정 기록 생성에 성공했습니다.' };
+    } catch (error) {
+      throw new HttpException('기록 생성에 실패했습니다', 400);
+    }
+  }
+
+  async getLatestPostRecord(movieId: number): Promise<ProcessedPost> {
+    const isExistMovie = await this.movieRepository.findOneMovie(movieId);
+    if (!isExistMovie) {
+      throw new HttpException('영화가 존재하지 않습니다', 403);
+    }
+    const latestPost = await this.postRepository.getLatestPostRecord(movieId);
+    console.log(latestPost);
+    if (!latestPost) {
+      throw new HttpException(
+        '해당 영화에 대한 게시물이 존재하지 않습니다',
+        404,
+      );
+    }
+    const result = {
+      postId: latestPost.postId,
+      userId: latestPost.userId,
+      content: latestPost.content,
+      comment: latestPost.comment,
+      createdAt: latestPost.createdAt,
+      version: latestPost.version,
+    };
+
+    return result;
+  }
+
+  async getOnePostRecord(
+    movieId: number,
+    postId: number,
+  ): Promise<ProcessedPost> {
+    try {
+      const isExistMovie = await this.movieRepository.findOneMovie(movieId);
       if (!isExistMovie) {
         throw new HttpException('영화가 존재하지 않습니다.', 403);
       }
@@ -43,9 +90,10 @@ export class PostService {
         postId,
       );
       const result = {
-        userId: allData.userId?.userId || '',
+        postId: allData.postId,
+        userId: allData.userId,
         content: allData.content,
-        commnet: allData.comment,
+        comment: allData.comment,
         createdAt: allData.createdAt,
         version: allData.version,
       };
@@ -56,9 +104,9 @@ export class PostService {
     }
   }
 
-  async getPostRecords(movieId: number) {
+  async getPostRecords(movieId: number): Promise<ProcessedPost[]> {
     try {
-      const isExistMovie = await this.movieRepository.findOneMoive(movieId);
+      const isExistMovie = await this.movieRepository.findOneMovie(movieId);
 
       if (!isExistMovie) {
         throw new HttpException('영화가 존재하지 않습니다.', 403);
@@ -69,7 +117,7 @@ export class PostService {
       const result = allData.map((data) => {
         return {
           postId: data.postId,
-          userId: data.userId?.userId || '',
+          userId: data.userId,
           content: data.content,
           comment: data.comment,
           createdAt: data.createdAt,

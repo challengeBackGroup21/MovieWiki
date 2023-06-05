@@ -12,13 +12,15 @@ import { AccessTokenGuard } from 'src/auth/guards';
 import { CreatePostRecordDto } from '../posts/dto/create-post-record.dto';
 import { PostService } from './posts.service';
 import { RevertPostRecordDto } from './dto/revert-post-record.dto';
+import { UpdatePostRecordDto } from './dto/update-post-record.dto';
+import { ProcessedPost } from './types/process-post.type';
 
 @Controller('post')
 export class PostController {
   constructor(private postService: PostService) {}
 
   // @UseGuards() 로그인 가드 사용
-  // 영화 상세 수정 기록 생성
+  // 영화 상세 기록 생성
   @Post('/:movieId/record')
   @UseGuards(AccessTokenGuard)
   createPostRecord(
@@ -32,19 +34,43 @@ export class PostController {
       user.userId,
     );
   }
+  // 영화 상세 수정 기록 생성
+  @Post('/:movieId/record/versions')
+  @UseGuards(AccessTokenGuard)
+  updatePostRecord(
+    @Body() updatePostRecordDto: UpdatePostRecordDto,
+    @Param('movieId') movieId: number,
+    @GetCurrentUser() user: any,
+  ) {
+    return this.postService.updatePostRecord(
+      updatePostRecordDto,
+      movieId,
+      user.userId,
+    );
+  }
+
+  // 영화 최신 버전 기록 조회
+  @Get('/:movieId/record/latest')
+  getLatestPostRecord(
+    @Param('movieId', ParseIntPipe) movieId: number,
+  ): Promise<ProcessedPost> {
+    return this.postService.getLatestPostRecord(movieId);
+  }
 
   // 영화 상세 수정 기록 조회
   @Get('/:movieId/record/:postId')
   getOnePostRecord(
     @Param('movieId', ParseIntPipe) movieId: number,
     @Param('postId', ParseIntPipe) postId: number,
-  ) {
+  ): Promise<ProcessedPost> {
     return this.postService.getOnePostRecord(movieId, postId);
   }
 
   // 영화 상세 수정 기록 전체 조회
   @Get('/:movieId/record')
-  getPostRecords(@Param('movieId', ParseIntPipe) movieId: number) {
+  getPostRecords(
+    @Param('movieId', ParseIntPipe) movieId: number,
+  ): Promise<ProcessedPost[]> {
     return this.postService.getPostRecords(movieId);
   }
   // 영화 기록 이전 버전 다시 생성

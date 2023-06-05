@@ -49,7 +49,7 @@ export class User extends BaseEntity {
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
-  @OneToMany(() => Post, (post) => post.userId, { eager: false })
+  @OneToMany(() => Post, (post) => post.user, { eager: false })
   posts: Post[];
 
   @OneToMany(() => Notification, (notification) => notification.reporterId, {

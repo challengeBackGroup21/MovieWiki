@@ -18,31 +18,31 @@ export class Movie extends BaseEntity {
   @IsNumber()
   movieId: number;
 
-  @Column()
+  @Column({ nullable: true })
   @IsString()
   movieCd: string;
 
-  @Column()
+  @Column({ nullable: true })
   @IsString()
   movieNm: string;
 
-  @Column()
+  @Column({ nullable: true })
   @IsString()
   showTm: string;
 
-  @Column()
+  @Column({ nullable: true })
   @IsString()
   openDt: string;
 
-  @Column()
+  @Column({ nullable: true })
   @IsString()
   typeNm: string;
 
-  @Column()
+  @Column({ nullable: true })
   @IsString()
   nationAlt: string;
 
-  @Column()
+  @Column({ nullable: true })
   @IsString()
   genreAlt: string;
 
@@ -77,7 +77,7 @@ export class Movie extends BaseEntity {
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 
-  @OneToMany(() => Post, (post) => post.movieId, { eager: true })
+  @OneToMany(() => Post, (post) => post.movie, { eager: false })
   posts: Post[];
 
   @OneToMany(() => Notification, (notification) => notification.movieId, {
