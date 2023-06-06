@@ -91,10 +91,12 @@ export class PostRepository extends Repository<Post> {
   }
 
   async getOnePostRecord(movieId: number, postId: number): Promise<Post> {
-    const post = await this.findOne({
-      where: { postId, movie: { movieId } },
-      relations: ['movie', 'user'],
-    });
+    const post = await this.createQueryBuilder('post')
+      .leftJoinAndSelect('post.movie', 'movie')
+      .where('movie.movieId = :movieId', { movieId })
+      .andWhere('post.postId = :postId', { postId })
+      .getOne();
+
     console.log(post);
     return post;
   }

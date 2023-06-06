@@ -18,31 +18,31 @@ export class Movie extends BaseEntity {
   @IsNumber()
   movieId: number;
 
-  @Column({ nullable: true })
+  @Column()
   @IsString()
   movieCd: string;
 
-  @Column({ nullable: true })
+  @Column()
   @IsString()
   movieNm: string;
 
-  @Column({ nullable: true })
+  @Column()
   @IsString()
   showTm: string;
 
-  @Column({ nullable: true })
+  @Column()
   @IsString()
   openDt: string;
 
-  @Column({ nullable: true })
+  @Column()
   @IsString()
   typeNm: string;
 
-  @Column({ nullable: true })
+  @Column()
   @IsString()
   nationAlt: string;
 
-  @Column({ nullable: true })
+  @Column()
   @IsString()
   genreAlt: string;
 
