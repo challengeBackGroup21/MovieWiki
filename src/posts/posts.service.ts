@@ -6,6 +6,9 @@ import { RevertPostRecordDto } from './dto/revert-post-record.dto';
 import { PostRepository } from './post.repository';
 import { UpdatePostRecordDto } from './dto/update-post-record.dto';
 import { ProcessedPost } from './types/process-post.type';
+import { DataSource } from 'typeorm';
+import { Movie } from 'src/movies/movie.entity';
+import { User } from 'src/auth/user.entity';
 
 @Injectable()
 export class PostService {
@@ -14,39 +17,85 @@ export class PostService {
     private postRepository: PostRepository,
     @InjectRepository(MovieRepository)
     private readonly movieRepository: MovieRepository,
+    private dataSource: DataSource,
   ) {}
   async createPostRecord(
     createPostRecordDto: CreatePostRecordDto,
     movieId: number,
-    userId: any,
-    // req.user.userId, 유저 정보
+    user: User,
   ) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    console.log('Transaction started');
+    await queryRunner.startTransaction('READ COMMITTED');
+
+    const movie = await queryRunner.manager
+      .getRepository(Movie)
+      .findOne({ where: { movieId } });
+    if (!movie) {
+      throw new HttpException('영화가 존재하지 않습니다', 400);
+    }
     try {
       await this.postRepository.createPostRecord(
         createPostRecordDto,
-        movieId,
-        userId,
-      ); // req.user.userId 추가 예정
+        movie,
+        user,
+        queryRunner.manager,
+      );
+
+      await queryRunner.commitTransaction();
+      console.log('Transaction committed');
       return { message: '영화 기록 생성에 성공했습니다.' };
     } catch (error) {
-      throw new HttpException('기록 생성에 실패했습니다', 400);
+      await queryRunner.rollbackTransaction();
+      console.log('Transaction rolled back');
+      if (error instanceof HttpException) {
+        throw error;
+      } else {
+        throw new HttpException('기록 생성에 실패했습니다', 400);
+      }
+    } finally {
+      await queryRunner.release();
     }
   }
 
   async updatePostRecord(
     updatePostRecordDto: UpdatePostRecordDto,
     movieId: number,
-    userId: any,
+    user: User,
   ) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    console.log('Transaction started');
+    await queryRunner.startTransaction('READ COMMITTED');
+
+    const movie = await queryRunner.manager
+      .getRepository(Movie)
+      .findOne({ where: { movieId } });
+    if (!movie) {
+      throw new HttpException('영화가 존재하지 않습니다', 400);
+    }
     try {
       await this.postRepository.updatePostRecord(
         updatePostRecordDto,
         movieId,
-        userId,
+        user,
+        queryRunner.manager,
       );
+
+      await queryRunner.commitTransaction();
+      console.log('Transaction committed');
       return { message: '영화 수정 기록 생성에 성공했습니다.' };
     } catch (error) {
-      throw new HttpException('기록 생성에 실패했습니다', 400);
+      await queryRunner.rollbackTransaction();
+      console.log('Transaction rolled back');
+      if (error instanceof HttpException) {
+        throw error;
+      } else {
+        throw new HttpException('기록 생성에 실패했습니다', 400);
+      }
+    } finally {
+      await queryRunner.release();
     }
   }
 
@@ -135,15 +184,20 @@ export class PostService {
     revertPostRecordDto: RevertPostRecordDto,
     movieId: number,
     postId: number,
-    userId: any,
+    user: User,
   ) {
-    const result = await this.getOnePostRecord(movieId, postId);
+    const previousVersionPost = await this.postRepository.getOnePostRecord(
+      movieId,
+      postId,
+    );
+    if (!previousVersionPost) {
+      throw new HttpException('이전 버전이 존재하지 않습니다', 400);
+    }
     try {
       await this.postRepository.revertPostRecord(
         revertPostRecordDto,
-        result,
-        movieId,
-        userId,
+        previousVersionPost,
+        user,
       );
       return { message: '기록 생성에 성공하였습니다' };
     } catch (error) {

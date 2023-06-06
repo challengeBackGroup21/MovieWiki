@@ -15,6 +15,8 @@ import { RevertPostRecordDto } from './dto/revert-post-record.dto';
 import { UpdatePostRecordDto } from './dto/update-post-record.dto';
 import { ProcessedPost } from './types/process-post.type';
 
+import { User } from 'src/auth/user.entity';
+
 @Controller('post')
 export class PostController {
   constructor(private postService: PostService) {}
@@ -26,12 +28,12 @@ export class PostController {
   createPostRecord(
     @Body() createMovieRecordDto: CreatePostRecordDto,
     @Param('movieId') movieId: number,
-    @GetCurrentUser() user: any,
+    @GetCurrentUser() user: User,
   ) {
     return this.postService.createPostRecord(
       createMovieRecordDto,
       movieId,
-      user.userId,
+      user,
     );
   }
   // 영화 상세 수정 기록 생성
@@ -40,12 +42,12 @@ export class PostController {
   updatePostRecord(
     @Body() updatePostRecordDto: UpdatePostRecordDto,
     @Param('movieId') movieId: number,
-    @GetCurrentUser() user: any,
+    @GetCurrentUser() user: User,
   ) {
     return this.postService.updatePostRecord(
       updatePostRecordDto,
       movieId,
-      user.userId,
+      user,
     );
   }
 
@@ -80,13 +82,13 @@ export class PostController {
     @Body() revertPostRecordDto: RevertPostRecordDto,
     @Param('movieId', ParseIntPipe) movieId: number,
     @Param('postId', ParseIntPipe) postId: number,
-    @GetCurrentUser() user: any,
+    @GetCurrentUser() user: User,
   ) {
     return this.postService.revertPostRecord(
       revertPostRecordDto,
       movieId,
       postId,
-      user.userId,
+      user,
     );
   }
 }
