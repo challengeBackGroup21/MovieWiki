@@ -38,25 +38,29 @@ export class NotificationRepository {
     await this.notificationRepository.delete({ postId, reporterId });
   }
 
-  async getReporterNotification(reporterId: number) {
-    const notificationPost = await this.notificationRepository.findOne({
-      where: { reporterId },
-    });
+    async getReporterNotification(reporterId: number) {
+        const notificationPost = await this.notificationRepository.find({
+            where: { reporterId },
+            order: { notiId: 'ASC'}
+        });
 
     return notificationPost;
   }
 
-  async getReportedNotification(reportedId: number) {
-    const notificationPost = await this.notificationRepository.findOne({
-      where: { reportedId },
-    });
+    async getReportedNotification(reportedId: number) {
+        const notificationPost = await this.notificationRepository.find({
+            where: { reportedId },
+            order: { notiId: 'ASC'}
+        });
 
     return notificationPost;
   }
 
-  async getAllNotification() {
-    return await this.notificationRepository.find();
-  }
+    async getAllNotification() {
+        return await this.notificationRepository.find({
+            order: { notiId: 'ASC'}
+        });
+    };
 
   async updateStatusNotification(notiId: number, status: NotificationStatus) {
     return await this.notificationRepository.update(
