@@ -8,10 +8,6 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-<<<<<<< HEAD
-=======
-  RelationId,
->>>>>>> 59ddd03bfdabc258670638d10c47a0a5845f27af
 } from 'typeorm';
 import { User } from '../auth/user.entity';
 import { Movie } from '../movies/movie.entity';
@@ -27,11 +23,7 @@ export class Notification extends BaseEntity {
   @Column({ name: 'postId' })
   postId: number;
 
-<<<<<<< HEAD
-  @Column({ name: 'movieId' })
-=======
   @Column({ name: 'movieId', nullable: true })
->>>>>>> 59ddd03bfdabc258670638d10c47a0a5845f27af
   movieId: number;
 
   @Column({ name: 'reporterId' })
