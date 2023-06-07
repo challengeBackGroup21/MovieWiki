@@ -77,7 +77,7 @@ export class Movie extends BaseEntity {
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 
-  @OneToMany(() => Post, (post) => post.movieId, { eager: true })
+  @OneToMany(() => Post, (post) => post.movie, { eager: true })
   posts: Post[];
 
   @OneToMany(() => Notification, (notification) => notification.movieId, {
