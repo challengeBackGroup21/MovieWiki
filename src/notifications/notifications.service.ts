@@ -41,7 +41,7 @@ export class NotificationsService {
           notificationContent,
           reporterId,
           reportedId,
-          movieId
+          movieId,
         );
         return '해당 게시물의 신고가 완료되었습니다.';
       } else {
@@ -128,7 +128,8 @@ export class NotificationsService {
 
     try {
       if (auth === 'admin' && status === 'ACCEPT') {
-        const userId = await this.notificationRepository.findOneNotificationBynotiId(notiId);
+        const userId =
+          await this.notificationRepository.findOneNotificationBynotiId(notiId);
 
         await this.notificationRepository.updateStatusNotification(
           notiId,
@@ -137,7 +138,7 @@ export class NotificationsService {
         await this.userRepository.incrementUserBanCount(userId);
         await queryRunner.commitTransaction();
 
-        return '관리자 권한으로 신고 승인이 완료되었습니다.'
+        return '관리자 권한으로 신고 승인이 완료되었습니다.';
       } else {
         await queryRunner.rollbackTransaction();
         return '신고 승인 권한이 없습니다.';
@@ -148,7 +149,7 @@ export class NotificationsService {
       throw new HttpException('신고 승인 처리에 실패했습니다.', 400);
     } finally {
       await queryRunner.release();
-    };
+    }
   }
 
   async rejectNotification(
@@ -163,7 +164,7 @@ export class NotificationsService {
           status,
         );
 
-        return '관리자 권한으로 신고 반려가 완료되었습니다.'
+        return '관리자 권한으로 신고 반려가 완료되었습니다.';
       } else {
         return '신고 반려 권한이 없습니다.';
       }
