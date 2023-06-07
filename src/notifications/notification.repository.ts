@@ -43,23 +43,27 @@ export class NotificationRepository {
     };
 
     async getReporterNotification(reporterId: number) {
-        const notificationPost = await this.notificationRepository.findOne({
-            where: { reporterId }
+        const notificationPost = await this.notificationRepository.find({
+            where: { reporterId },
+            order: { notiId: 'ASC'}
         });
 
         return notificationPost
     };
 
     async getReportedNotification(reportedId: number) {
-        const notificationPost = await this.notificationRepository.findOne({
-            where: { reportedId }
+        const notificationPost = await this.notificationRepository.find({
+            where: { reportedId },
+            order: { notiId: 'ASC'}
         });
 
         return notificationPost
     };
 
     async getAllNotification() {
-        return await this.notificationRepository.find();
+        return await this.notificationRepository.find({
+            order: { notiId: 'ASC'}
+        });
     };
 
     async updateStatusNotification(
