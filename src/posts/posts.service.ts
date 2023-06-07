@@ -4,10 +4,8 @@ import { MovieRepository } from 'src/movies/movie.repository';
 import { CreatePostRecordDto } from '../posts/dto/create-post-record.dto';
 import { RevertPostRecordDto } from './dto/revert-post-record.dto';
 import { PostRepository } from './post.repository';
-import { UpdatePostRecordDto } from './dto/update-post-record.dto';
 import { ProcessedPost } from './types/process-post.type';
 import { DataSource } from 'typeorm';
-import { Movie } from 'src/movies/movie.entity';
 import { User } from 'src/auth/user.entity';
 
 @Injectable()
@@ -29,13 +27,20 @@ export class PostService {
     console.log('Transaction started');
     await queryRunner.startTransaction('READ COMMITTED');
 
-    const movie = await queryRunner.manager
-      .getRepository(Movie)
-      .findOne({ where: { movieId } });
-    if (!movie) {
-      throw new HttpException('영화가 존재하지 않습니다', 400);
-    }
     try {
+      const latestPost = await this.getLatestPostRecord(movieId);
+
+      if (
+        !(
+          createPostRecordDto.version === '' ||
+          latestPost.version.toISOString() === createPostRecordDto.version
+        )
+      ) {
+        throw new HttpException('최신 기록이 변경되었습니다', 409);
+      }
+
+      const movie = await this.movieRepository.findOneMovie(movieId);
+
       await this.postRepository.createPostRecord(
         createPostRecordDto,
         movie,
@@ -59,53 +64,13 @@ export class PostService {
     }
   }
 
-  async updatePostRecord(
-    updatePostRecordDto: UpdatePostRecordDto,
-    movieId: number,
-    user: User,
-  ) {
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    console.log('Transaction started');
-    await queryRunner.startTransaction('READ COMMITTED');
-
-    const movie = await queryRunner.manager
-      .getRepository(Movie)
-      .findOne({ where: { movieId } });
-    if (!movie) {
-      throw new HttpException('영화가 존재하지 않습니다', 400);
-    }
-    try {
-      await this.postRepository.updatePostRecord(
-        updatePostRecordDto,
-        movieId,
-        user,
-        queryRunner.manager,
-      );
-
-      await queryRunner.commitTransaction();
-      console.log('Transaction committed');
-      return { message: '영화 수정 기록 생성에 성공했습니다.' };
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      console.log('Transaction rolled back');
-      if (error instanceof HttpException) {
-        throw error;
-      } else {
-        throw new HttpException('기록 생성에 실패했습니다', 400);
-      }
-    } finally {
-      await queryRunner.release();
-    }
-  }
-
   async getLatestPostRecord(movieId: number): Promise<ProcessedPost> {
     const isExistMovie = await this.movieRepository.findOneMovie(movieId);
     if (!isExistMovie) {
       throw new HttpException('영화가 존재하지 않습니다', 403);
     }
     const latestPost = await this.postRepository.getLatestPostRecord(movieId);
-    console.log(latestPost);
+    // console.log(latestPost);
     if (!latestPost) {
       throw new HttpException(
         '해당 영화에 대한 게시물이 존재하지 않습니다',
