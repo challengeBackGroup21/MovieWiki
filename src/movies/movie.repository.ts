@@ -41,20 +41,18 @@ export class MovieRepository extends Repository<Movie> {
   }
   // 동일한 제목의 영화 존재할 수 도 있어서 find로 검색
   async movieNmSearch(query: string): Promise<Movie[]> {
-    const movies = await this.find({
-      where: { movieNm: query },
-    });
+    const movies = await this.createQueryBuilder('movie')
+      .where('movie.movieNm = :movieNm', { movieNm: query })
+      .getMany();
 
     return movies;
   }
 
   async moviesSearch(): Promise<Movie[]> {
-    const movies = await this.find({
-      order: {
-        movieId: 'ASC',
-      },
-      take: 20,
-    });
+    const movies = await this.createQueryBuilder('movie')
+      .orderBy('movie.movieId', 'ASC')
+      .take(20)
+      .getMany();
 
     return movies;
   }
@@ -76,11 +74,18 @@ export class MovieRepository extends Repository<Movie> {
   }
 
   async findOneMovie(movieId: number) {
-    return await this.findOne({ where: { movieId } });
+    // return await this.findOne({ where: { movieId } });
+    return await this.createQueryBuilder('movie')
+      .where('movie.movieId = :movieId', { movieId })
+      .getOne();
   }
 
   async getLikedMovieList(likedListLength: number) {
-    return await this.find({ order: { likes: 'DESC' }, take: likedListLength });
+    const likedMovies = await this.createQueryBuilder('movie')
+      .orderBy('movie.likes', 'DESC')
+      .take(likedListLength)
+      .getMany();
+    return likedMovies;
   }
 
   async incrementMovieLike(movieId: number) {

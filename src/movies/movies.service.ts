@@ -145,6 +145,7 @@ export class MoviesService {
       const Movies = await this.movieRepositry.getLikedMovieList(
         likedListLength,
       );
+      console.log(Movies);
       return Movies;
     } catch (error) {
       throw new HttpException('인기 리스트 조회에 실패했습니다.', 400);
