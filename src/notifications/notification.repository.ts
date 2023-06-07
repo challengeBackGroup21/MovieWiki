@@ -22,14 +22,16 @@ export class NotificationRepository {
         postId: number,
         notificationContent: string,
         reporterId: number,
-        reportedId: number
+        reportedId: number,
+        movieId: number
     ) {
-        const notification = this.notificationRepository.create({
-            postId,
-            notificationContent,
-            reporterId,
-            reportedId
-        });
+        const notification = new Notification()
+        notification.postId = postId,
+        notification.notificationContent = notificationContent,
+        notification.reporterId = reporterId,
+        notification.reportedId = reportedId,
+        notification.movieId = movieId
+
         return this.notificationRepository.save(notification);
     };
 
