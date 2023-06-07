@@ -75,7 +75,7 @@ export class MovieRepository extends Repository<Movie> {
     return updateMovie;
   }
 
-  async findOneMoive(movieId: number) {
+  async findOneMovie(movieId: number) {
     return await this.findOne({ where: { movieId } });
   }
 

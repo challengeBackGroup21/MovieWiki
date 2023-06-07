@@ -8,6 +8,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  RelationId,
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../auth/user.entity';
@@ -21,6 +22,12 @@ export class Post extends BaseEntity {
   @IsNumber()
   postId: number;
 
+  @RelationId((post: Post) => post.user)
+  userId: number;
+
+  @RelationId((post: Post) => post.movie)
+  movieId: number;
+
   @Column()
   @IsString()
   content: string;
@@ -29,7 +36,7 @@ export class Post extends BaseEntity {
   @IsString()
   comment: string;
 
-  @Column({ nullable: true, default: null })
+  @Column()
   @IsDate()
   version: Date;
 
@@ -39,19 +46,19 @@ export class Post extends BaseEntity {
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 
-  @OneToMany((type) => Notification, (Notification) => Notification.postId, {
+  @OneToMany(() => Notification, (Notification) => Notification.postId, {
     eager: true,
   })
   notifications: Notification[];
 
-  @OneToMany((type) => Like, (like) => like.postId, { eager: true })
+  @OneToMany(() => Like, (like) => like.postId, { eager: true })
   likes: Like[];
 
   @ManyToOne(() => User, (user) => user.posts, { eager: false })
   @JoinColumn({ name: 'userId', referencedColumnName: 'userId' })
-  userId: User;
+  user: User;
 
   @ManyToOne(() => Movie, (movie) => movie.posts, { eager: false })
   @JoinColumn({ name: 'movieId', referencedColumnName: 'movieId' })
-  movieId: number;
+  movie: Movie;
 }
