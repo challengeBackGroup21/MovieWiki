@@ -92,7 +92,6 @@ export class NotificationsController {
     status: NotificationStatus,
   ): Promise<any> {
     const auth = user.auth;
-
     return await this.notificationsService.acceptNotification(
       auth,
       notiId,

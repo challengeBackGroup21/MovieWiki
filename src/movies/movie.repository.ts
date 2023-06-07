@@ -80,7 +80,10 @@ export class MovieRepository extends Repository<Movie> {
   }
 
   async getLikedMovieList(likedListLength: number) {
-    return await this.find({ order: { likes: 'DESC' }, take: likedListLength });
+    return await this.find({
+      order: { likes: 'DESC' },
+      take: likedListLength,
+    });
   }
 
   async incrementMovieLike(movieId: number) {

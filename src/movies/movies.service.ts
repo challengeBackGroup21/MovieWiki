@@ -90,7 +90,6 @@ export class MoviesService {
     }
   }
 
-
   // 영화 상세 정보 조회
   async getMovieById(movieId: number): Promise<any> {
     const isExistMovie = await this.movieRepositry.getMovieById(movieId);
