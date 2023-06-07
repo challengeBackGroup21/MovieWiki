@@ -8,7 +8,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  RelationId
+  RelationId,
 } from 'typeorm';
 import { User } from '../auth/user.entity';
 import { Movie } from '../movies/movie.entity';
@@ -21,16 +21,16 @@ export class Notification extends BaseEntity {
   @IsNumber()
   notiId: number;
 
-  @Column({name: 'postId'})
+  @Column({ name: 'postId' })
   postId: number;
 
-  @Column({name: 'movieId'})
+  @Column({ name: 'movieId', nullable: true })
   movieId: number;
 
-  @Column({name: 'reporterId'})
+  @Column({ name: 'reporterId' })
   reporterId: number;
 
-  @Column({name: 'reportedId'})
+  @Column({ name: 'reportedId' })
   reportedId: number;
 
   @Column()
