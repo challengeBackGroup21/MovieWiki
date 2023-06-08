@@ -7,6 +7,7 @@ import { CreatePostRecordDto } from '../posts/dto/create-post-record.dto';
 import { RevertPostRecordDto } from './dto/revert-post-record.dto';
 import { PostRepository } from './post.repository';
 import { ProcessedPost } from './types/process-post.type';
+import { SnapshotRepository } from 'src/snapshot/snapshot.repository';
 
 @Injectable()
 export class PostService {
@@ -15,8 +16,11 @@ export class PostService {
     private postRepository: PostRepository,
     @InjectRepository(MovieRepository)
     private readonly movieRepository: MovieRepository,
+    @InjectRepository(SnapshotRepository)
+    private readonly snapshotRepository: SnapshotRepository,
     private dataSource: DataSource,
   ) {}
+
   async createPostRecord(
     createPostRecordDto: CreatePostRecordDto,
     movieId: number,
@@ -38,7 +42,7 @@ export class PostService {
       if (
         !(
           createPostRecordDto.version === '' ||
-          latestPost.version.toISOString() === createPostRecordDto.version
+          latestPost.version.toString() === createPostRecordDto.version
         )
       ) {
         throw new HttpException('최신 기록이 변경되었습니다', 409);

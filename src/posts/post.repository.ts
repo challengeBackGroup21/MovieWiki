@@ -23,7 +23,8 @@ export class PostRepository extends Repository<Post> {
     post.content = createPostRecordDto.content;
     post.movie = movie;
     post.user = user;
-    post.version = new Date();
+    const latestPost = await this.getLatestPostRecord(movie.movieId);
+    post.version = latestPost.version + 1;
     return await manager.save(post);
   }
 
@@ -70,7 +71,10 @@ export class PostRepository extends Repository<Post> {
     post.content = previousVersionPost.content;
     post.movie = previousVersionPost.movie;
     post.user = user;
-    post.version = new Date();
+    const latestPost = await this.getLatestPostRecord(
+      previousVersionPost.movieId,
+    );
+    post.version = latestPost.version + 1;
     return await this.save(post);
   }
 

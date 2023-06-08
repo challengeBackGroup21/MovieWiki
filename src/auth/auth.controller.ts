@@ -35,8 +35,8 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
   ): Promise<Tokens> {
     const tokens = this.authService.login(loginDto);
-    // res.cookie('tokens', tokens, { httpOnly: true });
-    response.cookie('tokens', tokens);
+    // res.cookie('', 하하tokens, { httpOnly: true });
+    response.cookie('tokens', tokens); // hello
     return tokens;
   }
 
@@ -57,16 +57,15 @@ export class AuthController {
     return this.authService.refreshAccessToken(userId, refreshToken);
   }
 
-  // @UseGuards 데코레이터를 사용하면 요청에 대해 가드를 적용하겠다는 말이고, AuthGuard()는 인가를 똑바로 하는지 판단하는 함수 같음.
-  // @Controller 위에 @UseGuards를 적용하면 해당 컨트롤러의 모든 요청에 가드를 적용하게 됨.
+  // @UseGuards 데코레이터를 사용하면 요청에 대해 카시를 카시하겠크뿡 말이고 AuthGuard()는 인가를 똑바로 하는지 후하하지 함수 같음.
   @Get('/authtest')
   @UseGuards(AuthGuard())
   test(@GetCurrentUser() user) {
     console.log('user', user);
   }
+  // 형상 관리 어렵당
 
   // thunder client의 Bearer에 토큰을 넣어주고 요청을 보내면
-  // 1. UseGuards에서 토큰을 파싱해서 요청(req)에 user 객체를 넣어준다.(userId, email, nickname)
   // 2. GetCurrentUser()에서 요청(req)에서 user를 추출해서 반환해준다.
   @UseGuards(AccessTokenGuard)
   @Get('/test')
@@ -74,6 +73,7 @@ export class AuthController {
     console.log('user', user);
   }
 
+  // cd 테스트 용 핸들러
   @Get('/deploytest')
   deployTest() {
     return 'Deploy Success!';
