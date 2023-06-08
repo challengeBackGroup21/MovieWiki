@@ -8,6 +8,7 @@ import { RevertPostRecordDto } from './dto/revert-post-record.dto';
 import { PostRepository } from './post.repository';
 import { ProcessedPost } from './types/process-post.type';
 import { SnapshotRepository } from 'src/snapshot/snapshot.repository';
+import { Snapshot } from 'src/snapshot/snapshot.entity';
 
 @Injectable()
 export class PostService {
@@ -57,6 +58,28 @@ export class PostService {
 
       await queryRunner.commitTransaction();
       console.log('Transaction committed');
+
+      // 여기에서 snapshot을 저장해주는 기능이 있어야 한다.
+      // snapshot에 해당 movieId의 현재 버전을 -1로 저장하는 것. postId가 있어야 하냐?
+
+      // 이거 version이 1이면 생성하고, 1이 아니면 update하는 쪽으로 변경해야 할 것 같다.
+      const latestSnapshot = new Snapshot();
+      latestSnapshot.content = createPostRecordDto.content;
+      latestSnapshot.movieId = movieId;
+      latestSnapshot.postId = latestPost.postId;
+      latestSnapshot.version = -1;
+      await this.snapshotRepository.save(latestSnapshot);
+
+      // 해당 버전이 10의 배수인 수에 도달했을 때
+      if ((latestPost.version - 1) % 10 === 0) {
+        const milestoneSnapshot = new Snapshot();
+        milestoneSnapshot.content = createPostRecordDto.content;
+        milestoneSnapshot.movieId = movieId;
+        milestoneSnapshot.postId = latestPost.postId;
+        milestoneSnapshot.version = latestPost.version;
+        await this.snapshotRepository.save(milestoneSnapshot);
+      }
+
       return { message: '영화 기록 생성에 성공했습니다.' };
     } catch (error) {
       await queryRunner.rollbackTransaction();
