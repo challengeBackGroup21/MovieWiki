@@ -1,7 +1,7 @@
-import { PassportStrategy } from '@nestjs/passport';
-import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Injectable } from '@nestjs/common';
+import { PassportStrategy } from '@nestjs/passport';
 import * as config from 'config';
+import { ExtractJwt, Strategy } from 'passport-jwt';
 
 //  PassportStrategy 클래스를 상속받는 클래스
 

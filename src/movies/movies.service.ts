@@ -93,7 +93,6 @@ export class MoviesService {
   // 영화 상세 정보 조회
   async getMovieById(movieId: number): Promise<any> {
     const isExistMovie = await this.movieRepositry.getMovieById(movieId);
-    console.log(isExistMovie);
     if (!isExistMovie) {
       throw new HttpException('존재하지 않는 영화입니다', 400);
     }
@@ -145,8 +144,21 @@ export class MoviesService {
       const Movies = await this.movieRepositry.getLikedMovieList(
         likedListLength,
       );
-      console.log(Movies);
-      return Movies;
+      const MovieList = Movies.map((movie) => {
+        return {
+          movieId: movie.movieId,
+          movieNm: movie.movieNm,
+          directors: movie.directors.map((dir) => dir.peopleNm),
+          genreAlt: movie.genreAlt,
+          showTm: movie.showTm,
+          actors: movie.actors.map((act) => act.peopleNm),
+          watchGradeNm: movie.watchGradeNm,
+          views: movie.views,
+          likes: movie.likes,
+        };
+      });
+
+      return MovieList;
     } catch (error) {
       throw new HttpException('인기 리스트 조회에 실패했습니다.', 400);
     }

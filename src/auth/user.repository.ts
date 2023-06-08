@@ -1,12 +1,12 @@
-import { DataSource, Repository } from 'typeorm';
-import { User } from './user.entity';
 import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { SignUpDto } from './dto/auth-credential.dto';
 import * as bcrypt from 'bcryptjs';
+import { DataSource, Repository } from 'typeorm';
+import { SignUpDto } from './dto/auth-credential.dto';
+import { User } from './user.entity';
 
 @Injectable()
 export class UserRepository extends Repository<User> {
@@ -50,6 +50,6 @@ export class UserRepository extends Repository<User> {
   }
 
   async incrementUserBanCount(userId: number) {
-    await this.increment({ userId }, "banCount", 1);
+    await this.increment({ userId }, 'banCount', 1);
   }
 }
