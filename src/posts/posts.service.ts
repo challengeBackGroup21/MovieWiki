@@ -1,15 +1,12 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/auth/user.entity';
-import { Movie } from 'src/movies/movie.entity';
 import { MovieRepository } from 'src/movies/movie.repository';
 import { DataSource } from 'typeorm';
 import { CreatePostRecordDto } from '../posts/dto/create-post-record.dto';
 import { RevertPostRecordDto } from './dto/revert-post-record.dto';
 import { PostRepository } from './post.repository';
 import { ProcessedPost } from './types/process-post.type';
-import { DataSource } from 'typeorm';
-import { User } from 'src/auth/user.entity';
 
 @Injectable()
 export class PostService {
@@ -31,7 +28,12 @@ export class PostService {
     await queryRunner.startTransaction('READ COMMITTED');
 
     try {
-      const latestPost = await this.getLatestPostRecord(movieId);
+      const isExistMovie = await this.movieRepository.findOneMovie(movieId);
+      if (!isExistMovie) {
+        throw new HttpException('영화가 존재하지 않습니다', 400);
+      }
+
+      const latestPost = await this.postRepository.getLatestPostRecord(movieId);
 
       if (
         !(
@@ -42,11 +44,9 @@ export class PostService {
         throw new HttpException('최신 기록이 변경되었습니다', 409);
       }
 
-      const movie = await this.movieRepository.findOneMovie(movieId);
-
       await this.postRepository.createPostRecord(
         createPostRecordDto,
-        movie,
+        isExistMovie,
         user,
         queryRunner.manager,
       );
