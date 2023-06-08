@@ -11,7 +11,6 @@ import { GetCurrentUser } from 'src/auth/common/decorators';
 import { AccessTokenGuard } from 'src/auth/guards';
 import { CreatePostRecordDto } from '../posts/dto/create-post-record.dto';
 import { RevertPostRecordDto } from './dto/revert-post-record.dto';
-import { UpdatePostRecordDto } from './dto/update-post-record.dto';
 import { PostService } from './posts.service';
 import { ProcessedPost } from './types/process-post.type';
 
@@ -22,7 +21,7 @@ export class PostController {
   constructor(private postService: PostService) {}
 
   // @UseGuards() 로그인 가드 사용
-  // 영화 상세 기록 생성
+  // 영화 상세 기록 생성 및 수정
   @Post('/:movieId/record')
   @UseGuards(AccessTokenGuard)
   createPostRecord(
@@ -32,20 +31,6 @@ export class PostController {
   ) {
     return this.postService.createPostRecord(
       createMovieRecordDto,
-      movieId,
-      user,
-    );
-  }
-  // 영화 상세 수정 기록 생성
-  @Post('/:movieId/record/versions')
-  @UseGuards(AccessTokenGuard)
-  updatePostRecord(
-    @Body() updatePostRecordDto: UpdatePostRecordDto,
-    @Param('movieId') movieId: number,
-    @GetCurrentUser() user: User,
-  ) {
-    return this.postService.updatePostRecord(
-      updatePostRecordDto,
       movieId,
       user,
     );
