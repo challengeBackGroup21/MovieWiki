@@ -8,7 +8,6 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  RelationId,
 } from 'typeorm';
 import { User } from '../auth/user.entity';
 import { Movie } from '../movies/movie.entity';

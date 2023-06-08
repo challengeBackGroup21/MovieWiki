@@ -1,6 +1,9 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/auth/user.entity';
+import { Movie } from 'src/movies/movie.entity';
 import { MovieRepository } from 'src/movies/movie.repository';
+import { DataSource } from 'typeorm';
 import { CreatePostRecordDto } from '../posts/dto/create-post-record.dto';
 import { RevertPostRecordDto } from './dto/revert-post-record.dto';
 import { PostRepository } from './post.repository';
