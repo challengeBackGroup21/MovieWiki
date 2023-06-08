@@ -4,13 +4,13 @@ import {
   Get,
   Param,
   ParseIntPipe,
-  UseGuards,
   Patch,
   Query,
+  UseGuards,
 } from '@nestjs/common';
-import { UpdateMovieDto } from './dto/update-movie-dto';
-import { AccessTokenGuard } from 'src/auth/guards';
 import { GetCurrentUser } from 'src/auth/common/decorators';
+import { AccessTokenGuard } from 'src/auth/guards';
+import { UpdateMovieDto } from './dto/update-movie-dto';
 import { Movie } from './movie.entity';
 import { MoviesService } from './movies.service';
 
