@@ -8,6 +8,7 @@ import { LoggerMiddleware } from './logger/logger.middleware';
 import { MoviesModule } from './movies/movies.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { PostsModule } from './posts/posts.module';
+import { SnapshotModule } from './snapshot/snapshot.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { PostsModule } from './posts/posts.module';
     MoviesModule,
     NotificationsModule,
     PostsModule,
+    SnapshotModule,
   ],
   controllers: [],
   providers: [],

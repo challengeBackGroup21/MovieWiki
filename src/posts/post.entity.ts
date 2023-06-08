@@ -15,6 +15,7 @@ import { User } from '../auth/user.entity';
 import { Like } from '../likes/like.entity';
 import { Movie } from '../movies/movie.entity';
 import { Notification } from '../notifications/notification.entity';
+import { Snapshot } from 'src/snapshot/snapshot.entity';
 
 @Entity()
 export class Post extends BaseEntity {
@@ -36,9 +37,9 @@ export class Post extends BaseEntity {
   @IsString()
   comment: string;
 
-  @Column()
-  @IsDate()
-  version: Date;
+  @Column({ nullable: true, default: null })
+  @IsNumber()
+  version: number;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
@@ -53,6 +54,9 @@ export class Post extends BaseEntity {
 
   @OneToMany(() => Like, (like) => like.postId, { eager: true })
   likes: Like[];
+
+  @OneToMany(() => Snapshot, (snapshot) => snapshot.postId, { eager: false })
+  snapshot: Snapshot;
 
   @ManyToOne(() => User, (user) => user.posts, { eager: false })
   @JoinColumn({ name: 'userId', referencedColumnName: 'userId' })
