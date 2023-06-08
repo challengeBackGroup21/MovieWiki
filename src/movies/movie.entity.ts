@@ -11,6 +11,7 @@ import {
 import { Like } from '../likes/like.entity';
 import { Notification } from '../notifications/notification.entity';
 import { Post } from '../posts/post.entity';
+import { Snapshot } from 'src/snapshot/snapshot.entity';
 
 @Entity()
 export class Movie extends BaseEntity {
@@ -79,6 +80,9 @@ export class Movie extends BaseEntity {
 
   @OneToMany(() => Post, (post) => post.movie, { eager: true })
   posts: Post[];
+
+  @OneToMany(() => Snapshot, (snapshot) => snapshot.movie, { eager: false })
+  snapshots: Snapshot[];
 
   @OneToMany(() => Notification, (notification) => notification.movieId, {
     eager: true,
