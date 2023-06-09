@@ -44,18 +44,18 @@ export class PostService {
       }
 
       const latestPost = await this.postRepository.getLatestPostRecord(movieId);
-      // if (!latestPost) {
-      //   throw new HttpException('최신 버전 없다', 400);
-      // }
+      if (!latestPost) {
+        throw new HttpException('최신 버전 없다', 400);
+      }
 
-      // if (
-      //   !(
-      //     createPostRecordDto.version === '' ||
-      //     latestPost.version.toString() === createPostRecordDto.version
-      //   )
-      // ) {
-      //   throw new HttpException('최신 기록이 변경되었습니다', 409);
-      // }
+      if (
+        !(
+          createPostRecordDto.version === '' ||
+          latestPost.version.toString() === createPostRecordDto.version
+        )
+      ) {
+        throw new HttpException('최신 기록이 변경되었습니다', 409);
+      }
 
       const diffUtil = new DiffUtil();
       let content = '';
@@ -91,28 +91,28 @@ export class PostService {
       const newPost = await this.postRepository.getLatestPostRecord(movieId);
       console.log(newPost);
 
-      // if (newPost.version === 1) {
-      //   // 최초 버전인 경우 생성
-      //   // createSnapshot()
-      //   const newSnapshot = new Snapshot();
-      //   newSnapshot.content = createPostRecordDto.content;
-      //   newSnapshot.movieId = movieId;
-      //   newSnapshot.postId = newPost.postId;
-      //   newSnapshot.version = newPost.version;
-      //   newSnapshot.isLatest = true;
-      //   await queryRunner.manager.getRepository(Snapshot).save(newSnapshot);
-      // } else {
-      //   // 갱신
-      //   const snapshotToUpdate = await this.snapshotRepository.findOne({
-      //     where: { isLatest: true, movieId },
-      //   });
-      //   snapshotToUpdate.content = createPostRecordDto.content;
-      //   snapshotToUpdate.version++;
-      //   snapshotToUpdate.postId = newPost.postId;
-      //   await queryRunner.manager
-      //     .getRepository(Snapshot)
-      //     .save(snapshotToUpdate);
-      // }
+      if (newPost.version === 1) {
+        // 최초 버전인 경우 생성
+        // createSnapshot()
+        const newSnapshot = new Snapshot();
+        newSnapshot.content = createPostRecordDto.content;
+        newSnapshot.movieId = movieId;
+        newSnapshot.postId = newPost.postId;
+        newSnapshot.version = newPost.version;
+        newSnapshot.isLatest = true;
+        await queryRunner.manager.getRepository(Snapshot).save(newSnapshot);
+      } else {
+        // 갱신
+        const snapshotToUpdate = await this.snapshotRepository.findOne({
+          where: { isLatest: true, movieId },
+        });
+        snapshotToUpdate.content = createPostRecordDto.content;
+        snapshotToUpdate.version++;
+        snapshotToUpdate.postId = newPost.postId;
+        await queryRunner.manager
+          .getRepository(Snapshot)
+          .save(snapshotToUpdate);
+      }
 
       // 10 배수 snapshot
       if ((newPost.version - 1) % 10 === 0) {
