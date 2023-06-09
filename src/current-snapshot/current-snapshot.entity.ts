@@ -7,6 +7,7 @@ import {
   JoinColumn,
   OneToOne,
   PrimaryGeneratedColumn,
+  RelationId,
   VersionColumn,
 } from 'typeorm';
 
@@ -16,7 +17,7 @@ export class CurrentSnapshot extends BaseEntity {
   @IsNumber()
   currentSnapshotId: number;
 
-  @Column()
+  @RelationId((CurrentSnapshot: CurrentSnapshot) => CurrentSnapshot.movie)
   movieId: number;
 
   @Column()
@@ -27,6 +28,6 @@ export class CurrentSnapshot extends BaseEntity {
   version: number;
 
   @OneToOne(() => Movie, (movie) => movie.currentSnapshot, { eager: true })
-  @JoinColumn({ name: 'movieId' })
+  @JoinColumn({ name: 'movieId', referencedColumnName: 'movieId' })
   movie: Movie;
 }

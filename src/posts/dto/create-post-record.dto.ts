@@ -9,6 +9,6 @@ export class CreatePostRecordDto {
   @IsString()
   comment: string;
 
-  @IsString()
-  version: string;
+  // @IsString()
+  // version: string;
 }

@@ -9,35 +9,41 @@ export class CurrentSnapshotRepository extends Repository<CurrentSnapshot> {
   constructor(private dataSource: DataSource) {
     super(CurrentSnapshot, dataSource.createEntityManager());
   }
-  async updateCurrentSnapshot(
+  async createCurrentSnapshot(
     movieId: number,
     manager: EntityManager,
     content: string,
+  ) {
+    // 최초 버전이 없는 경우
+    const currentSnapshot = new CurrentSnapshot();
+    currentSnapshot.movieId = movieId;
+    currentSnapshot.version = 1;
+    currentSnapshot.content = content;
+
+    console.log('어떻게 생겼어?', currentSnapshot);
+
+    await manager.save(currentSnapshot);
+  }
+
+  async updateCurrentSnapshot(
+    currentSnapshot: CurrentSnapshot,
+    manager: EntityManager,
+    content: string,
   ): Promise<void> {
-    let currentSnapshot = await manager
-      .createQueryBuilder(CurrentSnapshot, 'currentSnapshot')
-      .where('currentSnapshot.movieId=:movieId', {
-        movieId: movieId,
+    //   currentSnapshot.version = currentSnapshot.version + 1;
+
+    console.log('여기서는 어때?', currentSnapshot);
+
+    currentSnapshot.content = content;
+    await manager.save(currentSnapshot);
+
+    await manager
+      .getRepository(CurrentSnapshot)
+      .createQueryBuilder('currentSnapshot')
+      .setLock('optimistic', currentSnapshot.version)
+      .where('currentSnapshot.movieId  = :movieId', {
+        movieId: currentSnapshot.movieId,
       })
-      .getOne();
-
-    if (!currentSnapshot) {
-      // 최초 버전이 없는 경우
-      currentSnapshot = new CurrentSnapshot();
-      currentSnapshot.movieId = movieId;
-      currentSnapshot.version = 1;
-      currentSnapshot.content = content;
-
-      await manager.save(currentSnapshot);
-    } else {
-      await manager
-        .createQueryBuilder(CurrentSnapshot, 'currentSnapshot')
-        .update(CurrentSnapshot)
-        .set({ content: content, version: currentSnapshot.version + 1 })
-        .where('movieId  = :movieId', {
-          movieId: movieId,
-        })
-        .execute();
-    }
+      .execute();
   }
 }
