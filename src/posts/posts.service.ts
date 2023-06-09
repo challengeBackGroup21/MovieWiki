@@ -10,6 +10,8 @@ import { ProcessedPost } from './types/process-post.type';
 import { SnapshotRepository } from 'src/snapshot/snapshot.repository';
 import { Snapshot } from 'src/snapshot/snapshot.entity';
 import { DiffUtil } from './diff.util';
+import { CurrentSnapshotRepository } from 'src/current-snapshot/current-snapshot.repository';
+import { CurrentSnapshot } from 'src/current-snapshot/current-snapshot.entity';
 
 @Injectable()
 export class PostService {
@@ -20,6 +22,8 @@ export class PostService {
     private readonly movieRepository: MovieRepository,
     @InjectRepository(SnapshotRepository)
     private readonly snapshotRepository: SnapshotRepository,
+    @InjectRepository(CurrentSnapshotRepository)
+    private readonly currentSnapshotRepository: CurrentSnapshotRepository,
     private dataSource: DataSource,
   ) {}
 
@@ -59,9 +63,11 @@ export class PostService {
         );
       } else {
         // 최초 생성이 아닌 경우
-        const latestSnapshot = await this.snapshotRepository.findOne({
-          where: { isLatest: true, movieId },
-        });
+        const latestSnapshot = await queryRunner.manager
+          .getRepository(Snapshot)
+          .findOne({
+            where: { isLatest: true, movieId },
+          });
         content = JSON.stringify(
           diffUtil.diffLineToWord(
             latestSnapshot.content,
@@ -78,9 +84,6 @@ export class PostService {
         content,
       );
 
-      await queryRunner.commitTransaction();
-      console.log('Transaction committed');
-
       // 여기서부터 snapshot 생성 코드
       const newPost = await this.postRepository.getLatestPostRecord(movieId);
       console.log(newPost);
@@ -94,7 +97,7 @@ export class PostService {
         newSnapshot.postId = newPost.postId;
         newSnapshot.version = newPost.version;
         newSnapshot.isLatest = true;
-        await this.snapshotRepository.save(newSnapshot);
+        await queryRunner.manager.getRepository(Snapshot).save(newSnapshot);
       } else {
         // 갱신
         const snapshotToUpdate = await this.snapshotRepository.findOne({
@@ -103,7 +106,9 @@ export class PostService {
         snapshotToUpdate.content = createPostRecordDto.content;
         snapshotToUpdate.version++;
         snapshotToUpdate.postId = newPost.postId;
-        await this.snapshotRepository.save(snapshotToUpdate);
+        await queryRunner.manager
+          .getRepository(Snapshot)
+          .save(snapshotToUpdate);
       }
 
       // 10 배수 snapshot
@@ -114,8 +119,17 @@ export class PostService {
         newSnapshot.postId = newPost.postId;
         newSnapshot.version = newPost.version;
         newSnapshot.isLatest = false;
-        await this.snapshotRepository.save(newSnapshot);
+        await queryRunner.manager.getRepository(Snapshot).save(newSnapshot);
       }
+
+      await this.currentSnapshotRepository.updateCurrentSnapshot(
+        movieId,
+        queryRunner.manager,
+        content,
+      );
+
+      await queryRunner.commitTransaction();
+      console.log('Transaction committed');
 
       return { message: '영화 기록 생성에 성공했습니다.' };
     } catch (error) {

@@ -1,4 +1,4 @@
-import { IsDate, IsNumber, IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 import {
   BaseEntity,
   Column,
@@ -10,6 +10,7 @@ import {
   PrimaryGeneratedColumn,
   RelationId,
   UpdateDateColumn,
+  VersionColumn,
 } from 'typeorm';
 import { User } from '../auth/user.entity';
 import { Like } from '../likes/like.entity';

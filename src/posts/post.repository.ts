@@ -2,9 +2,9 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { User } from 'src/auth/user.entity';
 import { Movie } from 'src/movies/movie.entity';
 import { DataSource, EntityManager, Repository } from 'typeorm';
-import { CreatePostRecordDto } from '../posts/dto/create-post-record.dto';
-import { RevertPostRecordDto } from './dto/revert-post-record.dto';
 import { Post } from './post.entity';
+import { CreatePostRecordDto } from './dto/create-post-record.dto';
+import { RevertPostRecordDto } from './dto/revert-post-record.dto';
 
 @Injectable()
 export class PostRepository extends Repository<Post> {
@@ -26,7 +26,14 @@ export class PostRepository extends Repository<Post> {
     post.content = content;
 
     // createPostRecordDto의 version으로 해줄까?
-    const latestPost = await this.getLatestPostRecord(movie.movieId);
+    const latestPost = await manager
+      .getRepository(Post)
+      .createQueryBuilder('post')
+      .leftJoinAndSelect('post.movie', 'movie')
+      .where('movie.movieId = :movieId', { movieId: movie.movieId })
+      .orderBy('post.version', 'DESC')
+      .getOne();
+
     if (!latestPost) {
       // 최초 생성인 경우
       post.version = 1;
