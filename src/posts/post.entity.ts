@@ -37,7 +37,7 @@ export class Post extends BaseEntity {
   @IsString()
   comment: string;
 
-  @Column({ nullable: true, default: null })
+  @Column({ nullable: true, default: 1 })
   @IsNumber()
   version: number;
 
@@ -56,7 +56,7 @@ export class Post extends BaseEntity {
   likes: Like[];
 
   @OneToMany(() => Snapshot, (snapshot) => snapshot.postId, { eager: false })
-  snapshot: Snapshot;
+  snapshot: Snapshot[];
 
   @ManyToOne(() => User, (user) => user.posts, { eager: false })
   @JoinColumn({ name: 'userId', referencedColumnName: 'userId' })

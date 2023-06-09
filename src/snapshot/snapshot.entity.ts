@@ -1,4 +1,4 @@
-import { IsNumber, IsString } from 'class-validator';
+import { IsBoolean, IsNumber, IsString } from 'class-validator';
 import {
   BaseEntity,
   Column,
@@ -6,6 +6,7 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  RelationId,
 } from 'typeorm';
 import { Movie } from '../movies/movie.entity';
 import { Post } from 'src/posts/post.entity';
@@ -16,12 +17,6 @@ export class Snapshot extends BaseEntity {
   @IsNumber()
   snapshotId: number;
 
-  @IsNumber()
-  movieId: number;
-
-  @IsNumber()
-  postId: number;
-
   @Column()
   @IsNumber()
   version: number;
@@ -30,16 +25,15 @@ export class Snapshot extends BaseEntity {
   @IsString()
   content: string;
 
-  // Entity를 만들 때 고려해야 할 사항
-  /**
-   1. column 다 적어주기.
-   */
+  @Column()
+  @IsBoolean()
+  isLatest: boolean;
 
-  @ManyToOne(() => Movie, (movie) => movie.snapshots, { eager: false })
-  @JoinColumn({ name: 'movieId', referencedColumnName: 'movieId' })
-  movie: Movie;
-
-  @ManyToOne(() => Post)
+  @ManyToOne(() => Post, (post) => post.likes, { eager: false })
   @JoinColumn({ name: 'postId', referencedColumnName: 'postId' })
-  post: Post;
+  postId: number;
+
+  @ManyToOne(() => Movie, (movie) => movie.thisMovieLikes, { eager: false })
+  @JoinColumn({ name: 'movieId', referencedColumnName: 'movieId' })
+  movieId: number;
 }
