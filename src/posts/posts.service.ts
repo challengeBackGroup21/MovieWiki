@@ -9,6 +9,7 @@ import { PostRepository } from './post.repository';
 import { ProcessedPost } from './types/process-post.type';
 import { SnapshotRepository } from 'src/snapshot/snapshot.repository';
 import { Snapshot } from 'src/snapshot/snapshot.entity';
+import { DiffUtil } from './diff.util';
 
 @Injectable()
 export class PostService {
@@ -49,39 +50,76 @@ export class PostService {
         throw new HttpException('최신 기록이 변경되었습니다', 409);
       }
 
+      const diffUtil = new DiffUtil();
+      let content = '';
+      if (!latestPost) {
+        // 최초 생성인 경우
+        content = JSON.stringify(
+          diffUtil.diffLineToWord('', createPostRecordDto.content),
+        );
+      } else {
+        // 최초 생성이 아닌 경우
+        const latestSnapshot = await this.snapshotRepository.findOne({
+          where: { isLatest: true, movieId },
+        });
+        content = JSON.stringify(
+          diffUtil.diffLineToWord(
+            latestSnapshot.content,
+            createPostRecordDto.content,
+          ),
+        );
+      }
+
       await this.postRepository.createPostRecord(
         createPostRecordDto,
         isExistMovie,
         user,
         queryRunner.manager,
+        content,
       );
 
       await queryRunner.commitTransaction();
       console.log('Transaction committed');
 
-      // 여기에서 snapshot을 저장해주는 기능이 있어야 한다.
-      // snapshot에 해당 movieId의 현재 버전을 -1로 저장하는 것. postId가 있어야 하냐?
+      // 여기서부터 snapshot 생성 코드
+      const newPost = await this.postRepository.getLatestPostRecord(movieId);
+      console.log(newPost);
 
-      // 이거 version이 1이면 생성하고, 1이 아니면 update하는 쪽으로 변경해야 할 것 같다.
-      const latestSnapshot = new Snapshot();
-      latestSnapshot.content = createPostRecordDto.content;
-      latestSnapshot.movieId = movieId;
-      latestSnapshot.postId = latestPost.postId;
-      latestSnapshot.version = -1;
-      await this.snapshotRepository.save(latestSnapshot);
+      if (newPost.version === 1) {
+        // 최초 버전인 경우 생성
+        // createSnapshot()
+        const newSnapshot = new Snapshot();
+        newSnapshot.content = createPostRecordDto.content;
+        newSnapshot.movieId = movieId;
+        newSnapshot.postId = newPost.postId;
+        newSnapshot.version = newPost.version;
+        newSnapshot.isLatest = true;
+        await this.snapshotRepository.save(newSnapshot);
+      } else {
+        // 갱신
+        const snapshotToUpdate = await this.snapshotRepository.findOne({
+          where: { isLatest: true, movieId },
+        });
+        snapshotToUpdate.content = createPostRecordDto.content;
+        snapshotToUpdate.version++;
+        snapshotToUpdate.postId = newPost.postId;
+        await this.snapshotRepository.save(snapshotToUpdate);
+      }
 
-      // 해당 버전이 10의 배수인 수에 도달했을 때
-      if ((latestPost.version - 1) % 10 === 0) {
-        const milestoneSnapshot = new Snapshot();
-        milestoneSnapshot.content = createPostRecordDto.content;
-        milestoneSnapshot.movieId = movieId;
-        milestoneSnapshot.postId = latestPost.postId;
-        milestoneSnapshot.version = latestPost.version;
-        await this.snapshotRepository.save(milestoneSnapshot);
+      // 10 배수 snapshot
+      if ((newPost.version - 1) % 10 === 0) {
+        const newSnapshot = new Snapshot();
+        newSnapshot.content = createPostRecordDto.content;
+        newSnapshot.movieId = movieId;
+        newSnapshot.postId = newPost.postId;
+        newSnapshot.version = newPost.version;
+        newSnapshot.isLatest = false;
+        await this.snapshotRepository.save(newSnapshot);
       }
 
       return { message: '영화 기록 생성에 성공했습니다.' };
     } catch (error) {
+      console.error(error);
       await queryRunner.rollbackTransaction();
       console.log('Transaction rolled back');
       if (error instanceof HttpException) {

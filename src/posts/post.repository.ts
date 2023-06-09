@@ -17,14 +17,24 @@ export class PostRepository extends Repository<Post> {
     movie: Movie,
     user: User,
     manager: EntityManager,
+    content: string,
   ): Promise<Post> {
     const post = new Post();
     post.comment = createPostRecordDto.comment;
-    post.content = createPostRecordDto.content;
     post.movie = movie;
     post.user = user;
+    post.content = content;
+
+    // createPostRecordDto의 version으로 해줄까?
     const latestPost = await this.getLatestPostRecord(movie.movieId);
-    post.version = latestPost.version + 1;
+    if (!latestPost) {
+      // 최초 생성인 경우
+      post.version = 1;
+    } else {
+      // 최초 생성이 아닌 경우
+      post.version = latestPost.version + 1;
+    }
+
     return await manager.save(post);
   }
 
