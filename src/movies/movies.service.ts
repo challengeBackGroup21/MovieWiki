@@ -16,10 +16,9 @@ export class MoviesService {
     try {
       if (option === 'directors') {
         const movies = await this.movieRepositry.directorsSearch(query);
-
         if (movies.length === 0) {
           throw new HttpException(
-            `${option}해당하는 영화 목록 조회를 실패했습니다`,
+            `${query}에 해당하는 영화 목록 조회를 실패했습니다`,
             400,
           );
         }
