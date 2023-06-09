@@ -25,7 +25,7 @@ export class PostService {
     @InjectRepository(CurrentSnapshotRepository)
     private readonly currentSnapshotRepository: CurrentSnapshotRepository,
     private dataSource: DataSource,
-  ) {}
+  ) { }
 
   async createPostRecord(
     createPostRecordDto: CreatePostRecordDto,
@@ -171,7 +171,7 @@ export class PostService {
     if (!isExistMovie) {
       throw new HttpException('영화가 존재하지 않습니다', 403);
     }
-    const latestPost = await this.postRepository.getLatestPostRecord(movieId);
+    const latestPost = await this.snapshotRepository.getLatestPostRecord(movieId);
     // console.log(latestPost);
     if (!latestPost) {
       throw new HttpException(
@@ -181,10 +181,7 @@ export class PostService {
     }
     const result = {
       postId: latestPost.postId,
-      userId: latestPost.userId,
       content: latestPost.content,
-      comment: latestPost.comment,
-      createdAt: latestPost.createdAt,
       version: latestPost.version,
     };
 
@@ -246,29 +243,26 @@ export class PostService {
       throw new HttpException('수정 기록 조회에 실패했습니다.', 400);
     }
   }
-  // 게시글 이전 버전으로 다시 생성
-  async revertPostRecord(
-    revertPostRecordDto: RevertPostRecordDto,
+
+  //특정 버전으로 롤백
+  async revertPost(
     movieId: number,
-    postId: number,
-    user: User,
+    version: number
   ) {
-    const previousVersionPost = await this.postRepository.getOnePostRecord(
-      movieId,
-      postId,
-    );
-    if (!previousVersionPost) {
-      throw new HttpException('이전 버전이 존재하지 않습니다', 400);
-    }
     try {
-      await this.postRepository.revertPostRecord(
-        revertPostRecordDto,
-        previousVersionPost,
-        user,
-      );
-      return { message: '기록 생성에 성공하였습니다' };
+      const original = await this.snapshotRepository.findSnapshotByVersion(movieId, version);
+      const diffs = await this.postRepository.findPostByVersion(movieId, version);
+      
+      const diffUtil = new DiffUtil();
+      let result = original;
+      for (let i = 0; i < diffs.length; i++) {
+        result = diffUtil.applyDiff(result, diffs[i]);
+      }
+
+      return result;
     } catch (error) {
-      throw new HttpException('기록 생성에 실패하였습니다', 400);
+      console.error(error);
+      throw new HttpException(`${version} 버전으로 롤백에 실패하였습니다.`, 400);
     }
   }
 }
