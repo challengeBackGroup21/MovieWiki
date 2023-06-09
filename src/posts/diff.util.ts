@@ -224,4 +224,29 @@ export class DiffUtil {
 
     return modified;
   };
+
+  /* 특정 버전의 전체 스냅샷(original)에 변경 사항 데이터를 더해 전체 스냅샷을 만듦 */
+  applyDiff = (original, diffs) => {
+    let modified = original;
+
+    for (let i = 0; i < diffs.length; i++) {
+      const { type, value, idx } = diffs[i];
+      if (type === "add") {
+        modified = modified.slice(0, idx) + value + modified.slice(idx);
+        for (let j = i + 1; j < diffs.length; j++) {
+          if (diffs[j].type === "remove") {
+            diffs[j].idx += value.length;
+          }
+        }
+      } else if (type === "remove") {
+        modified = modified.slice(0, idx) + modified.slice(idx + value.length);
+        for (let j = i + 1; j < diffs.length; j++) {
+          if (diffs[j].type === "add") {
+            diffs[j].idx -= value.length;
+          }
+        }
+      }
+    }
+    return modified;
+  }
 }
