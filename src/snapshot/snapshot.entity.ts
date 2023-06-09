@@ -17,6 +17,12 @@ export class Snapshot extends BaseEntity {
   @IsNumber()
   snapshotId: number;
 
+  @Column({ name: 'postId'})
+  postId: number;
+
+  @Column({ name: 'movieId'})
+  movieId: number;
+
   @Column()
   @IsNumber()
   version: number;
@@ -29,11 +35,11 @@ export class Snapshot extends BaseEntity {
   @IsBoolean()
   isLatest: boolean;
 
-  @ManyToOne(() => Post, (post) => post.likes, { eager: false })
-  @JoinColumn({ name: 'postId', referencedColumnName: 'postId' })
-  postId: number;
+  @ManyToOne(() => Post)
+  @JoinColumn({ name: 'postId'})
+  post: Post;
 
-  @ManyToOne(() => Movie, (movie) => movie.thisMovieLikes, { eager: false })
-  @JoinColumn({ name: 'movieId', referencedColumnName: 'movieId' })
-  movieId: number;
+  @ManyToOne(() => Movie)
+  @JoinColumn({ name: 'movieId'})
+  movie: Movie;
 }
