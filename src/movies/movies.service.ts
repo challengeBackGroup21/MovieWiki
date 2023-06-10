@@ -63,7 +63,6 @@ export class MoviesService {
 
         return movies;
       }
-
       if (option === 'movieNm') {
         const movies = await this.movieRepositry.movieNmSearch(query);
         if (movies.length === 0) {
@@ -76,7 +75,7 @@ export class MoviesService {
         return movies;
       }
       if (option === 'total') {
-        const movies = await this.movieRepositry.moviesSearch();
+        const movies = await this.movieRepositry.moviesSearch(query);
 
         return movies;
       }

@@ -9,9 +9,10 @@ export class MovieRepository extends Repository<Movie> {
   }
   async directorsSearch(query: string): Promise<Movie[]> {
     const movies = await this.createQueryBuilder('movie')
-      .where('movie.directors @> :directors', {
-        directors: JSON.stringify([{ peopleNm: query }]),
+      .where('movie.directors ::text ILIKE :directors', {
+        directors: `%${query}%`,
       })
+      .take(20)
       .getMany();
     return movies;
   }
@@ -19,6 +20,7 @@ export class MovieRepository extends Repository<Movie> {
   async genreAltSearch(query: string): Promise<Movie[]> {
     const movies = await this.createQueryBuilder('movie')
       .where('movie.genreAlt LIKE :genreAlt', { genreAlt: `%${query}%` })
+      .take(20)
       .getMany();
 
     return movies;
@@ -27,6 +29,7 @@ export class MovieRepository extends Repository<Movie> {
   async nationAltSearch(query: string): Promise<Movie[]> {
     const movies = await this.createQueryBuilder('movie')
       .where('movie.nationAlt LIKE :nationAlt', { nationAlt: `%${query}%` })
+      .take(20)
       .getMany();
 
     return movies;
@@ -35,6 +38,7 @@ export class MovieRepository extends Repository<Movie> {
   async openDtSearch(query: string): Promise<Movie[]> {
     const movies = await this.createQueryBuilder('movie')
       .where('movie.openDt LIKE :openDt', { openDt: `${query}%` })
+      .take(20)
       .getMany();
 
     return movies;
@@ -42,14 +46,22 @@ export class MovieRepository extends Repository<Movie> {
   // 동일한 제목의 영화 존재할 수 도 있어서 find로 검색
   async movieNmSearch(query: string): Promise<Movie[]> {
     const movies = await this.createQueryBuilder('movie')
-      .where('movie.movieNm = :movieNm', { movieNm: query })
+      .where('movie.movieNm = :movieNm', { movieNm: `%${query}%` })
+      .take(20)
       .getMany();
 
     return movies;
   }
 
-  async moviesSearch(): Promise<Movie[]> {
+  async moviesSearch(query: string): Promise<Movie[]> {
     const movies = await this.createQueryBuilder('movie')
+      .where('movie.directors ::text ILIKE :directors', {
+        directors: `%${query}%`,
+      })
+      .orWhere('movie.genreAlt LIKE :genreAlt', { genreAlt: `%${query}%` })
+      .orWhere('movie.nationAlt LIKE :nationAlt', { nationAlt: `%${query}%` })
+      .orWhere('movie.openDt LIKE :openDt', { openDt: `${query}%` })
+      .orWhere('movie.movieNm = :movieNm', { movieNm: `%${query}%` })
       .orderBy('movie.movieId', 'ASC')
       .take(20)
       .getMany();
