@@ -231,22 +231,22 @@ export class DiffUtil {
 
     for (let i = 0; i < diffs.length; i++) {
       const { type, value, idx } = diffs[i];
-      if (type === "add") {
+      if (type === 'add') {
         modified = modified.slice(0, idx) + value + modified.slice(idx);
         for (let j = i + 1; j < diffs.length; j++) {
-          if (diffs[j].type === "remove") {
+          if (diffs[j].type === 'remove') {
             diffs[j].idx += value.length;
           }
         }
-      } else if (type === "remove") {
+      } else if (type === 'remove') {
         modified = modified.slice(0, idx) + modified.slice(idx + value.length);
         for (let j = i + 1; j < diffs.length; j++) {
-          if (diffs[j].type === "add") {
+          if (diffs[j].type === 'add') {
             diffs[j].idx -= value.length;
           }
         }
       }
     }
     return modified;
-  }
+  };
 }

@@ -70,9 +70,6 @@ export class PostController {
     @Param('version', ParseIntPipe) version: number,
     @GetCurrentUser() user: User,
   ) {
-    return this.postService.revertPost(
-      movieId,
-      version
-      );
+    return this.postService.revertPost(movieId, version);
   }
 }

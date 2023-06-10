@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   Entity,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -12,6 +13,7 @@ import { Like } from '../likes/like.entity';
 import { Notification } from '../notifications/notification.entity';
 import { Post } from '../posts/post.entity';
 import { Snapshot } from 'src/snapshot/snapshot.entity';
+import { CurrentSnapshot } from 'src/current-snapshot/current-snapshot.entity';
 
 @Entity()
 export class Movie extends BaseEntity {
@@ -77,6 +79,11 @@ export class Movie extends BaseEntity {
 
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
+
+  @OneToOne(() => CurrentSnapshot, (currentSnapshot) => currentSnapshot.movie, {
+    eager: false,
+  })
+  currentSnapshot: CurrentSnapshot;
 
   @OneToMany(() => Post, (post) => post.movie, { eager: true })
   posts: Post[];
