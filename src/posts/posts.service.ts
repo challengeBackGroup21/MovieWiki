@@ -52,8 +52,8 @@ export class PostService {
 
       if (
         !(
-          createPostRecordDto.version === '' ||
-          latestPost.version.toString() === createPostRecordDto.version
+          createPostRecordDto.version === null ||
+          latestPost?.version === createPostRecordDto.version
         )
       ) {
         throw new HttpException('최신 기록이 변경되었습니다', 409);

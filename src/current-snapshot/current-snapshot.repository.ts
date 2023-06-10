@@ -19,6 +19,7 @@ export class CurrentSnapshotRepository extends Repository<CurrentSnapshot> {
     const currentSnapshot = new CurrentSnapshot();
     currentSnapshot.movieId = movieId;
     currentSnapshot.version = 1;
+    currentSnapshot.comment = createPostRecordDto.comment;
     currentSnapshot.content = createPostRecordDto.content;
 
     console.log('어떻게 생겼어?', currentSnapshot);
@@ -28,13 +29,14 @@ export class CurrentSnapshotRepository extends Repository<CurrentSnapshot> {
   // 현재 스냅샷 업데이트
   async updateCurrentSnapshot(
     currentSnapshot: CurrentSnapshot,
-    createPostRecordDto,
+    createPostRecordDto: CreatePostRecordDto,
     manager: EntityManager,
   ): Promise<void> {
     //   currentSnapshot.version = currentSnapshot.version + 1;
 
     console.log('여기서는 어때?', currentSnapshot);
 
+    currentSnapshot.comment = createPostRecordDto.comment;
     currentSnapshot.content = createPostRecordDto.content;
     await manager.save(currentSnapshot);
 
