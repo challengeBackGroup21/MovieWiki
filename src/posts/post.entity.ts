@@ -38,7 +38,7 @@ export class Post extends BaseEntity {
   @IsString()
   comment: string;
 
-  @Column({ nullable: true, default: 1 })
+  @VersionColumn({ nullable: true })
   @IsNumber()
   version: number;
 

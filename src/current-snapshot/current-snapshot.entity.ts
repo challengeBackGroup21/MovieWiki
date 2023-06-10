@@ -17,7 +17,7 @@ export class CurrentSnapshot extends BaseEntity {
   @IsNumber()
   currentSnapshotId: number;
 
-  @RelationId((CurrentSnapshot: CurrentSnapshot) => CurrentSnapshot.movie)
+  @Column()
   movieId: number;
 
   @Column()

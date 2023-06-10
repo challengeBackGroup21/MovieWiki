@@ -9,32 +9,33 @@ export class CurrentSnapshotRepository extends Repository<CurrentSnapshot> {
   constructor(private dataSource: DataSource) {
     super(CurrentSnapshot, dataSource.createEntityManager());
   }
+  // 현재 스냅샷 없을 때 생성
   async createCurrentSnapshot(
     movieId: number,
+    createPostRecordDto: CreatePostRecordDto,
     manager: EntityManager,
-    content: string,
   ) {
     // 최초 버전이 없는 경우
     const currentSnapshot = new CurrentSnapshot();
     currentSnapshot.movieId = movieId;
     currentSnapshot.version = 1;
-    currentSnapshot.content = content;
+    currentSnapshot.content = createPostRecordDto.content;
 
     console.log('어떻게 생겼어?', currentSnapshot);
 
     await manager.save(currentSnapshot);
   }
-
+  // 현재 스냅샷 업데이트
   async updateCurrentSnapshot(
     currentSnapshot: CurrentSnapshot,
+    createPostRecordDto,
     manager: EntityManager,
-    content: string,
   ): Promise<void> {
     //   currentSnapshot.version = currentSnapshot.version + 1;
 
     console.log('여기서는 어때?', currentSnapshot);
 
-    currentSnapshot.content = content;
+    currentSnapshot.content = createPostRecordDto.content;
     await manager.save(currentSnapshot);
 
     await manager
@@ -45,5 +46,13 @@ export class CurrentSnapshotRepository extends Repository<CurrentSnapshot> {
         movieId: currentSnapshot.movieId,
       })
       .execute();
+  }
+  // 현재 스냅샷 조회
+  async findOneCurrentSnapshot(movieId: number): Promise<CurrentSnapshot> {
+    return await this.createQueryBuilder('currentSnapshot')
+      .where('currentSnapshot.movieId = :movieId', {
+        movieId,
+      })
+      .getOne();
   }
 }

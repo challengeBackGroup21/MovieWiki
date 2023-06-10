@@ -21,8 +21,11 @@ export class SnapshotRepository extends Repository<Snapshot> {
     return latestPost;
   }
 
-  // version 값을 이용해 전체 snapshot 데이터를 검색 
-  async findSnapshotByVersion(movieId: number, version: number): Promise<string> {
+  // version 값을 이용해 전체 snapshot 데이터를 검색
+  async findSnapshotByVersion(
+    movieId: number,
+    version: number,
+  ): Promise<string> {
     version = Math.floor(version / 10) * 10 + 1;
 
     if (version !== undefined) {

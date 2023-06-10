@@ -18,14 +18,7 @@ export class PostRepository extends Repository<Post> {
     user: User,
     manager: EntityManager,
     content: string,
-  ): Promise<Post> {
-    const post = new Post();
-    post.comment = createPostRecordDto.comment;
-    post.movie = movie;
-    post.user = user;
-    post.content = content;
-
-    // createPostRecordDto의 version으로 해줄까?
+  ) {
     const latestPost = await manager
       .getRepository(Post)
       .createQueryBuilder('post')
@@ -33,6 +26,15 @@ export class PostRepository extends Repository<Post> {
       .where('movie.movieId = :movieId', { movieId: movie.movieId })
       .orderBy('post.version', 'DESC')
       .getOne();
+
+    console.log('content 있냐?', content);
+    const post = new Post();
+    post.comment = createPostRecordDto.comment;
+    post.movie = movie;
+    post.user = user;
+    post.content = content;
+
+    // createPostRecordDto의 version으로 해줄까?
 
     if (!latestPost) {
       // 최초 생성인 경우
@@ -42,7 +44,7 @@ export class PostRepository extends Repository<Post> {
       post.version = latestPost.version + 1;
     }
 
-    return await manager.save(post);
+    await manager.save(post);
   }
 
   // findOne으로 movieId를 찾을려하니 Post에 movieId가 실제로 존재하지 않아서
@@ -100,7 +102,7 @@ export class PostRepository extends Repository<Post> {
 
   /* 특정 버전으로 롤백할 때 */
   async findPostByVersion(movieId: number, version: number) {
-    const snapshotVersion = (Math.floor(version / 10) * 10) + 1;
+    const snapshotVersion = Math.floor(version / 10) * 10 + 1;
 
     const posts = await this.createQueryBuilder('post')
       .leftJoinAndSelect('post.movie', 'movie')

@@ -25,7 +25,7 @@ export class PostService {
     @InjectRepository(CurrentSnapshotRepository)
     private readonly currentSnapshotRepository: CurrentSnapshotRepository,
     private dataSource: DataSource,
-  ) { }
+  ) {}
 
   async createPostRecord(
     createPostRecordDto: CreatePostRecordDto,
@@ -44,9 +44,11 @@ export class PostService {
       }
 
       const latestPost = await this.postRepository.getLatestPostRecord(movieId);
-      if (!latestPost) {
-        throw new HttpException('최신 버전 없다', 400);
-      }
+
+      console.log('있냐?', latestPost);
+      // if (!latestPost) {
+      //   throw new HttpException('최신 버전 없다', 400);
+      // }
 
       if (
         !(
@@ -57,20 +59,21 @@ export class PostService {
         throw new HttpException('최신 기록이 변경되었습니다', 409);
       }
 
+      console.log('start');
       const diffUtil = new DiffUtil();
       let content = '';
       if (!latestPost) {
         // 최초 생성인 경우
         content = JSON.stringify(
           diffUtil.diffLineToWord('', createPostRecordDto.content),
+          // console.log(diffUtil.diffLineToWord),
         );
       } else {
         // 최초 생성이 아닌 경우
-        const latestSnapshot = await queryRunner.manager
-          .getRepository(Snapshot)
-          .findOne({
-            where: { isLatest: true, movieId },
-          });
+        const latestSnapshot =
+          await this.currentSnapshotRepository.findOneCurrentSnapshot(movieId);
+
+        console.log(latestSnapshot);
         content = JSON.stringify(
           diffUtil.diffLineToWord(
             latestSnapshot.content,
@@ -87,32 +90,58 @@ export class PostService {
         content,
       );
 
-      // 여기서부터 snapshot 생성 코드
-      const newPost = await this.postRepository.getLatestPostRecord(movieId);
-      console.log(newPost);
+      //여기서부터 snapshot 생성 코드
+      // const newPost = await this.postRepository.getLatestPostRecord(movieId);
+      // console.log('newPost 있어?', newPost);
 
-      if (newPost.version === 1) {
-        // 최초 버전인 경우 생성
-        // createSnapshot()
-        const newSnapshot = new Snapshot();
-        newSnapshot.content = createPostRecordDto.content;
-        newSnapshot.movieId = movieId;
-        newSnapshot.postId = newPost.postId;
-        newSnapshot.version = newPost.version;
-        newSnapshot.isLatest = true;
-        await queryRunner.manager.getRepository(Snapshot).save(newSnapshot);
+      // if (newPost.version === 1) {
+      //   // 최초 버전인 경우 생성
+      //   // createSnapshot()
+      //   const newSnapshot = new Snapshot();
+      //   newSnapshot.content = createPostRecordDto.content;
+      //   newSnapshot.movieId = movieId;
+      //   newSnapshot.postId = newPost.postId;
+      //   newSnapshot.version = newPost.version;
+      //   newSnapshot.isLatest = true;
+      //   await queryRunner.manager.getRepository(Snapshot).save(newSnapshot);
+      // } else {
+      //   // 갱신
+      //   const snapshotToUpdate = await this.snapshotRepository.findOne({
+      //     where: { isLatest: true, movieId },
+      //   });
+      //   snapshotToUpdate.content = createPostRecordDto.content;
+      //   snapshotToUpdate.version++;
+      //   snapshotToUpdate.postId = newPost.postId;
+      //   await queryRunner.manager
+      //     .getRepository(Snapshot)
+      //     .save(snapshotToUpdate);
+      // }
+
+      // 최신 버전
+      const currentSnapshot =
+        await this.currentSnapshotRepository.findOneCurrentSnapshot(movieId);
+
+      if (!currentSnapshot) {
+        // 현재 스냅샷이 존재하지 않을 경우
+        await this.currentSnapshotRepository.createCurrentSnapshot(
+          movieId,
+          createPostRecordDto,
+          queryRunner.manager,
+        );
       } else {
-        // 갱신
-        const snapshotToUpdate = await this.snapshotRepository.findOne({
-          where: { isLatest: true, movieId },
-        });
-        snapshotToUpdate.content = createPostRecordDto.content;
-        snapshotToUpdate.version++;
-        snapshotToUpdate.postId = newPost.postId;
-        await queryRunner.manager
-          .getRepository(Snapshot)
-          .save(snapshotToUpdate);
+        // 현재스냅샷이 존재할 경우
+        await this.currentSnapshotRepository.updateCurrentSnapshot(
+          currentSnapshot,
+          createPostRecordDto,
+          queryRunner.manager,
+        );
       }
+
+      await queryRunner.commitTransaction();
+      console.log('Transaction committed');
+
+      const newPost = await this.postRepository.getLatestPostRecord(movieId);
+      console.log('newPost 있어?', newPost);
 
       // 10 배수 snapshot
       if ((newPost.version - 1) % 10 === 0) {
@@ -122,34 +151,8 @@ export class PostService {
         newSnapshot.postId = newPost.postId;
         newSnapshot.version = newPost.version;
         newSnapshot.isLatest = false;
-        await queryRunner.manager.getRepository(Snapshot).save(newSnapshot);
+        await this.snapshotRepository.save(newSnapshot);
       }
-
-      // 최신 버전
-      const currentSnapshot = await queryRunner.manager
-        .getRepository(CurrentSnapshot)
-        .createQueryBuilder('currentSnapshot')
-        .where('currentSnapshot.movieId =:movieId', {
-          movieId,
-        })
-        .getOne();
-
-      if (!currentSnapshot) {
-        await this.currentSnapshotRepository.createCurrentSnapshot(
-          movieId,
-          queryRunner.manager,
-          content,
-        );
-      } else {
-        await this.currentSnapshotRepository.updateCurrentSnapshot(
-          currentSnapshot,
-          queryRunner.manager,
-          content,
-        );
-      }
-
-      await queryRunner.commitTransaction();
-      console.log('Transaction committed');
 
       return { message: '영화 기록 생성에 성공했습니다.' };
     } catch (error) {
@@ -171,7 +174,8 @@ export class PostService {
     if (!isExistMovie) {
       throw new HttpException('영화가 존재하지 않습니다', 403);
     }
-    const latestPost = await this.snapshotRepository.getLatestPostRecord(movieId);
+    const latestPost =
+      await this.currentSnapshotRepository.findOneCurrentSnapshot(movieId);
     // console.log(latestPost);
     if (!latestPost) {
       throw new HttpException(
@@ -180,7 +184,7 @@ export class PostService {
       );
     }
     const result = {
-      postId: latestPost.postId,
+      // postId: latestPost.postId,
       content: latestPost.content,
       version: latestPost.version,
     };
@@ -245,14 +249,17 @@ export class PostService {
   }
 
   //특정 버전으로 롤백
-  async revertPost(
-    movieId: number,
-    version: number
-  ) {
+  async revertPost(movieId: number, version: number) {
     try {
-      const original = await this.snapshotRepository.findSnapshotByVersion(movieId, version);
-      const diffs = await this.postRepository.findPostByVersion(movieId, version);
-      
+      const original = await this.snapshotRepository.findSnapshotByVersion(
+        movieId,
+        version,
+      );
+      const diffs = await this.postRepository.findPostByVersion(
+        movieId,
+        version,
+      );
+
       const diffUtil = new DiffUtil();
       let result = original;
       for (let i = 0; i < diffs.length; i++) {
@@ -262,7 +269,10 @@ export class PostService {
       return result;
     } catch (error) {
       console.error(error);
-      throw new HttpException(`${version} 버전으로 롤백에 실패하였습니다.`, 400);
+      throw new HttpException(
+        `${version} 버전으로 롤백에 실패하였습니다.`,
+        400,
+      );
     }
   }
 }
