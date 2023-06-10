@@ -71,23 +71,6 @@ export class PostRepository extends Repository<Post> {
     return posts;
   }
 
-  async revertPostRecord(
-    revertPostRecordDto: RevertPostRecordDto,
-    previousVersionPost: Post,
-    user: User,
-  ) {
-    const post = new Post();
-    post.comment = revertPostRecordDto.comment;
-    post.content = previousVersionPost.content;
-    post.movie = previousVersionPost.movie;
-    post.user = user;
-    const latestPost = await this.getLatestPostRecord(
-      previousVersionPost.movieId,
-    );
-    post.version = latestPost.version + 1;
-    return await this.save(post);
-  }
-
   async findReportedId(postId: number) {
     const post = await this.createQueryBuilder('post')
       .leftJoinAndSelect('post.movie', 'movie')
@@ -106,5 +89,25 @@ export class PostRepository extends Repository<Post> {
 
     console.log(post);
     return post.movieId;
+  }
+
+  /* 특정 버전으로 롤백할 때 */
+  async findPostByVersion(movieId: number, version: number) {
+    const snapshotVersion = (Math.floor(version / 10) * 10) + 1;
+
+    const posts = await this.createQueryBuilder('post')
+      .leftJoinAndSelect('post.movie', 'movie')
+      .where('movie.movieId = :movieId', { movieId })
+      .andWhere('post.version >= :minVersion AND post.version <= :maxVersion', {
+        minVersion: snapshotVersion + 1,
+        maxVersion: version,
+      })
+      .getMany();
+
+    const diffs = posts.map((post) => JSON.parse(post.content));
+
+    console.log('postRepoDiff : ' + diffs);
+    console.log(typeof diffs);
+    return diffs;
   }
 }

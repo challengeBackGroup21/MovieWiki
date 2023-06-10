@@ -15,6 +15,7 @@ import { PostService } from './posts.service';
 import { ProcessedPost } from './types/process-post.type';
 
 import { User } from 'src/auth/user.entity';
+import { version } from 'os';
 
 @Controller('post')
 export class PostController {
@@ -60,20 +61,18 @@ export class PostController {
   ): Promise<ProcessedPost[]> {
     return this.postService.getPostRecords(movieId);
   }
-  // 영화 기록 이전 버전 다시 생성
-  @Post('/:movieId/record/:postId')
+
+  //특정 버전으로 롤백
+  @Post('/:movieId/record/:version')
   @UseGuards(AccessTokenGuard)
-  revertPostRecord(
-    @Body() revertPostRecordDto: RevertPostRecordDto,
+  revertPost(
     @Param('movieId', ParseIntPipe) movieId: number,
-    @Param('postId', ParseIntPipe) postId: number,
+    @Param('version', ParseIntPipe) version: number,
     @GetCurrentUser() user: User,
   ) {
-    return this.postService.revertPostRecord(
-      revertPostRecordDto,
+    return this.postService.revertPost(
       movieId,
-      postId,
-      user,
-    );
+      version
+      );
   }
 }
