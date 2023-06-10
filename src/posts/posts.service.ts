@@ -90,33 +90,6 @@ export class PostService {
         content,
       );
 
-      //여기서부터 snapshot 생성 코드
-      // const newPost = await this.postRepository.getLatestPostRecord(movieId);
-      // console.log('newPost 있어?', newPost);
-
-      // if (newPost.version === 1) {
-      //   // 최초 버전인 경우 생성
-      //   // createSnapshot()
-      //   const newSnapshot = new Snapshot();
-      //   newSnapshot.content = createPostRecordDto.content;
-      //   newSnapshot.movieId = movieId;
-      //   newSnapshot.postId = newPost.postId;
-      //   newSnapshot.version = newPost.version;
-      //   newSnapshot.isLatest = true;
-      //   await queryRunner.manager.getRepository(Snapshot).save(newSnapshot);
-      // } else {
-      //   // 갱신
-      //   const snapshotToUpdate = await this.snapshotRepository.findOne({
-      //     where: { isLatest: true, movieId },
-      //   });
-      //   snapshotToUpdate.content = createPostRecordDto.content;
-      //   snapshotToUpdate.version++;
-      //   snapshotToUpdate.postId = newPost.postId;
-      //   await queryRunner.manager
-      //     .getRepository(Snapshot)
-      //     .save(snapshotToUpdate);
-      // }
-
       // 최신 버전
       const currentSnapshot =
         await this.currentSnapshotRepository.findOneCurrentSnapshot(movieId);
