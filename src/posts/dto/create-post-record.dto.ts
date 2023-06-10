@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreatePostRecordDto {
   @IsNotEmpty()
@@ -9,6 +9,7 @@ export class CreatePostRecordDto {
   @IsString()
   comment: string;
 
-  @IsString()
-  version: string;
+  @IsOptional()
+  @IsNumber()
+  version: number;
 }

@@ -19,6 +19,16 @@ export class PostRepository extends Repository<Post> {
     manager: EntityManager,
     content: string,
   ) {
+    console.log('content 있냐?', content);
+    const post = new Post();
+
+    post.comment = createPostRecordDto.comment;
+    post.content = content;
+    post.movie = movie;
+    post.user = user;
+
+    // createPostRecordDto의 version으로 해줄까?
+
     const latestPost = await manager
       .getRepository(Post)
       .createQueryBuilder('post')
@@ -26,15 +36,6 @@ export class PostRepository extends Repository<Post> {
       .where('movie.movieId = :movieId', { movieId: movie.movieId })
       .orderBy('post.version', 'DESC')
       .getOne();
-
-    console.log('content 있냐?', content);
-    const post = new Post();
-    post.comment = createPostRecordDto.comment;
-    post.movie = movie;
-    post.user = user;
-    post.content = content;
-
-    // createPostRecordDto의 version으로 해줄까?
 
     if (!latestPost) {
       // 최초 생성인 경우

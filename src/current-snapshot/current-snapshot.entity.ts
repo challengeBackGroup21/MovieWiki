@@ -7,7 +7,6 @@ import {
   JoinColumn,
   OneToOne,
   PrimaryGeneratedColumn,
-  RelationId,
   VersionColumn,
 } from 'typeorm';
 
@@ -19,6 +18,10 @@ export class CurrentSnapshot extends BaseEntity {
 
   @Column()
   movieId: number;
+
+  @Column({ nullable: true })
+  @IsString()
+  comment: string;
 
   @Column()
   @IsString()
