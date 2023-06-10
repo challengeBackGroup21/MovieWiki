@@ -11,8 +11,6 @@ export const typeORMConfig: TypeOrmModuleOptions = {
   database: process.env.RDS_DB_NAME || dbConfig.database,
   entities: [__dirname + '/../**/*.entity.{js,ts}'],
   synchronize: dbConfig.synchronize,
-  ssl: {
-    rejectUnauthorized: false,
-  },
-  // logging: true,
+  ssl: false, // SSL 옵션을 비활성화
+  logging: true,
 };

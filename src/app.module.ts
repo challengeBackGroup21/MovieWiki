@@ -9,6 +9,7 @@ import { MoviesModule } from './movies/movies.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { PostsModule } from './posts/posts.module';
 import { SnapshotModule } from './snapshot/snapshot.module';
+import { CurrentSnapshotModule } from './current-snapshot/current-snapshot.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { SnapshotModule } from './snapshot/snapshot.module';
     NotificationsModule,
     PostsModule,
     SnapshotModule,
+    CurrentSnapshotModule,
   ],
   controllers: [],
   providers: [],
