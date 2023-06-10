@@ -2,14 +2,13 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/auth/user.entity';
 import { MovieRepository } from 'src/movies/movie.repository';
+import { Snapshot } from 'src/snapshot/snapshot.entity';
+import { SnapshotRepository } from 'src/snapshot/snapshot.repository';
 import { DataSource } from 'typeorm';
 import { CreatePostRecordDto } from '../posts/dto/create-post-record.dto';
-import { RevertPostRecordDto } from './dto/revert-post-record.dto';
+import { DiffUtil } from './diff.util';
 import { PostRepository } from './post.repository';
 import { ProcessedPost } from './types/process-post.type';
-import { SnapshotRepository } from 'src/snapshot/snapshot.repository';
-import { Snapshot } from 'src/snapshot/snapshot.entity';
-import { DiffUtil } from './diff.util';
 
 @Injectable()
 export class PostService {
@@ -21,7 +20,7 @@ export class PostService {
     @InjectRepository(SnapshotRepository)
     private readonly snapshotRepository: SnapshotRepository,
     private dataSource: DataSource,
-  ) { }
+  ) {}
 
   async createPostRecord(
     createPostRecordDto: CreatePostRecordDto,
@@ -137,7 +136,9 @@ export class PostService {
     if (!isExistMovie) {
       throw new HttpException('영화가 존재하지 않습니다', 403);
     }
-    const latestPost = await this.snapshotRepository.getLatestPostRecord(movieId);
+    const latestPost = await this.snapshotRepository.getLatestPostRecord(
+      movieId,
+    );
     // console.log(latestPost);
     if (!latestPost) {
       throw new HttpException(
@@ -211,14 +212,17 @@ export class PostService {
   }
 
   //특정 버전으로 롤백
-  async revertPost(
-    movieId: number,
-    version: number
-  ) {
+  async revertPost(movieId: number, version: number) {
     try {
-      const original = await this.snapshotRepository.findSnapshotByVersion(movieId, version);
-      const diffs = await this.postRepository.findPostByVersion(movieId, version);
-      
+      const original = await this.snapshotRepository.findSnapshotByVersion(
+        movieId,
+        version,
+      );
+      const diffs = await this.postRepository.findPostByVersion(
+        movieId,
+        version,
+      );
+
       const diffUtil = new DiffUtil();
       let result = original;
       for (let i = 0; i < diffs.length; i++) {
@@ -228,7 +232,10 @@ export class PostService {
       return result;
     } catch (error) {
       console.error(error);
-      throw new HttpException(`${version} 버전으로 롤백에 실패하였습니다.`, 400);
+      throw new HttpException(
+        `${version} 버전으로 롤백에 실패하였습니다.`,
+        400,
+      );
     }
   }
 }

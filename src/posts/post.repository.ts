@@ -3,7 +3,6 @@ import { User } from 'src/auth/user.entity';
 import { Movie } from 'src/movies/movie.entity';
 import { DataSource, EntityManager, Repository } from 'typeorm';
 import { CreatePostRecordDto } from '../posts/dto/create-post-record.dto';
-import { RevertPostRecordDto } from './dto/revert-post-record.dto';
 import { Post } from './post.entity';
 
 @Injectable()
@@ -93,7 +92,7 @@ export class PostRepository extends Repository<Post> {
 
   /* 특정 버전으로 롤백할 때 */
   async findPostByVersion(movieId: number, version: number) {
-    const snapshotVersion = (Math.floor(version / 10) * 10) + 1;
+    const snapshotVersion = Math.floor(version / 10) * 10 + 1;
 
     const posts = await this.createQueryBuilder('post')
       .leftJoinAndSelect('post.movie', 'movie')

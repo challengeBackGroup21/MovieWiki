@@ -16,10 +16,10 @@ export class Snapshot extends BaseEntity {
   @IsNumber()
   snapshotId: number;
 
-  @Column({ name: 'postId'})
+  @Column({ name: 'postId' })
   postId: number;
 
-  @Column({ name: 'movieId'})
+  @Column({ name: 'movieId' })
   movieId: number;
 
   @Column()
@@ -35,10 +35,10 @@ export class Snapshot extends BaseEntity {
   isLatest: boolean;
 
   @ManyToOne(() => Post)
-  @JoinColumn({ name: 'postId'})
+  @JoinColumn({ name: 'postId' })
   post: Post;
 
   @ManyToOne(() => Movie)
-  @JoinColumn({ name: 'movieId'})
+  @JoinColumn({ name: 'movieId' })
   movie: Movie;
 }
