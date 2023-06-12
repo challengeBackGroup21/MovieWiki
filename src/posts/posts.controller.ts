@@ -10,12 +10,10 @@ import {
 import { GetCurrentUser } from 'src/auth/common/decorators';
 import { AccessTokenGuard } from 'src/auth/guards';
 import { CreatePostRecordDto } from '../posts/dto/create-post-record.dto';
-import { RevertPostRecordDto } from './dto/revert-post-record.dto';
 import { PostService } from './posts.service';
 import { ProcessedPost } from './types/process-post.type';
 
 import { User } from 'src/auth/user.entity';
-import { version } from 'os';
 
 @Controller('post')
 export class PostController {

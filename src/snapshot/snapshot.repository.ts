@@ -1,7 +1,5 @@
-import { HttpException, Injectable } from '@nestjs/common';
-import { Movie } from 'src/movies/movie.entity';
-import { DataSource, EntityManager, Repository } from 'typeorm';
-import { CreatePostRecordDto } from '../posts/dto/create-post-record.dto';
+import { Injectable } from '@nestjs/common';
+import { DataSource, Repository } from 'typeorm';
 import { Snapshot } from './snapshot.entity';
 
 @Injectable()

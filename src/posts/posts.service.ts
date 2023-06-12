@@ -1,17 +1,15 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/auth/user.entity';
+import { CurrentSnapshotRepository } from 'src/current-snapshot/current-snapshot.repository';
 import { MovieRepository } from 'src/movies/movie.repository';
+import { Snapshot } from 'src/snapshot/snapshot.entity';
+import { SnapshotRepository } from 'src/snapshot/snapshot.repository';
 import { DataSource } from 'typeorm';
 import { CreatePostRecordDto } from '../posts/dto/create-post-record.dto';
-import { RevertPostRecordDto } from './dto/revert-post-record.dto';
+import { DiffUtil } from './diff.util';
 import { PostRepository } from './post.repository';
 import { ProcessedPost } from './types/process-post.type';
-import { SnapshotRepository } from 'src/snapshot/snapshot.repository';
-import { Snapshot } from 'src/snapshot/snapshot.entity';
-import { DiffUtil } from './diff.util';
-import { CurrentSnapshotRepository } from 'src/current-snapshot/current-snapshot.repository';
-import { CurrentSnapshot } from 'src/current-snapshot/current-snapshot.entity';
 
 @Injectable()
 export class PostService {

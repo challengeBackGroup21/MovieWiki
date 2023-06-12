@@ -16,10 +16,9 @@ export class MoviesService {
     try {
       if (option === 'directors') {
         const movies = await this.movieRepositry.directorsSearch(query);
-
         if (movies.length === 0) {
           throw new HttpException(
-            `${option}해당하는 영화 목록 조회를 실패했습니다`,
+            `${query}에 해당하는 영화 목록 조회를 실패했습니다`,
             400,
           );
         }
@@ -91,6 +90,7 @@ export class MoviesService {
 
   // 영화 상세 정보 조회
   async getMovieById(movieId: number): Promise<any> {
+    console.log('service');
     const isExistMovie = await this.movieRepositry.getMovieById(movieId);
     if (!isExistMovie) {
       throw new HttpException('존재하지 않는 영화입니다', 400);

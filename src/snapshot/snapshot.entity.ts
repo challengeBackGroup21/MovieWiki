@@ -1,4 +1,5 @@
 import { IsBoolean, IsNumber, IsString } from 'class-validator';
+import { Post } from 'src/posts/post.entity';
 import {
   BaseEntity,
   Column,
@@ -6,10 +7,8 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
-  RelationId,
 } from 'typeorm';
 import { Movie } from '../movies/movie.entity';
-import { Post } from 'src/posts/post.entity';
 
 @Entity()
 export class Snapshot extends BaseEntity {
