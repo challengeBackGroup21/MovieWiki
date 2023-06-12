@@ -40,7 +40,6 @@ export class PostController {
   getLatestPostRecord(
     @Param('movieId', ParseIntPipe) movieId: number,
   ): Promise<ProcessedPost> {
-    console.log(movieId);
     return this.postService.getLatestPostRecord(movieId);
   }
 

@@ -90,6 +90,7 @@ export class MoviesService {
 
   // 영화 상세 정보 조회
   async getMovieById(movieId: number): Promise<any> {
+    console.log('service');
     const isExistMovie = await this.movieRepositry.getMovieById(movieId);
     if (!isExistMovie) {
       throw new HttpException('존재하지 않는 영화입니다', 400);
