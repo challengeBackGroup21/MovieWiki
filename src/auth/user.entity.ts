@@ -49,6 +49,7 @@ export class User extends BaseEntity {
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
+  // 왜 연결을 entity끼리 하는 거지?
   @OneToMany(() => Post, (post) => post.user, { eager: false })
   posts: Post[];
 

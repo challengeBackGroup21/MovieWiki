@@ -1,6 +1,6 @@
 export class DiffUtil {
   // 문장에서 단어 찾기
-  diffLineToWord = (originalText, modifiedText) => {
+  diffLineToWord = (originalText, modifiedText): any[] => {
     const diff = [];
     const dp = [];
     // DP 테이블 초기화
@@ -51,7 +51,6 @@ export class DiffUtil {
           });
           currentRemoval = '';
         }
-        // diff.unshift({ type: "equal", value: originalText[i - 1] });
         i--;
         j--;
       } else if (
@@ -84,6 +83,12 @@ export class DiffUtil {
       }
     }
 
+    const addDiff = () => {
+      if (currentAddition !== '') {
+        diff.unshift({ type: 'add', value: currentAddition, idx: addIdx });
+      }
+    };
+
     // 반복 후 마지막에 첫 문자열에 적용해줌.
     if (currentAddition !== '') {
       diff.unshift({ type: 'add', value: currentAddition, idx: addIdx });
@@ -102,19 +107,14 @@ export class DiffUtil {
       if (type === 'add') {
         modified = modified.slice(0, idx) + value + modified.slice(idx);
         for (let j = i + 1; j < diff.length; j++) {
-          // add는 modifiedText 기준으로 생성된 애들이기 때문에 이미 추가가 진행된 상태의 idx이기 때문에 적용을 안 해준다.
-          if (diff[j].type === 'add') {
-            // diff[j].idx += value.length;
-          } else if (diff[j].type === 'remove') {
+          if (diff[j].type === 'remove') {
             diff[j].idx += value.length;
           }
         }
       } else if (type === 'remove') {
         modified = modified.slice(0, idx) + modified.slice(idx + value.length);
         for (let j = i + 1; j < diff.length; j++) {
-          if (diff[j].type === 'add') {
-            // diff[j].idx -= value.length;
-          } else if (diff[j].type === 'remove') {
+          if (diff[j].type === 'remove') {
             diff[j].idx -= value.length;
           }
         }

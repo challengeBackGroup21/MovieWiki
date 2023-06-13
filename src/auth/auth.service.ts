@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -19,7 +20,12 @@ export class AuthService {
   ) {}
 
   async signUp(signUpDto: SignUpDto): Promise<void> {
-    return this.userRepository.createUser(signUpDto);
+    const { email, nickname, password } = signUpDto;
+    if (signUpDto.password.includes(signUpDto.nickname)) {
+      throw new BadRequestException(`비밀번호에 닉네임을 포함할 수 없습니다.`);
+    }
+    const hashedPassword = await this.hash(password);
+    return this.userRepository.createUser(signUpDto, hashedPassword);
   }
 
   /**
