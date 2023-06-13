@@ -23,7 +23,7 @@ export class PostService {
     @InjectRepository(CurrentSnapshotRepository)
     private readonly currentSnapshotRepository: CurrentSnapshotRepository,
     private dataSource: DataSource,
-  ) {}
+  ) { }
 
   async createPostRecord(
     createPostRecordDto: CreatePostRecordDto,
@@ -63,7 +63,7 @@ export class PostService {
       if (!latestPost) {
         // 최초 생성인 경우
         content = JSON.stringify(
-          diffUtil.diffLineToWord('', createPostRecordDto.content),
+          diffUtil.diffArticleToSentence('', createPostRecordDto.content),
           // console.log(diffUtil.diffLineToWord),
         );
       } else {
@@ -73,7 +73,7 @@ export class PostService {
 
         console.log(latestSnapshot);
         content = JSON.stringify(
-          diffUtil.diffLineToWord(
+          diffUtil.diffArticleToSentence(
             latestSnapshot.content,
             createPostRecordDto.content,
           ),
@@ -226,18 +226,29 @@ export class PostService {
         movieId,
         version,
       );
-      const diffs = await this.postRepository.findPostByVersion(
+      const diffs = await this.postRepository.findDiffsByVersion(
         movieId,
         version,
       );
+      const post = await this.postRepository.findPostByVersion(
+        movieId,
+        version
+      );
 
       const diffUtil = new DiffUtil();
-      let result = original;
+      let content = original.content;
       for (let i = 0; i < diffs.length; i++) {
-        result = diffUtil.applyDiff(result, diffs[i]);
+        content = diffUtil.generateModifiedArticle(content, diffs[i]);
       }
 
-      return result;
+      const patchSnapshot = await this.currentSnapshotRepository.patchSnapshot(
+        movieId, 
+        content,
+        post.comment,
+        version
+      );
+
+      return { message: `${version} 버전으로 롤백에 성공하였습니다.` };
     } catch (error) {
       console.error(error);
       throw new HttpException(

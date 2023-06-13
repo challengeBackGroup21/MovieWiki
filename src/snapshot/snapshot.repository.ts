@@ -23,7 +23,7 @@ export class SnapshotRepository extends Repository<Snapshot> {
   async findSnapshotByVersion(
     movieId: number,
     version: number,
-  ): Promise<string> {
+  ): Promise<Snapshot> {
     version = Math.floor(version / 10) * 10 + 1;
 
     if (version !== undefined) {
@@ -33,7 +33,7 @@ export class SnapshotRepository extends Repository<Snapshot> {
         .andWhere('snapshot.version = :version', { version })
         .getOne();
 
-      return snapshot?.content;
+      return snapshot;
     }
   }
 }

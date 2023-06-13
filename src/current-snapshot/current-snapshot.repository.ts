@@ -57,4 +57,17 @@ export class CurrentSnapshotRepository extends Repository<CurrentSnapshot> {
       })
       .getOne();
   }
+
+  async patchSnapshot(
+    movieId: number,
+    content: string,
+    comment: string,
+    version: number
+  ): Promise<void> {
+    await this.createQueryBuilder('currentSnapshot')
+      .update()
+      .set({ content, comment, version })
+      .where('movieId = :movieId', { movieId })
+      .execute();
+  }  
 }
