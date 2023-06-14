@@ -36,4 +36,22 @@ export class SnapshotRepository extends Repository<Snapshot> {
       return snapshot;
     }
   }
+
+  // rollback 버전이 10의 배수일 경우 스냅샷 업데이트
+  async rollbackVersionUpdateSnapshot(
+    movieId: number,
+    postId: number,
+    version: number,
+    content: string
+  ) {
+    const snapshot = new Snapshot();
+    snapshot.movieId = movieId;
+    snapshot.postId = postId;
+    snapshot.version = version;
+    snapshot.content = content;
+    snapshot.isLatest = false;
+
+    console.log(snapshot);
+    await this.manager.save(snapshot);
+  };
 }

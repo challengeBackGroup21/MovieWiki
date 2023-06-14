@@ -200,18 +200,30 @@ export class PostService {
         throw new HttpException('영화가 존재하지 않습니다.', 403);
       }
 
-      const allData = await this.postRepository.getPostRecords(movieId);
+      const latestPost = await this.postRepository.getPostRecords(movieId);
 
-      const result = allData.map((data) => {
-        return {
-          postId: data.postId,
-          userId: data.userId,
-          content: data.content,
-          comment: data.comment,
-          createdAt: data.createdAt,
-          version: data.version,
+      const result = [];
+
+      for (let i = latestPost.version; i >= 1; i--) {
+        const original = await this.snapshotRepository.findSnapshotByVersion(movieId, i);
+        const diffs = await this.postRepository.findDiffsByVersion(movieId, i);
+        const post = await this.postRepository.findPostByVersion(movieId, i);
+
+        const diffUtil = new DiffUtil();
+        let content = original.content;
+        for (let j = 0; j < diffs.length; j++) {
+          content = diffUtil.generateModifiedArticle(content, diffs[j]);
         };
-      });
+
+        result.push({
+          postId: post.postId,
+          userId: post.userId,
+          content: content,
+          comment: post.comment,
+          createdAt: post.createdAt,
+          version: post.version
+        });
+      }
 
       return result;
     } catch (error) {
@@ -235,17 +247,40 @@ export class PostService {
         version
       );
 
+      const currentSnapshot = await this.currentSnapshotRepository.findOneCurrentSnapshot(movieId);
+
       const diffUtil = new DiffUtil();
       let content = original.content;
       for (let i = 0; i < diffs.length; i++) {
         content = diffUtil.generateModifiedArticle(content, diffs[i]);
+      };
+
+      let diff = '';
+      diff = JSON.stringify(
+        diffUtil.diffArticleToSentence(currentSnapshot.content, content)
+      );
+
+      const rollbackVersionDiffCreatePost = await this.postRepository.rollbackVersionDiffCreatePost(
+        diff,
+        post.comment,
+        post.userId,
+        movieId
+      );
+
+      if (rollbackVersionDiffCreatePost.version % 10 === 1) {
+        this.snapshotRepository.rollbackVersionUpdateSnapshot(
+          rollbackVersionDiffCreatePost.movieId,
+          rollbackVersionDiffCreatePost.postId,
+          rollbackVersionDiffCreatePost.version,
+          content
+        );
       }
 
       const patchSnapshot = await this.currentSnapshotRepository.patchSnapshot(
-        movieId, 
+        movieId,
         content,
         post.comment,
-        version
+        rollbackVersionDiffCreatePost.version
       );
 
       return { message: `${version} 버전으로 롤백에 성공하였습니다.` };

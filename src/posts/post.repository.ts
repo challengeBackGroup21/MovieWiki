@@ -75,7 +75,7 @@ export class PostRepository extends Repository<Post> {
       .leftJoinAndSelect('post.movie', 'movie')
       .where('movie.movieId = :movieId', { movieId })
       .orderBy('post.version', 'DESC')
-      .getMany();
+      .getOne();
 
     console.log(posts);
     return posts;
@@ -126,6 +126,29 @@ export class PostRepository extends Repository<Post> {
       .andWhere('post.version = :version', { version })
       .getOne();
 
-      return post;
+    return post;
+  };
+
+  async rollbackVersionDiffCreatePost(
+    content: string,
+    comment: string,
+    userId: number,
+    movieId: number
+  ) {
+    const latestPost = await this.createQueryBuilder('post')
+      .leftJoinAndSelect('post.movie', 'movie')
+      .where('movie.movieId = :movieId', { movieId })
+      .orderBy('post.version', 'DESC')
+      .getOne();
+
+    const post = new Post();
+    post.content = content;
+    post.comment = comment;
+    post.movieId = movieId;
+    post.userId = userId;
+    post.version = latestPost.version + 1;
+
+    console.log(post);
+    return await this.manager.save(post);
   };
 }
