@@ -75,7 +75,7 @@ export class PostRepository extends Repository<Post> {
       .leftJoinAndSelect('post.movie', 'movie')
       .where('movie.movieId = :movieId', { movieId })
       .orderBy('post.version', 'DESC')
-      .getMany();
+      .getOne();
 
     console.log(posts);
     return posts;
@@ -102,7 +102,7 @@ export class PostRepository extends Repository<Post> {
   }
 
   /* 특정 버전으로 롤백할 때 */
-  async findPostByVersion(movieId: number, version: number) {
+  async findDiffsByVersion(movieId: number, version: number) {
     const snapshotVersion = Math.floor(version / 10) * 10 + 1;
 
     const posts = await this.createQueryBuilder('post')
@@ -116,8 +116,39 @@ export class PostRepository extends Repository<Post> {
 
     const diffs = posts.map((post) => JSON.parse(post.content));
 
-    console.log('postRepoDiff : ' + diffs);
-    console.log(typeof diffs);
     return diffs;
   }
+
+  async findPostByVersion(movieId: number, version: number) {
+    const post = await this.createQueryBuilder('post')
+      .leftJoinAndSelect('post.movie', 'movie')
+      .where('movie.movieId = :movieId', { movieId })
+      .andWhere('post.version = :version', { version })
+      .getOne();
+
+    return post;
+  };
+
+  async rollbackVersionDiffCreatePost(
+    content: string,
+    comment: string,
+    userId: number,
+    movieId: number
+  ) {
+    const latestPost = await this.createQueryBuilder('post')
+      .leftJoinAndSelect('post.movie', 'movie')
+      .where('movie.movieId = :movieId', { movieId })
+      .orderBy('post.version', 'DESC')
+      .getOne();
+
+    const post = new Post();
+    post.content = content;
+    post.comment = comment;
+    post.movieId = movieId;
+    post.userId = userId;
+    post.version = latestPost.version + 1;
+
+    console.log(post);
+    return await this.manager.save(post);
+  };
 }

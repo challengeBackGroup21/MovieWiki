@@ -43,14 +43,14 @@ export class PostController {
     return this.postService.getLatestPostRecord(movieId);
   }
 
-  // 영화 상세 수정 기록 조회
-  @Get('/:movieId/record/:postId')
-  getOnePostRecord(
-    @Param('movieId', ParseIntPipe) movieId: number,
-    @Param('postId', ParseIntPipe) postId: number,
-  ): Promise<ProcessedPost> {
-    return this.postService.getOnePostRecord(movieId, postId);
-  }
+  // // 영화 상세 수정 기록 조회
+  // @Get('/:movieId/record/:postId')
+  // getOnePostRecord(
+  //   @Param('movieId', ParseIntPipe) movieId: number,
+  //   @Param('postId', ParseIntPipe) postId: number,
+  // ): Promise<ProcessedPost> {
+  //   return this.postService.getOnePostRecord(movieId, postId);
+  // }
 
   // 영화 상세 수정 기록 전체 조회
   @Get('/:movieId/record')

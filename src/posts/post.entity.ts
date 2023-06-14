@@ -24,10 +24,10 @@ export class Post extends BaseEntity {
   @IsNumber()
   postId: number;
 
-  @RelationId((post: Post) => post.user)
+  @Column({ name: 'userId' })
   userId: number;
 
-  @RelationId((post: Post) => post.movie)
+  @Column({ name: 'movieId' })
   movieId: number;
 
   @Column()
@@ -59,11 +59,11 @@ export class Post extends BaseEntity {
   @OneToMany(() => Snapshot, (snapshot) => snapshot.postId, { eager: false })
   snapshot: Snapshot[];
 
-  @ManyToOne(() => User, (user) => user.posts, { eager: false })
-  @JoinColumn({ name: 'userId', referencedColumnName: 'userId' })
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'userId' })
   user: User;
 
-  @ManyToOne(() => Movie, (movie) => movie.posts, { eager: false })
-  @JoinColumn({ name: 'movieId', referencedColumnName: 'movieId' })
+  @ManyToOne(() => Movie)
+  @JoinColumn({ name: 'movieId' })
   movie: Movie;
 }
