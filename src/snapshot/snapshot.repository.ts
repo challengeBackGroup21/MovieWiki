@@ -23,7 +23,7 @@ export class SnapshotRepository extends Repository<Snapshot> {
   async findSnapshotByVersion(
     movieId: number,
     version: number,
-  ): Promise<string> {
+  ): Promise<Snapshot> {
     version = Math.floor(version / 10) * 10 + 1;
 
     if (version !== undefined) {
@@ -33,7 +33,25 @@ export class SnapshotRepository extends Repository<Snapshot> {
         .andWhere('snapshot.version = :version', { version })
         .getOne();
 
-      return snapshot?.content;
+      return snapshot;
     }
   }
+
+  // rollback 버전이 10의 배수일 경우 스냅샷 업데이트
+  async rollbackVersionUpdateSnapshot(
+    movieId: number,
+    postId: number,
+    version: number,
+    content: string
+  ) {
+    const snapshot = new Snapshot();
+    snapshot.movieId = movieId;
+    snapshot.postId = postId;
+    snapshot.version = version;
+    snapshot.content = content;
+    snapshot.isLatest = false;
+
+    console.log(snapshot);
+    await this.manager.save(snapshot);
+  };
 }
