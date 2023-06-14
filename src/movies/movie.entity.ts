@@ -1,4 +1,6 @@
 import { IsNumber, IsString } from 'class-validator';
+import { CurrentSnapshot } from 'src/current-snapshot/current-snapshot.entity';
+import { Snapshot } from 'src/snapshot/snapshot.entity';
 import {
   BaseEntity,
   Column,
@@ -12,8 +14,6 @@ import {
 import { Like } from '../likes/like.entity';
 import { Notification } from '../notifications/notification.entity';
 import { Post } from '../posts/post.entity';
-import { Snapshot } from 'src/snapshot/snapshot.entity';
-import { CurrentSnapshot } from 'src/current-snapshot/current-snapshot.entity';
 
 @Entity()
 export class Movie extends BaseEntity {

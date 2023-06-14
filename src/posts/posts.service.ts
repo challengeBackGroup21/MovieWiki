@@ -158,6 +158,7 @@ export class PostService {
       // postId: latestPost.postId,
       content: latestPost.content,
       version: latestPost.version,
+      comment: latestPost.comment,
     };
 
     return result;

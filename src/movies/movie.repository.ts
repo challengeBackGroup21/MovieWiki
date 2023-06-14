@@ -46,7 +46,7 @@ export class MovieRepository extends Repository<Movie> {
   // 동일한 제목의 영화 존재할 수 도 있어서 find로 검색
   async movieNmSearch(query: string): Promise<Movie[]> {
     const movies = await this.createQueryBuilder('movie')
-      .where('movie.movieNm = :movieNm', { movieNm: `%${query}%` })
+      .where('movie.movieNm LIKE :movieNm', { movieNm: `%${query}%` })
       .take(20)
       .getMany();
 
@@ -65,7 +65,6 @@ export class MovieRepository extends Repository<Movie> {
       .orderBy('movie.movieId', 'ASC')
       .take(20)
       .getMany();
-
     return movies;
   }
 

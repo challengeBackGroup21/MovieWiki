@@ -28,7 +28,6 @@ const redisConfig = config.get('redis');
         port: redisConfig.port,
         username: redisConfig.username,
         password: redisConfig.password,
-        ttl: 10,
       }),
     }),
     TypeOrmModule.forRoot(typeORMConfig),
