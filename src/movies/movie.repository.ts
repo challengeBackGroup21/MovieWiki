@@ -79,6 +79,10 @@ export class MovieRepository extends Repository<Movie> {
     return isExistMovie;
   }
 
+  async incrementMovieView(movieId: number) {
+    return await this.increment({ movieId }, 'views', 1);
+  }
+
   async updateMovieData(updateMovie): Promise<Movie> {
     await this.save(updateMovie);
     return updateMovie;

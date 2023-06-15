@@ -229,7 +229,7 @@ export class PostService {
           diff: JSON.parse(post.content),
         });
       }
-
+      console.log(result);
       return result;
     } catch (error) {
       throw new HttpException('수정 기록 조회에 실패했습니다.', 400);

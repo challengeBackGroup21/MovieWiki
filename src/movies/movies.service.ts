@@ -1,14 +1,16 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Cache } from 'cache-manager';
 import { UpdateMovieDto } from './dto/update-movie-dto';
 import { Movie } from './movie.entity';
 import { MovieRepository } from './movie.repository';
-
 @Injectable()
 export class MoviesService {
   constructor(
     @InjectRepository(MovieRepository)
     private movieRepositry: MovieRepository,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
 
   // option에 따라 검색하기
@@ -90,11 +92,19 @@ export class MoviesService {
 
   // 영화 상세 정보 조회
   async getMovieById(movieId: number): Promise<any> {
-    console.log('service');
     const isExistMovie = await this.movieRepositry.getMovieById(movieId);
     if (!isExistMovie) {
       throw new HttpException('존재하지 않는 영화입니다', 400);
     }
+    const isViewed = await this.cacheManager.get(`viewed/${movieId}`);
+
+    if (!isViewed) {
+      this.cacheManager.set(`viewed/${movieId}`, true, 100);
+      const increaseView = await this.movieRepositry.incrementMovieView(
+        movieId,
+      );
+    }
+
     const { posts, ...rest } = isExistMovie;
     const post = posts.length > 0 ? posts[0] : null;
     const detailMovie = { ...rest, post };
