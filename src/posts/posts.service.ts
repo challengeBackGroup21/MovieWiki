@@ -226,6 +226,7 @@ export class PostService {
           comment: post.comment,
           createdAt: post.createdAt,
           version: post.version,
+          diff: JSON.parse(post.content),
         });
       }
 
