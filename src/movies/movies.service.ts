@@ -91,15 +91,21 @@ export class MoviesService {
   }
 
   async getIsViewed(userIp: string, movieId: number) {
-    const isViewed = await this.cacheManager.get(`viewed/${movieId}/${userIp}`);
-
-    if (!isViewed) {
-      this.cacheManager.set(`viewed/${movieId}/${userIp}`, true);
-      const increaseView = await this.movieRepositry.incrementMovieView(
-        movieId,
+    try {
+      const isViewed = await this.cacheManager.get(
+        `viewed/${movieId}/${userIp}`,
       );
+
+      if (!isViewed) {
+        this.cacheManager.set(`viewed/${movieId}/${userIp}`, 'true', 100);
+        const increaseView = await this.movieRepositry.incrementMovieView(
+          movieId,
+        );
+      }
+      return 'view checked';
+    } catch (error) {
+      console.log(error);
     }
-    return;
   }
 
   // 영화 상세 정보 조회
