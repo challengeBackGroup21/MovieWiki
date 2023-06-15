@@ -163,34 +163,34 @@ export class PostService {
     return result;
   }
 
-  async getOnePostRecord(
-    movieId: number,
-    postId: number,
-  ): Promise<ProcessedPost> {
-    try {
-      const isExistMovie = await this.movieRepository.findOneMovie(movieId);
-      if (!isExistMovie) {
-        throw new HttpException('영화가 존재하지 않습니다.', 403);
-      }
+  // async getOnePostRecord(
+  //   movieId: number,
+  //   postId: number,
+  // ): Promise<ProcessedPost> {
+  //   try {
+  //     const isExistMovie = await this.movieRepository.findOneMovie(movieId);
+  //     if (!isExistMovie) {
+  //       throw new HttpException('영화가 존재하지 않습니다.', 403);
+  //     }
 
-      const allData = await this.postRepository.getOnePostRecord(
-        movieId,
-        postId,
-      );
-      const result = {
-        postId: allData.postId,
-        userId: allData.userId,
-        content: allData.content,
-        comment: allData.comment,
-        createdAt: allData.createdAt,
-        version: allData.version,
-      };
-      return result;
-    } catch (error) {
-      console.log(error);
-      throw new HttpException('수정 기록 조회에 실패했습니다.', 400);
-    }
-  }
+  //     const allData = await this.postRepository.getOnePostRecord(
+  //       movieId,
+  //       postId,
+  //     );
+  //     const result = {
+  //       postId: allData.postId,
+  //       userId: allData.userId,
+  //       content: allData.content,
+  //       comment: allData.comment,
+  //       createdAt: allData.createdAt,
+  //       version: allData.version,
+  //     };
+  //     return result;
+  //   } catch (error) {
+  //     console.log(error);
+  //     throw new HttpException('수정 기록 조회에 실패했습니다.', 400);
+  //   }
+  // }
 
   async getPostRecords(movieId: number): Promise<ProcessedPost[]> {
     try {
@@ -221,7 +221,8 @@ export class PostService {
           content: content,
           comment: post.comment,
           createdAt: post.createdAt,
-          version: post.version
+          version: post.version,
+          diff: JSON.parse(post.content)
         });
       }
 
