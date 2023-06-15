@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Ip,
   Param,
   ParseIntPipe,
   Patch,
@@ -37,6 +38,14 @@ export class MoviesController {
   @Get('/:movieId')
   getMovieById(@Param('movieId', ParseIntPipe) movieId: number): Promise<any> {
     return this.moviesService.getMovieById(movieId);
+  }
+
+  @Get('/:movieId/view')
+  getIsViewed(
+    @Ip() userIp: string,
+    @Param('movieId', ParseIntPipe) movieId: number,
+  ) {
+    return this.moviesService.getIsViewed(userIp, movieId);
   }
 
   // 영화 상세 정보 수정

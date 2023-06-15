@@ -90,19 +90,23 @@ export class MoviesService {
     }
   }
 
+  async getIsViewed(userIp: string, movieId: number) {
+    const isViewed = await this.cacheManager.get(`viewed/${movieId}/${userIp}`);
+
+    if (!isViewed) {
+      this.cacheManager.set(`viewed/${movieId}/${userIp}`, true);
+      const increaseView = await this.movieRepositry.incrementMovieView(
+        movieId,
+      );
+    }
+    return;
+  }
+
   // 영화 상세 정보 조회
   async getMovieById(movieId: number): Promise<any> {
     const isExistMovie = await this.movieRepositry.getMovieById(movieId);
     if (!isExistMovie) {
       throw new HttpException('존재하지 않는 영화입니다', 400);
-    }
-    const isViewed = await this.cacheManager.get(`viewed/${movieId}`);
-
-    if (!isViewed) {
-      this.cacheManager.set(`viewed/${movieId}`, true, 100);
-      const increaseView = await this.movieRepositry.incrementMovieView(
-        movieId,
-      );
     }
 
     const { posts, ...rest } = isExistMovie;
