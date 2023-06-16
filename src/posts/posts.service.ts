@@ -23,7 +23,7 @@ export class PostService {
     @InjectRepository(CurrentSnapshotRepository)
     private readonly currentSnapshotRepository: CurrentSnapshotRepository,
     private dataSource: DataSource,
-  ) { }
+  ) {}
 
   async createPostRecord(
     createPostRecordDto: CreatePostRecordDto,
@@ -158,39 +158,40 @@ export class PostService {
       // postId: latestPost.postId,
       content: latestPost.content,
       version: latestPost.version,
+      comment: latestPost.comment,
     };
 
     return result;
   }
 
-  // async getOnePostRecord(
-  //   movieId: number,
-  //   postId: number,
-  // ): Promise<ProcessedPost> {
-  //   try {
-  //     const isExistMovie = await this.movieRepository.findOneMovie(movieId);
-  //     if (!isExistMovie) {
-  //       throw new HttpException('영화가 존재하지 않습니다.', 403);
-  //     }
+  async getOnePostRecord(
+    movieId: number,
+    postId: number,
+  ): Promise<ProcessedPost> {
+    try {
+      const isExistMovie = await this.movieRepository.findOneMovie(movieId);
+      if (!isExistMovie) {
+        throw new HttpException('영화가 존재하지 않습니다.', 403);
+      }
 
-  //     const allData = await this.postRepository.getOnePostRecord(
-  //       movieId,
-  //       postId,
-  //     );
-  //     const result = {
-  //       postId: allData.postId,
-  //       userId: allData.userId,
-  //       content: allData.content,
-  //       comment: allData.comment,
-  //       createdAt: allData.createdAt,
-  //       version: allData.version,
-  //     };
-  //     return result;
-  //   } catch (error) {
-  //     console.log(error);
-  //     throw new HttpException('수정 기록 조회에 실패했습니다.', 400);
-  //   }
-  // }
+      const allData = await this.postRepository.getOnePostRecord(
+        movieId,
+        postId,
+      );
+      const result = {
+        postId: allData.postId,
+        userId: allData.userId,
+        content: allData.content,
+        comment: allData.comment,
+        createdAt: allData.createdAt,
+        version: allData.version,
+      };
+      return result;
+    } catch (error) {
+      console.log(error);
+      throw new HttpException('수정 기록 조회에 실패했습니다.', 400);
+    }
+  }
 
   async getPostRecords(movieId: number): Promise<ProcessedPost[]> {
     try {
@@ -205,8 +206,10 @@ export class PostService {
       const result = [];
 
       for (let i = latestPost.version; i >= 1; i--) {
+
         const original = await this.snapshotRepository.findSnapshotByVersion(movieId, i);
         console.log('getPostRecords original :', original);
+
         const diffs = await this.postRepository.findDiffsByVersion(movieId, i);
         console.log('getPostRecords diffs :', diffs);
         const post = await this.postRepository.findPostByVersion(movieId, i);
@@ -215,7 +218,7 @@ export class PostService {
         let content = original.content;
         for (let j = 0; j < diffs.length; j++) {
           content = diffUtil.generateModifiedArticle(content, diffs[j]);
-        };
+        }
 
         result.push({
           postId: post.postId,
@@ -224,10 +227,10 @@ export class PostService {
           comment: post.comment,
           createdAt: post.createdAt,
           version: post.version,
-          diff: JSON.parse(post.content)
+          diff: JSON.parse(post.content),
         });
       }
-
+      console.log(result);
       return result;
     } catch (error) {
       throw new HttpException('수정 기록 조회에 실패했습니다.', 400);
@@ -250,24 +253,27 @@ export class PostService {
       // 롤백하는 버전의 userId와 comment 추출하기 위해
       const post = await this.postRepository.findPostByVersion(
         movieId,
-        version
+        version,
       );
+
 
       // 현재 적용되어 있는 전체 스냅샷
       const currentSnapshot = await this.currentSnapshotRepository.findOneCurrentSnapshot(movieId);
+
 
       const diffUtil = new DiffUtil();
       // 빈배열이 전달될 경우 원본이 그대로 나옴
       let content = original.content;
       for (let i = 0; i < diffs.length; i++) {
         content = diffUtil.generateModifiedArticle(content, diffs[i]);
-      };
+      }
 
       // 현재 currentsnapshot에 저장되어 있는 스냅샷과 전체 스냅샷과 롤백할 버전의 전체 스냅샷 비교
       let diff = '';
       diff = JSON.stringify(
-        diffUtil.diffArticleToSentence(currentSnapshot.content, content)
+        diffUtil.diffArticleToSentence(currentSnapshot.content, content),
       );
+
 
       /* 현재 currentsnapshot에 저장되어 있는 스냅샷과 전체 스냅샷과 롤백할 버전의 전체 스냅샷
       변경 사항 데이터 post 테이블에 저장 */
@@ -278,12 +284,13 @@ export class PostService {
         movieId
       );
 
+
       if (rollbackVersionDiffCreatePost.version % 10 === 1) {
         this.snapshotRepository.rollbackVersionUpdateSnapshot(
           rollbackVersionDiffCreatePost.movieId,
           rollbackVersionDiffCreatePost.postId,
           rollbackVersionDiffCreatePost.version,
-          content
+          content,
         );
       }
 
@@ -292,7 +299,7 @@ export class PostService {
         movieId,
         content,
         post.comment,
-        rollbackVersionDiffCreatePost.version
+        rollbackVersionDiffCreatePost.version,
       );
 
       return { message: `${version} 버전으로 롤백에 성공하였습니다.` };
