@@ -312,7 +312,7 @@ export class DiffUtil {
 
     for (const change of diff) {
       if (change.type === 'remove') {
-        const sentenceToRemove = change.value;
+        const sentenceToRemove = change.value + '</p>';
         modifiedArticle = modifiedArticle.replace(sentenceToRemove, '');
       } else if (change.type === 'add') {
         const sentenceToAdd = change.value;
@@ -324,8 +324,10 @@ export class DiffUtil {
     // 연속된 '</p>' 정리
     modifiedArticle = this.cleanUpConsecutiveTags(modifiedArticle, '</p>');
 
-    // 마지막에 '</p>' 추가
-    modifiedArticle += '</p>';
+    // 마지막에 '</p>'가 없을 때만 추가
+    if (!modifiedArticle.endsWith('</p>')) {
+      modifiedArticle += '</p>';
+    }
 
     return modifiedArticle;
   }
@@ -339,7 +341,7 @@ export class DiffUtil {
       ...sentences.slice(index)
     ].filter(Boolean);
 
-    return modifiedSentences.join('</p>');
+    return modifiedSentences.join('</p>')+'</p>';
   }
 
   // 가공 마지막에 </p> 태그 중복값 제거
