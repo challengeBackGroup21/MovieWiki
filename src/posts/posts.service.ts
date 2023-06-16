@@ -206,13 +206,14 @@ export class PostService {
       const result = [];
 
       for (let i = latestPost.version; i >= 1; i--) {
-        const original = await this.snapshotRepository.findSnapshotByVersion(
-          movieId,
-          i,
-        );
-        const diffs = await this.postRepository.findDiffsByVersion(movieId, i);
-        const post = await this.postRepository.findPostByVersion(movieId, i);
 
+        const original = await this.snapshotRepository.findSnapshotByVersion(movieId, i);
+        console.log('getPostRecords original :', original);
+
+        const diffs = await this.postRepository.findDiffsByVersion(movieId, i);
+        console.log('getPostRecords diffs :', diffs);
+        const post = await this.postRepository.findPostByVersion(movieId, i);
+        console.log('getPostRecords post :', post);
         const diffUtil = new DiffUtil();
         let content = original.content;
         for (let j = 0; j < diffs.length; j++) {
@@ -239,40 +240,50 @@ export class PostService {
   //특정 버전으로 롤백
   async revertPost(movieId: number, version: number) {
     try {
+      // 롤백할 버전 이전 버전의 최신 전체 스냅샷 조회
       const original = await this.snapshotRepository.findSnapshotByVersion(
         movieId,
         version,
       );
+      // version이 1일 경우 빈 배열
       const diffs = await this.postRepository.findDiffsByVersion(
         movieId,
         version,
       );
+      // 롤백하는 버전의 userId와 comment 추출하기 위해
       const post = await this.postRepository.findPostByVersion(
         movieId,
         version,
       );
 
-      const currentSnapshot =
-        await this.currentSnapshotRepository.findOneCurrentSnapshot(movieId);
+
+      // 현재 적용되어 있는 전체 스냅샷
+      const currentSnapshot = await this.currentSnapshotRepository.findOneCurrentSnapshot(movieId);
+
 
       const diffUtil = new DiffUtil();
+      // 빈배열이 전달될 경우 원본이 그대로 나옴
       let content = original.content;
       for (let i = 0; i < diffs.length; i++) {
         content = diffUtil.generateModifiedArticle(content, diffs[i]);
       }
 
+      // 현재 currentsnapshot에 저장되어 있는 스냅샷과 전체 스냅샷과 롤백할 버전의 전체 스냅샷 비교
       let diff = '';
       diff = JSON.stringify(
         diffUtil.diffArticleToSentence(currentSnapshot.content, content),
       );
 
-      const rollbackVersionDiffCreatePost =
-        await this.postRepository.rollbackVersionDiffCreatePost(
-          diff,
-          post.comment,
-          post.userId,
-          movieId,
-        );
+
+      /* 현재 currentsnapshot에 저장되어 있는 스냅샷과 전체 스냅샷과 롤백할 버전의 전체 스냅샷
+      변경 사항 데이터 post 테이블에 저장 */
+      const rollbackVersionDiffCreatePost = await this.postRepository.rollbackVersionDiffCreatePost(
+        diff,
+        post.comment,
+        post.userId,
+        movieId
+      );
+
 
       if (rollbackVersionDiffCreatePost.version % 10 === 1) {
         this.snapshotRepository.rollbackVersionUpdateSnapshot(
@@ -283,7 +294,8 @@ export class PostService {
         );
       }
 
-      const patchSnapshot = await this.currentSnapshotRepository.patchSnapshot(
+      // 롤백한 버전의 전체 스냅샷 currentSnapshot 테이블에 저장
+      await this.currentSnapshotRepository.patchSnapshot(
         movieId,
         content,
         post.comment,
