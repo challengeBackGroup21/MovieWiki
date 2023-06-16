@@ -20,17 +20,14 @@ export class SnapshotRepository extends Repository<Snapshot> {
   }
 
   // version 값을 이용해 전체 snapshot 데이터를 검색
-  async findSnapshotByVersion(
-    movieId: number,
-    version: number,
-  ): Promise<Snapshot> {
-    version = Math.floor(version / 10) * 10 + 1;
+  async findSnapshotByVersion(movieId: number, version: number): Promise<Snapshot> {
+    const snapshotVersion = Math.floor((version - 1) / 10) * 10 + 1;
 
-    if (version !== undefined) {
+    if (snapshotVersion !== undefined) {
       const snapshot = await this.createQueryBuilder('snapshot')
         .leftJoinAndSelect('snapshot.movie', 'movie')
         .where('movie.movieId = :movieId', { movieId })
-        .andWhere('snapshot.version = :version', { version })
+        .andWhere('snapshot.version = :version', { version: snapshotVersion })
         .getOne();
 
       return snapshot;
