@@ -98,10 +98,17 @@ describe('AuthController', () => {
         password: 'password',
       };
 
-      authController.login(loginDto);
+      const tokens = { accessToken: '', refreshToken: '' };
+
+      jest.spyOn(authService, 'login').mockImplementation(async () => {
+        return tokens;
+      });
+
+      const loginResult = await authController.login(loginDto);
 
       expect(authService.login).toHaveBeenCalledTimes(1);
       expect(authService.login).toHaveBeenCalledWith(loginDto);
+      expect(loginResult).toEqual(tokens);
     });
   });
 

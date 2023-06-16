@@ -279,7 +279,7 @@ export class DiffUtil {
           dp[i][j] = Math.min(
             dp[i - 1][j] + 1, // 삭제
             dp[i][j - 1] + 1, // 삽입
-            dp[i - 1][j - 1] + 1 // 대체
+            dp[i - 1][j - 1] + 1, // 대체
           );
         }
       }
@@ -289,22 +289,34 @@ export class DiffUtil {
     let i = m;
     let j = n;
     while (i > 0 || j > 0) {
-      if (i > 0 && j > 0 && originalSentences[i - 1] === modifiedSentences[j - 1]) {
+      if (
+        i > 0 &&
+        j > 0 &&
+        originalSentences[i - 1] === modifiedSentences[j - 1]
+      ) {
         i--;
         j--;
       } else {
         if (j > 0 && (i === 0 || dp[i][j - 1] <= dp[i - 1][j])) {
-          diff.push({ type: 'add', value: modifiedSentences[j - 1], idx: j - 1 });
+          diff.push({
+            type: 'add',
+            value: modifiedSentences[j - 1],
+            idx: j - 1,
+          });
           j--;
         } else if (i > 0 && (j === 0 || dp[i][j - 1] > dp[i - 1][j])) {
-          diff.push({ type: 'remove', value: originalSentences[i - 1], idx: i - 1 });
+          diff.push({
+            type: 'remove',
+            value: originalSentences[i - 1],
+            idx: i - 1,
+          });
           i--;
         }
       }
     }
 
     return diff.reverse(); // 역순으로 반환하여 원래 순서대로 출력
-  }
+  };
 
   // 원본 데이터와 문장 단위 변경 사항 데이터 더해서 문서 출력
   generateModifiedArticle = (originalArticle, diff) => {
@@ -317,7 +329,11 @@ export class DiffUtil {
       } else if (change.type === 'add') {
         const sentenceToAdd = change.value;
         const insertIndex = change.idx;
-        modifiedArticle = this.insertSentence(modifiedArticle, sentenceToAdd, insertIndex);
+        modifiedArticle = this.insertSentence(
+          modifiedArticle,
+          sentenceToAdd,
+          insertIndex,
+        );
       }
     }
 
@@ -330,7 +346,7 @@ export class DiffUtil {
     }
 
     return modifiedArticle;
-  }
+  };
 
   // </p> 태그 단위로 나누고 다시 더함
   insertSentence = (article, sentence, index) => {
@@ -338,15 +354,15 @@ export class DiffUtil {
     const modifiedSentences = [
       ...sentences.slice(0, index),
       sentence,
-      ...sentences.slice(index)
+      ...sentences.slice(index),
     ].filter(Boolean);
 
-    return modifiedSentences.join('</p>')+'</p>';
-  }
+    return modifiedSentences.join('</p>') + '</p>';
+  };
 
   // 가공 마지막에 </p> 태그 중복값 제거
   cleanUpConsecutiveTags = (article, tag) => {
     const consecutiveTagsRegex = new RegExp(`${tag}+`, 'g');
     return article.replace(consecutiveTagsRegex, tag);
-  }
+  };
 }

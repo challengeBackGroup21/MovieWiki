@@ -31,6 +31,10 @@ const redisConfig = config.get('redis');
         ttl: 5,
       }),
     }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: `.${process.env.NODE_ENV}.yml`,
+    }),
     TypeOrmModule.forRoot(typeORMConfig),
     AuthModule,
     LikesModule,

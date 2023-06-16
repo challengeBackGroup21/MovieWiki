@@ -41,6 +41,7 @@ describe('AuthService', () => {
     usersRepository = moduleRef.get<UserRepository>(UserRepository);
   });
 
+  // 회원가입 테스트
   describe('signUp', () => {
     it('should create a new user', async () => {
       const signupDto: SignUpDto = {
@@ -65,7 +66,6 @@ describe('AuthService', () => {
       );
     });
 
-    // 이거 통과 못 할 거 같은데?
     it('should throw BadRequestException if password includes nickname', async () => {
       const signupDto: SignUpDto = {
         email: 'test@example.com',
@@ -86,6 +86,7 @@ describe('AuthService', () => {
     });
   });
 
+  // 로그인 테스트
   describe('login', () => {
     it('should authenticate and return tokens', async () => {
       const loginDto: LoginDto = {
