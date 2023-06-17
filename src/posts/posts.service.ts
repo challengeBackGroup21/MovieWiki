@@ -158,9 +158,8 @@ export class PostService {
       content: currentSnapshot.content,
       version: currentSnapshot.version,
       comment: currentSnapshot.comment,
-      post: latestPost.content
+      thisVersionDiff: JSON.parse(latestPost.content)
     };
-
     return result;
   }
 
