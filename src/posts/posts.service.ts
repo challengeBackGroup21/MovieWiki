@@ -145,9 +145,9 @@ export class PostService {
     if (!isExistMovie) {
       throw new HttpException('영화가 존재하지 않습니다', 403);
     }
-    const latestPost =
-      await this.currentSnapshotRepository.findOneCurrentSnapshot(movieId);
-    // console.log(latestPost);
+    const currentSnapshot = await this.currentSnapshotRepository.findOneCurrentSnapshot(movieId);
+    const latestPost = await this.postRepository.getPostRecords(movieId);
+
     if (!latestPost) {
       throw new HttpException(
         '해당 영화에 대한 게시물이 존재하지 않습니다',
@@ -155,12 +155,11 @@ export class PostService {
       );
     }
     const result = {
-      // postId: latestPost.postId,
-      content: latestPost.content,
-      version: latestPost.version,
-      comment: latestPost.comment,
+      content: currentSnapshot.content,
+      version: currentSnapshot.version,
+      comment: currentSnapshot.comment,
+      thisVersionDiff: JSON.parse(latestPost.content)
     };
-
     return result;
   }
 
