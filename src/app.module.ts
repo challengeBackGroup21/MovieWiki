@@ -7,7 +7,7 @@ import * as redisStore from 'cache-manager-ioredis';
 import * as config from 'config';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-import { typeORMConfig } from './configs/typeorm.config';
+import { testTypeORMConfig, typeORMConfig } from './configs/typeorm.config';
 import { CurrentSnapshotModule } from './current-snapshot/current-snapshot.module';
 import { LikesModule } from './likes/likes.module';
 import { LoggerMiddleware } from './logger/logger.middleware';
@@ -20,6 +20,7 @@ const redisConfig = config.get('redis');
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      // envFilePath: `./config/${process.env.NODE_ENV || 'development'}.yml`,
     }),
     CacheModule.registerAsync({
       useFactory: () => ({
@@ -31,11 +32,9 @@ const redisConfig = config.get('redis');
         ttl: 5,
       }),
     }),
-    ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: `.${process.env.NODE_ENV}.yml`,
-    }),
-    TypeOrmModule.forRoot(typeORMConfig),
+    TypeOrmModule.forRoot(
+      process.env.NODE_ENV === 'test' ? testTypeORMConfig : typeORMConfig,
+    ),
     AuthModule,
     LikesModule,
     MoviesModule,

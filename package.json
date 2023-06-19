@@ -17,7 +17,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "MODE=test jest --config ./test/jest-e2e.json"
+    "test:e2e": "cross-env NODE_ENV=test jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
     "@nestjs/cache-manager": "^1.0.0",
@@ -37,6 +37,7 @@
     "class-validator": "^0.14.0",
     "config": "^3.3.9",
     "cookie-parser": "^1.4.6",
+    "cross-env": "^7.0.3",
     "passport-jwt": "^4.0.1",
     "pg": "^8.11.0",
     "redis": "^4.6.7",

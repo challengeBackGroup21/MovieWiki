@@ -30,27 +30,11 @@ describe('AppController (e2e)', () => {
   let accessToken: string;
 
   beforeAll(async () => {
+    console.log('process.env.NODE_ENV', process.env.NODE_ENV);
     // testingModule을 하나 생성한다. 이 모듈을 통해 app 인스턴스를 생성한다.
     const dbConfig = config.get('db');
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [
-        AppModule,
-        TypeOrmModule.forRootAsync(typeORMConfig),
-        // TypeOrmModule.forRoot({
-        //   type: 'postgres',
-        //   host: 'localhost',
-        //   port: 5432,
-        //   username: 'postgres',
-        //   password: 'marx1818ch!',
-        //   database: 'MovieWikiTest',
-        //   entities: [__dirname + '/../**/*.entity.{js,ts}'],
-        //   synchronize: true,
-        //   ssl: {
-        //     rejectUnauthorized: false,
-        //   }, // SSL 옵션을 비활성화
-        //   logging: true,
-        // }),
-      ],
+      imports: [AppModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
@@ -70,12 +54,6 @@ describe('AppController (e2e)', () => {
     postController = moduleFixture.get<PostController>(PostController);
     postService = moduleFixture.get<PostService>(PostService);
     movieRepository = moduleFixture.get('MovieRepository');
-    // await movieRepository.query(`
-    //   CREATE SPATIAL INDEX spatial_index ON hospitals(point);
-    // `); // point column에 nullable = false로 설정해주어야함
-    // await movieRepository.query(
-    //   `SELECT setval('table_id_seq', (SELECT MAX(movieId) FROM movie))`,
-    // );
 
     const movies = await movieRepository.query(`
       SELECT * FROM movie limit 10
@@ -98,14 +76,8 @@ describe('AppController (e2e)', () => {
       .send(signUpDto);
   });
 
-  beforeEach(async () => {
-    // 여기에서 로그인을 계속 해줘야 할까? 그런데 그것을 어떻게 전달하지?
-  });
-
-  afterAll((done) => {
-    console.log('dataSource.destroy');
+  afterAll(async () => {
     app.close();
-    done();
   });
 
   it('login success', async () => {
@@ -118,62 +90,57 @@ describe('AppController (e2e)', () => {
       .send(loginDto);
     console.log('response.body', response.body);
     expect(response.status).toEqual(HttpStatus.OK);
-  });
-
-  it('signUp success', async () => {
-    // 회원가입 성공
+    accessToken = response.body.accessToken;
   });
 
   it('영화 상세 정보 생성 및 수정', async () => {
     const createPostRecordDto: CreatePostRecordDto = {
       content: '너무 재미있어요.',
       comment: 'ㅇㅇ',
-      version: 1,
+      version: null,
     };
-
     const mockUser: any = {
       userId: 1,
-      email: '',
-      nickname: 'Test User',
-      auth: 'admin',
+      email: 'meadd231@gmail.com',
+      nickname: 'meadd231',
+      auth: 'USER',
       // 필요한 사용자 정보 추가
     };
-    const accessToken = '';
+    const movieId = 1;
 
+    jest.spyOn(postController, 'createPostRecord');
     jest.spyOn(postService, 'createPostRecord');
 
     const response = await request(app.getHttpServer())
-      .post('/1/record')
+      .post('/post/1/record')
       .send(createPostRecordDto)
       .set('Authorization', `Bearer ${accessToken}`);
 
     // 응답 검증
-    expect(response.status).toBe(HttpStatus.CREATED); // 201 Created 상태코드를 기대
-    expect(response.body).toEqual('');
+    expect(response.status).toBe(HttpStatus.CREATED);
 
-    // createPostRecord() 메서드 호출 및 결과 검증
-    const createdRecord = await postController.createPostRecord(
-      createPostRecordDto,
-      1,
-      mockUser,
-    );
-    expect(createdRecord).toEqual({
+    expect(response.body).toEqual({
       message: '영화 기록 생성에 성공했습니다.',
-    }); // createPostRecord()에 전달된 인자를 검증
+    });
 
-    const movieId = 1;
-    const user = '';
-    expect(postService.createPostRecord).toHaveBeenCalledWith(
-      createPostRecordDto,
-      movieId,
-      user,
-    ); // createPostRecord()가 올바르게 호출되었는지 검증
+    expect(postService.createPostRecord).toHaveBeenCalledTimes(1);
+
+    // token의 발급시간과 만료시간을 체크할 수가 없었음.
+    // expect(postService.createPostRecord).toHaveBeenCalledWith(
+    //   createPostRecordDto,
+    //   movieId,
+    //   mockUser,
+    // );
   });
 
   it('특정 영화 post 버전 전체 조회', async () => {
-    const accessToken = '';
     const response = await request(app.getHttpServer())
-      .get('/1/record')
+      .get('/post/1/record')
       .set('Authorization', `Bearer ${accessToken}`);
+
+    jest.spyOn(postService, 'getPostRecords');
+
+    expect(response.status).toBe(HttpStatus.OK);
+    expect(postService.getPostRecords).toHaveBeenCalledTimes(1);
   });
 });
