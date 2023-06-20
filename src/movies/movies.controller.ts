@@ -30,8 +30,8 @@ export class MoviesController {
 
   // 인기 영화 리스트 조회
   @Get('/like')
-  getLikedMovieList(@Query('cnt', ParseIntPipe) likedListLength: number) {
-    return this.moviesService.getLikedMovieList(likedListLength);
+  getLikedMovieList() {
+    return this.moviesService.getLikedMovieList();
   }
 
   // 영화 상세 정보 조회

@@ -23,7 +23,7 @@ export class PostService {
     @InjectRepository(CurrentSnapshotRepository)
     private readonly currentSnapshotRepository: CurrentSnapshotRepository,
     private dataSource: DataSource,
-  ) {}
+  ) { }
 
   async createPostRecord(
     createPostRecordDto: CreatePostRecordDto,
@@ -194,6 +194,7 @@ export class PostService {
 
   async getPostRecords(movieId: number): Promise<ProcessedPost[]> {
     try {
+      const start = performance.now();
       const isExistMovie = await this.movieRepository.findOneMovie(movieId);
 
       if (!isExistMovie) {
@@ -207,12 +208,12 @@ export class PostService {
       for (let i = latestPost.version; i >= 1; i--) {
 
         const original = await this.snapshotRepository.findSnapshotByVersion(movieId, i);
-        console.log('getPostRecords original :', original);
+        // console.log('getPostRecords original :', original);
 
         const diffs = await this.postRepository.findDiffsByVersion(movieId, i);
-        console.log('getPostRecords diffs :', diffs);
+        // console.log('getPostRecords diffs :', diffs);
         const post = await this.postRepository.findPostByVersion(movieId, i);
-        console.log('getPostRecords post :', post);
+        // console.log('getPostRecords post :', post);
         const diffUtil = new DiffUtil();
         let content = original.content;
         for (let j = 0; j < diffs.length; j++) {
@@ -229,7 +230,11 @@ export class PostService {
           diff: JSON.parse(post.content),
         });
       }
-      console.log(result);
+      // console.log(result);
+      const end = performance.now();
+      const duration = end - start;
+
+      console.log(`코드 실행 시간: ${duration}ms`);
       return result;
     } catch (error) {
       throw new HttpException('수정 기록 조회에 실패했습니다.', 400);
