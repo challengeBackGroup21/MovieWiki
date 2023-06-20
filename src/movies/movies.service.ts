@@ -3,94 +3,51 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateMovieDto } from './dto/update-movie-dto';
 import { Movie } from './movie.entity';
 import { MovieRepository } from './movie.repository';
+import { SearchStrategy } from './strategies/search-strategy.interface';
+import { DirectorsSearch } from './strategies/directors-search.strategy';
+import { GenreSearch } from './strategies/genre-search.strategy';
+import { OpenSearch } from './strategies/open-search.strategy';
+import { NationSearch } from './strategies/nation-search.strategy';
+import { TotalSearch } from './strategies/total-search.strategy';
+import { MovieSearch } from './strategies/movie-search.strategy';
+import { ElasticsearchService } from '@nestjs/elasticsearch';
 
 @Injectable()
 export class MoviesService {
+  // ex) searchStrategies: {'directors': new DirectorsSearch(elasticsearchService)}
+  private searchStrategies: { [key: string]: SearchStrategy } = {};
   constructor(
     @InjectRepository(MovieRepository)
     private movieRepositry: MovieRepository,
-  ) {}
-
+    private readonly elasticsearchService: ElasticsearchService,
+  ) {
+    this.saveStrategy('directors', new DirectorsSearch(elasticsearchService));
+    this.saveStrategy('genreAlt', new GenreSearch(elasticsearchService));
+    this.saveStrategy('openDt', new OpenSearch(elasticsearchService));
+    this.saveStrategy('nationAlt', new NationSearch(elasticsearchService));
+    this.saveStrategy('movieNm', new MovieSearch(elasticsearchService));
+    this.saveStrategy('total', new TotalSearch(elasticsearchService));
+  }
+  // searchStrategies의 option(key)에 해당하는 검색전략을 추가
+  saveStrategy(option: string, searchStrategy: SearchStrategy) {
+    this.searchStrategies[option] = searchStrategy;
+  }
   // option에 따라 검색하기
-  async search(option: string, query: string): Promise<Movie[]> {
-    try {
-      if (option === 'directors') {
-        const movies = await this.movieRepositry.directorsSearch(query);
-        if (movies.length === 0) {
-          throw new HttpException(
-            `${query}에 해당하는 영화 목록 조회를 실패했습니다`,
-            400,
-          );
-        }
-        return movies;
-      }
 
-      if (option === 'genreAlt') {
-        const movies = await this.movieRepositry.genreAltSearch(query);
-
-        if (movies.length === 0) {
-          throw new HttpException(
-            `${query} 장르에 해당하는 영화 목록 조회를 실패했습니다`,
-            400,
-          );
-        }
-
-        return movies;
-      }
-
-      if (option === 'nationAlt') {
-        const movies = await this.movieRepositry.nationAltSearch(query);
-
-        if (movies.length === 0) {
-          throw new HttpException(
-            `${query} 국가에 해당하는 영화 목록 조회를 실패했습니다`,
-            400,
-          );
-        }
-
-        return movies;
-      }
-
-      if (option === 'openDt') {
-        const movies = await this.movieRepositry.openDtSearch(query);
-
-        if (movies.length === 0) {
-          throw new HttpException(
-            `${query} 년도에 해당하는 영화 목록 조회를 실패했습니다`,
-            400,
-          );
-        }
-
-        return movies;
-      }
-      if (option === 'movieNm') {
-        const movies = await this.movieRepositry.movieNmSearch(query);
-        if (movies.length === 0) {
-          throw new HttpException(
-            `${query}에 해당하는 영화 조회에 실패했습니다`,
-            400,
-          );
-        }
-
-        return movies;
-      }
-      if (option === 'total') {
-        const movies = await this.movieRepositry.moviesSearch(query);
-
-        return movies;
-      }
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      } else {
-        throw new HttpException('영화 조회에 실패하였습니다', 400);
-      }
+  async search(option: string, query: string) {
+    const searchStrategy = this.searchStrategies[option];
+    const movies = await searchStrategy.search(query);
+    if (movies.length === 0) {
+      throw new HttpException(
+        `${query}해당하는 영화 목록 조회를 실패했습니다`,
+        400,
+      );
     }
+    return movies;
   }
 
   // 영화 상세 정보 조회
   async getMovieById(movieId: number): Promise<any> {
-    console.log('service');
     const isExistMovie = await this.movieRepositry.getMovieById(movieId);
     if (!isExistMovie) {
       throw new HttpException('존재하지 않는 영화입니다', 400);

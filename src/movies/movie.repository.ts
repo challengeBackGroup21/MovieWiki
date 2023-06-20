@@ -12,7 +12,7 @@ export class MovieRepository extends Repository<Movie> {
       .where('movie.directors ::text ILIKE :directors', {
         directors: `%${query}%`,
       })
-      .take(20)
+      .take(10000)
       .getMany();
     return movies;
   }
@@ -20,7 +20,7 @@ export class MovieRepository extends Repository<Movie> {
   async genreAltSearch(query: string): Promise<Movie[]> {
     const movies = await this.createQueryBuilder('movie')
       .where('movie.genreAlt LIKE :genreAlt', { genreAlt: `%${query}%` })
-      .take(20)
+      .take(100)
       .getMany();
 
     return movies;
@@ -29,7 +29,7 @@ export class MovieRepository extends Repository<Movie> {
   async nationAltSearch(query: string): Promise<Movie[]> {
     const movies = await this.createQueryBuilder('movie')
       .where('movie.nationAlt LIKE :nationAlt', { nationAlt: `%${query}%` })
-      .take(20)
+      .take(10000)
       .getMany();
 
     return movies;
@@ -38,16 +38,16 @@ export class MovieRepository extends Repository<Movie> {
   async openDtSearch(query: string): Promise<Movie[]> {
     const movies = await this.createQueryBuilder('movie')
       .where('movie.openDt LIKE :openDt', { openDt: `${query}%` })
-      .take(20)
+      .take(10000)
       .getMany();
 
     return movies;
   }
   // 동일한 제목의 영화 존재할 수 도 있어서 find로 검색
-  async movieNmSearch(query: string): Promise<Movie[]> {
+  async movieNmSearch(query: string): Promise<any> {
     const movies = await this.createQueryBuilder('movie')
-      .where('movie.movieNm = :movieNm', { movieNm: `%${query}%` })
-      .take(20)
+      .where('movie.movieNm LIKE :movieNm', { movieNm: `%${query}%` })
+      .take(10000)
       .getMany();
 
     return movies;
@@ -61,9 +61,9 @@ export class MovieRepository extends Repository<Movie> {
       .orWhere('movie.genreAlt LIKE :genreAlt', { genreAlt: `%${query}%` })
       .orWhere('movie.nationAlt LIKE :nationAlt', { nationAlt: `%${query}%` })
       .orWhere('movie.openDt LIKE :openDt', { openDt: `${query}%` })
-      .orWhere('movie.movieNm = :movieNm', { movieNm: `%${query}%` })
+      .orWhere('movie.movieNm LIKE :movieNm', { movieNm: `%${query}%` })
       .orderBy('movie.movieId', 'ASC')
-      .take(20)
+      .take(10000)
       .getMany();
 
     return movies;
