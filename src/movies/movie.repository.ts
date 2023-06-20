@@ -47,7 +47,7 @@ export class MovieRepository extends Repository<Movie> {
   async movieNmSearch(query: string): Promise<any> {
     const movies = await this.createQueryBuilder('movie')
       .where('movie.movieNm LIKE :movieNm', { movieNm: `%${query}%` })
-      .take(10000)
+      .take(20)
       .getMany();
 
     return movies;
@@ -65,7 +65,6 @@ export class MovieRepository extends Repository<Movie> {
       .orderBy('movie.movieId', 'ASC')
       .take(10000)
       .getMany();
-
     return movies;
   }
 
@@ -78,6 +77,10 @@ export class MovieRepository extends Repository<Movie> {
       .getOne();
 
     return isExistMovie;
+  }
+
+  async incrementMovieView(movieId: number) {
+    return await this.increment({ movieId }, 'views', 1);
   }
 
   async updateMovieData(updateMovie): Promise<Movie> {

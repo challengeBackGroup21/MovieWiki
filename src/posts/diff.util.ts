@@ -249,4 +249,104 @@ export class DiffUtil {
     }
     return modified;
   };
+
+  // 문장 단위 변경 사항 추적 및 변경 사항 데이터 출력
+  diffArticleToSentence = (originalArticle, modifiedArticle) => {
+    const originalSentences = originalArticle.split('</p>');
+    const modifiedSentences = modifiedArticle.split('</p>');
+
+    const diff = [];
+
+    const m = originalSentences.length;
+    const n = modifiedSentences.length;
+
+    // 최소 편집 거리 계산을 위한 2차원 배열 초기화
+    const dp = new Array(m + 1);
+    for (let i = 0; i <= m; i++) {
+      dp[i] = new Array(n + 1);
+      dp[i][0] = i;
+    }
+    for (let j = 0; j <= n; j++) {
+      dp[0][j] = j;
+    }
+
+    // 최소 편집 거리 계산
+    for (let i = 1; i <= m; i++) {
+      for (let j = 1; j <= n; j++) {
+        if (originalSentences[i - 1] === modifiedSentences[j - 1]) {
+          dp[i][j] = dp[i - 1][j - 1];
+        } else {
+          dp[i][j] = Math.min(
+            dp[i - 1][j] + 1, // 삭제
+            dp[i][j - 1] + 1, // 삽입
+            dp[i - 1][j - 1] + 1 // 대체
+          );
+        }
+      }
+    }
+
+    // 수정된 문장 정보 추출
+    let i = m;
+    let j = n;
+    while (i > 0 || j > 0) {
+      if (i > 0 && j > 0 && originalSentences[i - 1] === modifiedSentences[j - 1]) {
+        i--;
+        j--;
+      } else {
+        if (j > 0 && (i === 0 || dp[i][j - 1] <= dp[i - 1][j])) {
+          diff.push({ type: 'add', value: modifiedSentences[j - 1], idx: j - 1 });
+          j--;
+        } else if (i > 0 && (j === 0 || dp[i][j - 1] > dp[i - 1][j])) {
+          diff.push({ type: 'remove', value: originalSentences[i - 1], idx: i - 1 });
+          i--;
+        }
+      }
+    }
+
+    return diff.reverse(); // 역순으로 반환하여 원래 순서대로 출력
+  }
+
+  // 원본 데이터와 문장 단위 변경 사항 데이터 더해서 문서 출력
+  generateModifiedArticle = (originalArticle, diff) => {
+    let modifiedArticle = originalArticle;
+
+    for (const change of diff) {
+      if (change.type === 'remove') {
+        const sentenceToRemove = change.value + '</p>';
+        modifiedArticle = modifiedArticle.replace(sentenceToRemove, '');
+      } else if (change.type === 'add') {
+        const sentenceToAdd = change.value;
+        const insertIndex = change.idx;
+        modifiedArticle = this.insertSentence(modifiedArticle, sentenceToAdd, insertIndex);
+      }
+    }
+
+    // 연속된 '</p>' 정리
+    modifiedArticle = this.cleanUpConsecutiveTags(modifiedArticle, '</p>');
+
+    // 마지막에 '</p>'가 없을 때만 추가
+    if (!modifiedArticle.endsWith('</p>')) {
+      modifiedArticle += '</p>';
+    }
+
+    return modifiedArticle;
+  }
+
+  // </p> 태그 단위로 나누고 다시 더함
+  insertSentence = (article, sentence, index) => {
+    const sentences = article.split('</p>');
+    const modifiedSentences = [
+      ...sentences.slice(0, index),
+      sentence,
+      ...sentences.slice(index)
+    ].filter(Boolean);
+
+    return modifiedSentences.join('</p>')+'</p>';
+  }
+
+  // 가공 마지막에 </p> 태그 중복값 제거
+  cleanUpConsecutiveTags = (article, tag) => {
+    const consecutiveTagsRegex = new RegExp(`${tag}+`, 'g');
+    return article.replace(consecutiveTagsRegex, tag);
+  }
 }

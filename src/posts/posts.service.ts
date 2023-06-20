@@ -23,7 +23,7 @@ export class PostService {
     @InjectRepository(CurrentSnapshotRepository)
     private readonly currentSnapshotRepository: CurrentSnapshotRepository,
     private dataSource: DataSource,
-  ) {}
+  ) { }
 
   async createPostRecord(
     createPostRecordDto: CreatePostRecordDto,
@@ -63,7 +63,7 @@ export class PostService {
       if (!latestPost) {
         // 최초 생성인 경우
         content = JSON.stringify(
-          diffUtil.diffLineToWord('', createPostRecordDto.content),
+          diffUtil.diffArticleToSentence('', createPostRecordDto.content),
           // console.log(diffUtil.diffLineToWord),
         );
       } else {
@@ -73,7 +73,7 @@ export class PostService {
 
         console.log(latestSnapshot);
         content = JSON.stringify(
-          diffUtil.diffLineToWord(
+          diffUtil.diffArticleToSentence(
             latestSnapshot.content,
             createPostRecordDto.content,
           ),
@@ -145,9 +145,9 @@ export class PostService {
     if (!isExistMovie) {
       throw new HttpException('영화가 존재하지 않습니다', 403);
     }
-    const latestPost =
-      await this.currentSnapshotRepository.findOneCurrentSnapshot(movieId);
-    // console.log(latestPost);
+    const currentSnapshot = await this.currentSnapshotRepository.findOneCurrentSnapshot(movieId);
+    const latestPost = await this.postRepository.getPostRecords(movieId);
+
     if (!latestPost) {
       throw new HttpException(
         '해당 영화에 대한 게시물이 존재하지 않습니다',
@@ -155,11 +155,11 @@ export class PostService {
       );
     }
     const result = {
-      // postId: latestPost.postId,
-      content: latestPost.content,
-      version: latestPost.version,
+      content: currentSnapshot.content,
+      version: currentSnapshot.version,
+      comment: currentSnapshot.comment,
+      thisVersionDiff: JSON.parse(latestPost.content)
     };
-
     return result;
   }
 
@@ -194,25 +194,47 @@ export class PostService {
 
   async getPostRecords(movieId: number): Promise<ProcessedPost[]> {
     try {
+      const start = performance.now();
       const isExistMovie = await this.movieRepository.findOneMovie(movieId);
 
       if (!isExistMovie) {
         throw new HttpException('영화가 존재하지 않습니다.', 403);
       }
 
-      const allData = await this.postRepository.getPostRecords(movieId);
+      const latestPost = await this.postRepository.getPostRecords(movieId);
 
-      const result = allData.map((data) => {
-        return {
-          postId: data.postId,
-          userId: data.userId,
-          content: data.content,
-          comment: data.comment,
-          createdAt: data.createdAt,
-          version: data.version,
-        };
-      });
+      const result = [];
 
+      for (let i = latestPost.version; i >= 1; i--) {
+
+        const original = await this.snapshotRepository.findSnapshotByVersion(movieId, i);
+        // console.log('getPostRecords original :', original);
+
+        const diffs = await this.postRepository.findDiffsByVersion(movieId, i);
+        // console.log('getPostRecords diffs :', diffs);
+        const post = await this.postRepository.findPostByVersion(movieId, i);
+        // console.log('getPostRecords post :', post);
+        const diffUtil = new DiffUtil();
+        let content = original.content;
+        for (let j = 0; j < diffs.length; j++) {
+          content = diffUtil.generateModifiedArticle(content, diffs[j]);
+        }
+
+        result.push({
+          postId: post.postId,
+          userId: post.userId,
+          content: content,
+          comment: post.comment,
+          createdAt: post.createdAt,
+          version: post.version,
+          diff: JSON.parse(post.content),
+        });
+      }
+      // console.log(result);
+      const end = performance.now();
+      const duration = end - start;
+
+      console.log(`코드 실행 시간: ${duration}ms`);
       return result;
     } catch (error) {
       throw new HttpException('수정 기록 조회에 실패했습니다.', 400);
@@ -222,22 +244,69 @@ export class PostService {
   //특정 버전으로 롤백
   async revertPost(movieId: number, version: number) {
     try {
+      // 롤백할 버전 이전 버전의 최신 전체 스냅샷 조회
       const original = await this.snapshotRepository.findSnapshotByVersion(
         movieId,
         version,
       );
-      const diffs = await this.postRepository.findPostByVersion(
+      // version이 1일 경우 빈 배열
+      const diffs = await this.postRepository.findDiffsByVersion(
+        movieId,
+        version,
+      );
+      // 롤백하는 버전의 userId와 comment 추출하기 위해
+      const post = await this.postRepository.findPostByVersion(
         movieId,
         version,
       );
 
+
+      // 현재 적용되어 있는 전체 스냅샷
+      const currentSnapshot = await this.currentSnapshotRepository.findOneCurrentSnapshot(movieId);
+
+
       const diffUtil = new DiffUtil();
-      let result = original;
+      // 빈배열이 전달될 경우 원본이 그대로 나옴
+      let content = original.content;
       for (let i = 0; i < diffs.length; i++) {
-        result = diffUtil.applyDiff(result, diffs[i]);
+        content = diffUtil.generateModifiedArticle(content, diffs[i]);
       }
 
-      return result;
+      // 현재 currentsnapshot에 저장되어 있는 스냅샷과 전체 스냅샷과 롤백할 버전의 전체 스냅샷 비교
+      let diff = '';
+      diff = JSON.stringify(
+        diffUtil.diffArticleToSentence(currentSnapshot.content, content),
+      );
+
+
+      /* 현재 currentsnapshot에 저장되어 있는 스냅샷과 전체 스냅샷과 롤백할 버전의 전체 스냅샷
+      변경 사항 데이터 post 테이블에 저장 */
+      const rollbackVersionDiffCreatePost = await this.postRepository.rollbackVersionDiffCreatePost(
+        diff,
+        post.comment,
+        post.userId,
+        movieId
+      );
+
+
+      if (rollbackVersionDiffCreatePost.version % 10 === 1) {
+        this.snapshotRepository.rollbackVersionUpdateSnapshot(
+          rollbackVersionDiffCreatePost.movieId,
+          rollbackVersionDiffCreatePost.postId,
+          rollbackVersionDiffCreatePost.version,
+          content,
+        );
+      }
+
+      // 롤백한 버전의 전체 스냅샷 currentSnapshot 테이블에 저장
+      await this.currentSnapshotRepository.patchSnapshot(
+        movieId,
+        content,
+        post.comment,
+        rollbackVersionDiffCreatePost.version,
+      );
+
+      return { message: `${version} 버전으로 롤백에 성공하였습니다.` };
     } catch (error) {
       console.error(error);
       throw new HttpException(

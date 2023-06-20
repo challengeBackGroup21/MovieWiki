@@ -1,8 +1,12 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { HttpException, Inject, Injectable } from '@nestjs/common';
+import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Cache } from 'cache-manager';
 import { UpdateMovieDto } from './dto/update-movie-dto';
 import { Movie } from './movie.entity';
 import { MovieRepository } from './movie.repository';
+import Redis from 'ioredis'
 import { SearchStrategy } from './strategies/search-strategy.interface';
 import { DirectorsSearch } from './strategies/directors-search.strategy';
 import { GenreSearch } from './strategies/genre-search.strategy';
@@ -19,8 +23,10 @@ export class MoviesService {
   constructor(
     @InjectRepository(MovieRepository)
     private movieRepositry: MovieRepository,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    @InjectRedis() private readonly redis: Redis
     private readonly elasticsearchService: ElasticsearchService,
-  ) {
+  ) { 
     this.saveStrategy('directors', new DirectorsSearch(elasticsearchService));
     this.saveStrategy('genreAlt', new GenreSearch(elasticsearchService));
     this.saveStrategy('openDt', new OpenSearch(elasticsearchService));
@@ -52,6 +58,7 @@ export class MoviesService {
     if (!isExistMovie) {
       throw new HttpException('존재하지 않는 영화입니다', 400);
     }
+
     const { posts, ...rest } = isExistMovie;
     const post = posts.length > 0 ? posts[0] : null;
     const detailMovie = { ...rest, post };
@@ -95,26 +102,33 @@ export class MoviesService {
     }
   }
 
-  async getLikedMovieList(likedListLength: number) {
+  async getLikedMovieList() {
     try {
-      const Movies = await this.movieRepositry.getLikedMovieList(
-        likedListLength,
-      );
-      const MovieList = Movies.map((movie) => {
+      const realTimePopularRankTopFive = await this.redis.zrevrange('rank', 0, 4);
+      let realTimePopularMovies = [];
+      for (const movieId of realTimePopularRankTopFive) {
+        const movie = await this.movieRepositry.findOneMovie(Number(movieId));
+        realTimePopularMovies.push(movie);
+      }
+
+      const MovieList = realTimePopularMovies.map((movie) => {
+        const directors = movie.directors.map((dir) => dir.peopleNm);
+        const actors = movie.actors.map((act) => act.peopleNm);
+
         return {
           movieId: movie.movieId,
           movieNm: movie.movieNm,
-          directors: movie.directors.map((dir) => dir.peopleNm),
+          directors: directors,
           genreAlt: movie.genreAlt,
           showTm: movie.showTm,
-          actors: movie.actors.map((act) => act.peopleNm),
+          actors: actors,
           watchGradeNm: movie.watchGradeNm,
           views: movie.views,
           likes: movie.likes,
         };
       });
 
-      return MovieList;
+      return MovieList
     } catch (error) {
       throw new HttpException('인기 리스트 조회에 실패했습니다.', 400);
     }

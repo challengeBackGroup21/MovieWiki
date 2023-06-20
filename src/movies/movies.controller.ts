@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Ip,
   Param,
   ParseIntPipe,
   Patch,
@@ -26,14 +27,22 @@ export class MoviesController {
 
   // 인기 영화 리스트 조회
   @Get('/like')
-  getLikedMovieList(@Query('cnt', ParseIntPipe) likedListLength: number) {
-    return this.moviesService.getLikedMovieList(likedListLength);
+  getLikedMovieList() {
+    return this.moviesService.getLikedMovieList();
   }
 
   // 영화 상세 정보 조회
   @Get('/:movieId')
   getMovieById(@Param('movieId', ParseIntPipe) movieId: number): Promise<any> {
     return this.moviesService.getMovieById(movieId);
+  }
+
+  @Get('/:movieId/view')
+  getIsViewed(
+    @Ip() userIp: string,
+    @Param('movieId', ParseIntPipe) movieId: number,
+  ) {
+    return this.moviesService.getIsViewed(userIp, movieId);
   }
 
   // 영화 상세 정보 수정
