@@ -1,25 +1,30 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { HttpException, Inject, Injectable } from '@nestjs/common';
+import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Cache } from 'cache-manager';
 import { UpdateMovieDto } from './dto/update-movie-dto';
 import { Movie } from './movie.entity';
 import { MovieRepository } from './movie.repository';
+import Redis from 'ioredis'
 
 @Injectable()
 export class MoviesService {
   constructor(
     @InjectRepository(MovieRepository)
     private movieRepositry: MovieRepository,
-  ) {}
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    @InjectRedis() private readonly redis: Redis
+  ) { }
 
   // option에 따라 검색하기
   async search(option: string, query: string): Promise<Movie[]> {
     try {
       if (option === 'directors') {
         const movies = await this.movieRepositry.directorsSearch(query);
-
         if (movies.length === 0) {
           throw new HttpException(
-            `${option}해당하는 영화 목록 조회를 실패했습니다`,
+            `${query}에 해당하는 영화 목록 조회를 실패했습니다`,
             400,
           );
         }
@@ -64,7 +69,6 @@ export class MoviesService {
 
         return movies;
       }
-
       if (option === 'movieNm') {
         const movies = await this.movieRepositry.movieNmSearch(query);
         if (movies.length === 0) {
@@ -77,7 +81,7 @@ export class MoviesService {
         return movies;
       }
       if (option === 'total') {
-        const movies = await this.movieRepositry.moviesSearch();
+        const movies = await this.movieRepositry.moviesSearch(query);
 
         return movies;
       }
@@ -90,14 +94,36 @@ export class MoviesService {
     }
   }
 
+  async getIsViewed(userIp: string, movieId: number) {
+    try {
+      const isViewed = await this.cacheManager.get(
+        `viewed/${movieId}/${userIp}`,
+      );
+
+      if (!isViewed) {
+        this.cacheManager.set(`viewed/${movieId}/${userIp}`, 'true', 100);
+        const increaseView = await this.movieRepositry.incrementMovieView(
+          movieId,
+        );
+      }
+
+      const movie_score = await this.redis.zscore('rank', `${movieId}`);
+      await this.redis.zadd('rank', Number(movie_score) + 1, `${movieId}`);
+      // await this.redis.expire('rank', 900);
+
+      return 'view checked';
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   // 영화 상세 정보 조회
   async getMovieById(movieId: number): Promise<any> {
     const isExistMovie = await this.movieRepositry.getMovieById(movieId);
-
     if (!isExistMovie) {
       throw new HttpException('존재하지 않는 영화입니다', 400);
     }
+
     const { posts, ...rest } = isExistMovie;
     const post = posts.length > 0 ? posts[0] : null;
     const detailMovie = { ...rest, post };
@@ -141,12 +167,33 @@ export class MoviesService {
     }
   }
 
-  async getLikedMovieList(likedListLength: number) {
+  async getLikedMovieList() {
     try {
-      const Movies = await this.movieRepositry.getLikedMovieList(
-        likedListLength,
-      );
-      return Movies;
+      const realTimePopularRankTopFive = await this.redis.zrevrange('rank', 0, 4);
+      let realTimePopularMovies = [];
+      for (const movieId of realTimePopularRankTopFive) {
+        const movie = await this.movieRepositry.findOneMovie(Number(movieId));
+        realTimePopularMovies.push(movie);
+      }
+
+      const MovieList = realTimePopularMovies.map((movie) => {
+        const directors = movie.directors.map((dir) => dir.peopleNm);
+        const actors = movie.actors.map((act) => act.peopleNm);
+
+        return {
+          movieId: movie.movieId,
+          movieNm: movie.movieNm,
+          directors: directors,
+          genreAlt: movie.genreAlt,
+          showTm: movie.showTm,
+          actors: actors,
+          watchGradeNm: movie.watchGradeNm,
+          views: movie.views,
+          likes: movie.likes,
+        };
+      });
+
+      return MovieList
     } catch (error) {
       throw new HttpException('인기 리스트 조회에 실패했습니다.', 400);
     }

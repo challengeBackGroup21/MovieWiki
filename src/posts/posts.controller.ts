@@ -11,56 +11,63 @@ import { GetCurrentUser } from 'src/auth/common/decorators';
 import { AccessTokenGuard } from 'src/auth/guards';
 import { CreatePostRecordDto } from '../posts/dto/create-post-record.dto';
 import { PostService } from './posts.service';
-import { RevertPostRecordDto } from './dto/revert-post-record.dto';
+import { ProcessedPost } from './types/process-post.type';
+
+import { User } from 'src/auth/user.entity';
 
 @Controller('post')
 export class PostController {
   constructor(private postService: PostService) {}
 
   // @UseGuards() 로그인 가드 사용
-  // 영화 상세 수정 기록 생성
+  // 영화 상세 기록 생성 및 수정
   @Post('/:movieId/record')
   @UseGuards(AccessTokenGuard)
   createPostRecord(
     @Body() createMovieRecordDto: CreatePostRecordDto,
     @Param('movieId') movieId: number,
-    @GetCurrentUser() user: any,
+    @GetCurrentUser() user: User,
   ) {
     return this.postService.createPostRecord(
       createMovieRecordDto,
       movieId,
-      user.userId,
+      user,
     );
   }
 
-  // 영화 상세 수정 기록 조회
-  @Get('/:movieId/record/:postId')
-  getOnePostRecord(
+  // 영화 최신 버전 기록 조회
+  @Get('/:movieId/record/latest')
+  getLatestPostRecord(
     @Param('movieId', ParseIntPipe) movieId: number,
-    @Param('postId', ParseIntPipe) postId: number,
-  ) {
-    return this.postService.getOnePostRecord(movieId, postId);
+  ): Promise<ProcessedPost> {
+    return this.postService.getLatestPostRecord(movieId);
   }
 
-  // 영화 상세 수정 기록 전체 조회
+  // // 영화 상세 수정 기록 조회
+  // @Get('/:movieId/record/:postId')
+  // getOnePostRecord(
+  //   @Param('movieId', ParseIntPipe) movieId: number,
+  //   @Param('postId', ParseIntPipe) postId: number,
+  // ): Promise<ProcessedPost> {
+  //   return this.postService.getOnePostRecord(movieId, postId);
+  // }
+
+  // 특정 영화 post 버전 전체 조회
   @Get('/:movieId/record')
-  getPostRecords(@Param('movieId', ParseIntPipe) movieId: number) {
+  getPostRecords(
+    @Param('movieId', ParseIntPipe) movieId: number,
+  ): Promise<ProcessedPost[]> {
     return this.postService.getPostRecords(movieId);
   }
-  // 영화 기록 이전 버전 다시 생성
-  @Post('/:movieId/record/:postId')
+
+  //특정 버전으로 롤백
+  @Post('/:movieId/record/:version')
   @UseGuards(AccessTokenGuard)
-  revertPostRecord(
-    @Body() revertPostRecordDto: RevertPostRecordDto,
+  revertPost(
     @Param('movieId', ParseIntPipe) movieId: number,
-    @Param('postId', ParseIntPipe) postId: number,
-    @GetCurrentUser() user: any,
+    @Param('version', ParseIntPipe) version: number,
+    @GetCurrentUser() user: User,
   ) {
-    return this.postService.revertPostRecord(
-      revertPostRecordDto,
-      movieId,
-      postId,
-      user.userId,
-    );
+    return this.postService.revertPost(movieId, version);
   }
 }

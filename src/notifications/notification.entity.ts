@@ -20,6 +20,18 @@ export class Notification extends BaseEntity {
   @IsNumber()
   notiId: number;
 
+  @Column({ name: 'postId' })
+  postId: number;
+
+  @Column({ name: 'movieId', nullable: true })
+  movieId: number;
+
+  @Column({ name: 'reporterId' })
+  reporterId: number;
+
+  @Column({ name: 'reportedId' })
+  reportedId: number;
+
   @Column()
   @IsString()
   notificationContent: string;
@@ -38,20 +50,19 @@ export class Notification extends BaseEntity {
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 
-  @ManyToOne(() => User, (user) => user.notifications, { eager: true })
-  @JoinColumn({ name: 'reporterId', referencedColumnName: 'userId' })
-  reporterId: number;
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'reporterId' })
+  reporter: User;
 
-  @ManyToOne(() => User, (user) => user.reportNotifications, { eager: true })
-  @JoinColumn({ name: 'reportedId', referencedColumnName: 'userId' })
-  reportedId: number;
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'reportedId' })
+  reported: User;
 
-  @ManyToOne(() => Post, (post) => post.notifications, { eager: false })
-  @JoinColumn({ name: 'postId', referencedColumnName: 'postId' })
-  postId: number;
+  @ManyToOne(() => Post)
+  @JoinColumn({ name: 'postId' })
+  post: Post;
 
-  @ManyToOne(() => Movie, (movie) => movie.notiMovieId, { eager: false })
-  @JoinColumn({ name: 'movieId', referencedColumnName: 'movieId' })
-  movieId: number;
-  post: any;
+  @ManyToOne(() => Movie)
+  @JoinColumn({ name: 'movieId' })
+  movie: Movie;
 }

@@ -3,13 +3,13 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { UserRepository } from './user.repository';
-import { LoginDto, SignUpDto } from './dto/auth-credential.dto';
-import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
-import { User } from './user.entity';
+import * as bcrypt from 'bcryptjs';
+import config from 'config';
+import { LoginDto, SignUpDto } from './dto/auth-credential.dto';
 import { Tokens } from './types';
-import * as config from 'config';
+import { User } from './user.entity';
+import { UserRepository } from './user.repository';
 
 @Injectable()
 export class AuthService {

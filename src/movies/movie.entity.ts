@@ -1,10 +1,13 @@
 import { IsNumber, IsString } from 'class-validator';
+import { CurrentSnapshot } from 'src/current-snapshot/current-snapshot.entity';
+import { Snapshot } from 'src/snapshot/snapshot.entity';
 import {
   BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -77,8 +80,16 @@ export class Movie extends BaseEntity {
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 
-  @OneToMany(() => Post, (post) => post.movieId, { eager: true })
+  @OneToOne(() => CurrentSnapshot, (currentSnapshot) => currentSnapshot.movie, {
+    eager: false,
+  })
+  currentSnapshot: CurrentSnapshot;
+
+  @OneToMany(() => Post, (post) => post.movie, { eager: true })
   posts: Post[];
+
+  @OneToMany(() => Snapshot, (snapshot) => snapshot.movieId, { eager: false })
+  snapshots: Snapshot[];
 
   @OneToMany(() => Notification, (notification) => notification.movieId, {
     eager: true,

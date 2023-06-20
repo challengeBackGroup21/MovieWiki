@@ -9,9 +9,10 @@ export class MovieRepository extends Repository<Movie> {
   }
   async directorsSearch(query: string): Promise<Movie[]> {
     const movies = await this.createQueryBuilder('movie')
-      .where('movie.directors @> :directors', {
-        directors: JSON.stringify([{ peopleNm: query }]),
+      .where('movie.directors ::text ILIKE :directors', {
+        directors: `%${query}%`,
       })
+      .take(20)
       .getMany();
     return movies;
   }
@@ -19,6 +20,7 @@ export class MovieRepository extends Repository<Movie> {
   async genreAltSearch(query: string): Promise<Movie[]> {
     const movies = await this.createQueryBuilder('movie')
       .where('movie.genreAlt LIKE :genreAlt', { genreAlt: `%${query}%` })
+      .take(20)
       .getMany();
 
     return movies;
@@ -27,6 +29,7 @@ export class MovieRepository extends Repository<Movie> {
   async nationAltSearch(query: string): Promise<Movie[]> {
     const movies = await this.createQueryBuilder('movie')
       .where('movie.nationAlt LIKE :nationAlt', { nationAlt: `%${query}%` })
+      .take(20)
       .getMany();
 
     return movies;
@@ -35,27 +38,33 @@ export class MovieRepository extends Repository<Movie> {
   async openDtSearch(query: string): Promise<Movie[]> {
     const movies = await this.createQueryBuilder('movie')
       .where('movie.openDt LIKE :openDt', { openDt: `${query}%` })
+      .take(20)
       .getMany();
 
     return movies;
   }
   // 동일한 제목의 영화 존재할 수 도 있어서 find로 검색
   async movieNmSearch(query: string): Promise<Movie[]> {
-    const movies = await this.find({
-      where: { movieNm: query },
-    });
+    const movies = await this.createQueryBuilder('movie')
+      .where('movie.movieNm LIKE :movieNm', { movieNm: `%${query}%` })
+      .take(20)
+      .getMany();
 
     return movies;
   }
 
-  async moviesSearch(): Promise<Movie[]> {
-    const movies = await this.find({
-      order: {
-        movieId: 'ASC',
-      },
-      take: 20,
-    });
-
+  async moviesSearch(query: string): Promise<Movie[]> {
+    const movies = await this.createQueryBuilder('movie')
+      .where('movie.directors ::text ILIKE :directors', {
+        directors: `%${query}%`,
+      })
+      .orWhere('movie.genreAlt LIKE :genreAlt', { genreAlt: `%${query}%` })
+      .orWhere('movie.nationAlt LIKE :nationAlt', { nationAlt: `%${query}%` })
+      .orWhere('movie.openDt LIKE :openDt', { openDt: `${query}%` })
+      .orWhere('movie.movieNm = :movieNm', { movieNm: `%${query}%` })
+      .orderBy('movie.movieId', 'ASC')
+      .take(20)
+      .getMany();
     return movies;
   }
 
@@ -70,17 +79,28 @@ export class MovieRepository extends Repository<Movie> {
     return isExistMovie;
   }
 
+  async incrementMovieView(movieId: number) {
+    return await this.increment({ movieId }, 'views', 1);
+  }
+
   async updateMovieData(updateMovie): Promise<Movie> {
     await this.save(updateMovie);
     return updateMovie;
   }
 
-  async findOneMoive(movieId: number) {
-    return await this.findOne({ where: { movieId } });
+  async findOneMovie(movieId: number) {
+    // return await this.findOne({ where: { movieId } });
+    return await this.createQueryBuilder('movie')
+      .where('movie.movieId = :movieId', { movieId })
+      .getOne();
   }
 
   async getLikedMovieList(likedListLength: number) {
-    return await this.find({ order: { likes: 'DESC' }, take: likedListLength });
+    const likedMovies = await this.createQueryBuilder('movie')
+      .orderBy('movie.likes', 'DESC')
+      .take(likedListLength)
+      .getMany();
+    return likedMovies;
   }
 
   async incrementMovieLike(movieId: number) {

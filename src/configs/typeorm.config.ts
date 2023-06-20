@@ -1,5 +1,5 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import * as config from 'config';
+import config from 'config';
 
 const dbConfig = config.get('db');
 export const typeORMConfig: TypeOrmModuleOptions = {
@@ -13,5 +13,6 @@ export const typeORMConfig: TypeOrmModuleOptions = {
   synchronize: dbConfig.synchronize,
   ssl: {
     rejectUnauthorized: false,
-  },
+  }, // SSL 옵션을 비활성화
+  logging: true,
 };

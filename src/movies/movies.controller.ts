@@ -2,15 +2,16 @@ import {
   Body,
   Controller,
   Get,
+  Ip,
   Param,
   ParseIntPipe,
-  UseGuards,
   Patch,
   Query,
+  UseGuards,
 } from '@nestjs/common';
-import { UpdateMovieDto } from './dto/update-movie-dto';
-import { AccessTokenGuard } from 'src/auth/guards';
 import { GetCurrentUser } from 'src/auth/common/decorators';
+import { AccessTokenGuard } from 'src/auth/guards';
+import { UpdateMovieDto } from './dto/update-movie-dto';
 import { Movie } from './movie.entity';
 import { MoviesService } from './movies.service';
 
@@ -29,14 +30,22 @@ export class MoviesController {
 
   // 인기 영화 리스트 조회
   @Get('/like')
-  getLikedMovieList(@Query('cnt', ParseIntPipe) likedListLength: number) {
-    return this.moviesService.getLikedMovieList(likedListLength);
+  getLikedMovieList() {
+    return this.moviesService.getLikedMovieList();
   }
 
   // 영화 상세 정보 조회
   @Get('/:movieId')
   getMovieById(@Param('movieId', ParseIntPipe) movieId: number): Promise<any> {
     return this.moviesService.getMovieById(movieId);
+  }
+
+  @Get('/:movieId/view')
+  getIsViewed(
+    @Ip() userIp: string,
+    @Param('movieId', ParseIntPipe) movieId: number,
+  ) {
+    return this.moviesService.getIsViewed(userIp, movieId);
   }
 
   // 영화 상세 정보 수정

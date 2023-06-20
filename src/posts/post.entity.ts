@@ -1,4 +1,4 @@
-import { IsDate, IsNumber, IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 import {
   BaseEntity,
   Column,
@@ -8,18 +8,27 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  RelationId,
   UpdateDateColumn,
+  VersionColumn,
 } from 'typeorm';
 import { User } from '../auth/user.entity';
 import { Like } from '../likes/like.entity';
 import { Movie } from '../movies/movie.entity';
 import { Notification } from '../notifications/notification.entity';
+import { Snapshot } from 'src/snapshot/snapshot.entity';
 
 @Entity()
 export class Post extends BaseEntity {
   @PrimaryGeneratedColumn()
   @IsNumber()
   postId: number;
+
+  @Column({ name: 'userId' })
+  userId: number;
+
+  @Column({ name: 'movieId' })
+  movieId: number;
 
   @Column()
   @IsString()
@@ -29,9 +38,9 @@ export class Post extends BaseEntity {
   @IsString()
   comment: string;
 
-  @Column({ nullable: true, default: null })
-  @IsDate()
-  version: Date;
+  @VersionColumn({ nullable: true })
+  @IsNumber()
+  version: number;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
@@ -39,19 +48,22 @@ export class Post extends BaseEntity {
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 
-  @OneToMany((type) => Notification, (Notification) => Notification.postId, {
+  @OneToMany(() => Notification, (Notification) => Notification.postId, {
     eager: true,
   })
   notifications: Notification[];
 
-  @OneToMany((type) => Like, (like) => like.postId, { eager: true })
+  @OneToMany(() => Like, (like) => like.postId, { eager: true })
   likes: Like[];
 
-  @ManyToOne(() => User, (user) => user.posts, { eager: false })
-  @JoinColumn({ name: 'userId', referencedColumnName: 'userId' })
-  userId: User;
+  @OneToMany(() => Snapshot, (snapshot) => snapshot.postId, { eager: false })
+  snapshot: Snapshot[];
 
-  @ManyToOne(() => Movie, (movie) => movie.posts, { eager: false })
-  @JoinColumn({ name: 'movieId', referencedColumnName: 'movieId' })
-  movieId: number;
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'userId' })
+  user: User;
+
+  @ManyToOne(() => Movie)
+  @JoinColumn({ name: 'movieId' })
+  movie: Movie;
 }
