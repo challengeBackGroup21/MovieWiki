@@ -19,7 +19,7 @@ const redisConfig = config.get('redis');
         port: redisConfig.port,
         username: redisConfig.username,
         password: redisConfig.password,
-        ttl: 3600,
+        ttl: 900,
       }),
     }),
   ],

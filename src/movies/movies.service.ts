@@ -104,7 +104,7 @@ export class MoviesService {
       }
       return 'view checked';
     } catch (error) {
-      console.log(error);
+      throw new HttpException('영화 조회 여부 조회에 실패했습니다.', 400);
     }
   }
 
