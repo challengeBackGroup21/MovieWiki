@@ -6,7 +6,7 @@ import { Cache } from 'cache-manager';
 import { UpdateMovieDto } from './dto/update-movie-dto';
 import { Movie } from './movie.entity';
 import { MovieRepository } from './movie.repository';
-import Redis from 'ioredis'
+import Redis from 'ioredis';
 import { SearchStrategy } from './strategies/search-strategy.interface';
 import { DirectorsSearch } from './strategies/directors-search.strategy';
 import { GenreSearch } from './strategies/genre-search.strategy';
@@ -24,9 +24,9 @@ export class MoviesService {
     @InjectRepository(MovieRepository)
     private movieRepositry: MovieRepository,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
-    @InjectRedis() private readonly redis: Redis
+    @InjectRedis() private readonly redis: Redis,
     private readonly elasticsearchService: ElasticsearchService,
-  ) { 
+  ) {
     this.saveStrategy('directors', new DirectorsSearch(elasticsearchService));
     this.saveStrategy('genreAlt', new GenreSearch(elasticsearchService));
     this.saveStrategy('openDt', new OpenSearch(elasticsearchService));
@@ -50,6 +50,29 @@ export class MoviesService {
       );
     }
     return movies;
+  }
+
+  async getIsViewed(userIp: string, movieId: number) {
+    try {
+      const isViewed = await this.cacheManager.get(
+        `viewed/${movieId}/${userIp}`,
+      );
+
+      if (!isViewed) {
+        this.cacheManager.set(`viewed/${movieId}/${userIp}`, 'true', 100);
+        const increaseView = await this.movieRepositry.incrementMovieView(
+          movieId,
+        );
+      }
+
+      const movie_score = await this.redis.zscore('rank', `${movieId}`);
+      await this.redis.zadd('rank', Number(movie_score) + 1, `${movieId}`);
+      // await this.redis.expire('rank', 900);
+
+      return 'view checked';
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   // 영화 상세 정보 조회
@@ -104,7 +127,11 @@ export class MoviesService {
 
   async getLikedMovieList() {
     try {
-      const realTimePopularRankTopFive = await this.redis.zrevrange('rank', 0, 4);
+      const realTimePopularRankTopFive = await this.redis.zrevrange(
+        'rank',
+        0,
+        4,
+      );
       let realTimePopularMovies = [];
       for (const movieId of realTimePopularRankTopFive) {
         const movie = await this.movieRepositry.findOneMovie(Number(movieId));
@@ -128,7 +155,7 @@ export class MoviesService {
         };
       });
 
-      return MovieList
+      return MovieList;
     } catch (error) {
       throw new HttpException('인기 리스트 조회에 실패했습니다.', 400);
     }

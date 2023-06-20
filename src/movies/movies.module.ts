@@ -14,7 +14,6 @@ import { ElasticsearchModule } from '@nestjs/elasticsearch';
 
 @Module({
   imports: [
-    
     TypeOrmModule.forFeature([Movie]),
     CacheModule.registerAsync({
       useFactory: () => ({
@@ -31,9 +30,8 @@ import { ElasticsearchModule } from '@nestjs/elasticsearch';
         host: redisConfig.host,
         port: redisConfig.port,
         password: redisConfig.password,
-      }
-    })
-  ,
+      },
+    }),
     ElasticsearchModule.register({
       node: 'http://13.124.152.252:9200',
       // maxRetries: 10,
