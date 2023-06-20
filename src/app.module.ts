@@ -3,8 +3,8 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import * as redisStore from 'cache-manager-ioredis';
-import * as config from 'config';
+import redisStore from 'cache-manager-ioredis';
+import config from 'config';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { typeORMConfig } from './configs/typeorm.config';
@@ -15,7 +15,9 @@ import { MoviesModule } from './movies/movies.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { PostsModule } from './posts/posts.module';
 import { SnapshotModule } from './snapshot/snapshot.module';
+
 const redisConfig = config.get('redis');
+
 @Module({
   imports: [
     ConfigModule.forRoot({

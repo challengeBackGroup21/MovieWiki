@@ -4,5 +4,9 @@ import { Cache } from 'cache-manager';
 
 @Injectable()
 export class AppService {
-  constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {}
+  public get cacheManager(): Cache {
+    return this._cacheManager;
+  }
+  constructor(@Inject(CACHE_MANAGER)
+    private readonly _cacheManager: Cache) {}
 }
