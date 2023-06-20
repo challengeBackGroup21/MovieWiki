@@ -1,17 +1,21 @@
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { HttpException, Inject, Injectable } from '@nestjs/common';
+import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cache } from 'cache-manager';
 import { UpdateMovieDto } from './dto/update-movie-dto';
 import { Movie } from './movie.entity';
 import { MovieRepository } from './movie.repository';
+import Redis from 'ioredis'
+
 @Injectable()
 export class MoviesService {
   constructor(
     @InjectRepository(MovieRepository)
     private movieRepositry: MovieRepository,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
-  ) {}
+    @InjectRedis() private readonly redis: Redis
+  ) { }
 
   // option에 따라 검색하기
   async search(option: string, query: string): Promise<Movie[]> {
@@ -102,6 +106,11 @@ export class MoviesService {
           movieId,
         );
       }
+
+      const movie_score = await this.redis.zscore('rank', `${movieId}`);
+      await this.redis.zadd('rank', Number(movie_score) + 1, `${movieId}`);
+      // await this.redis.expire('rank', 900);
+
       return 'view checked';
     } catch (error) {
       throw new HttpException('영화 조회 여부 조회에 실패했습니다.', 400);
@@ -158,26 +167,33 @@ export class MoviesService {
     }
   }
 
-  async getLikedMovieList(likedListLength: number) {
+  async getLikedMovieList() {
     try {
-      const Movies = await this.movieRepositry.getLikedMovieList(
-        likedListLength,
-      );
-      const MovieList = Movies.map((movie) => {
+      const realTimePopularRankTopFive = await this.redis.zrevrange('rank', 0, 4);
+      let realTimePopularMovies = [];
+      for (const movieId of realTimePopularRankTopFive) {
+        const movie = await this.movieRepositry.findOneMovie(Number(movieId));
+        realTimePopularMovies.push(movie);
+      }
+
+      const MovieList = realTimePopularMovies.map((movie) => {
+        const directors = movie.directors.map((dir) => dir.peopleNm);
+        const actors = movie.actors.map((act) => act.peopleNm);
+
         return {
           movieId: movie.movieId,
           movieNm: movie.movieNm,
-          directors: movie.directors.map((dir) => dir.peopleNm),
+          directors: directors,
           genreAlt: movie.genreAlt,
           showTm: movie.showTm,
-          actors: movie.actors.map((act) => act.peopleNm),
+          actors: actors,
           watchGradeNm: movie.watchGradeNm,
           views: movie.views,
           likes: movie.likes,
         };
       });
 
-      return MovieList;
+      return MovieList
     } catch (error) {
       throw new HttpException('인기 리스트 조회에 실패했습니다.', 400);
     }
