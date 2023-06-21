@@ -1,12 +1,12 @@
+import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { HttpException, Inject, Injectable } from '@nestjs/common';
-import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cache } from 'cache-manager';
+import Redis from 'ioredis';
 import { UpdateMovieDto } from './dto/update-movie-dto';
 import { Movie } from './movie.entity';
 import { MovieRepository } from './movie.repository';
-import Redis from 'ioredis'
 
 @Injectable()
 export class MoviesService {
@@ -14,8 +14,8 @@ export class MoviesService {
     @InjectRepository(MovieRepository)
     private movieRepositry: MovieRepository,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
-    @InjectRedis() private readonly redis: Redis
-  ) { }
+    @InjectRedis() private readonly redis: Redis,
+  ) {}
 
   // option에 따라 검색하기
   async search(option: string, query: string): Promise<Movie[]> {
@@ -169,8 +169,12 @@ export class MoviesService {
 
   async getLikedMovieList() {
     try {
-      const realTimePopularRankTopFive = await this.redis.zrevrange('rank', 0, 4);
-      let realTimePopularMovies = [];
+      const realTimePopularRankTopFive = await this.redis.zrevrange(
+        'rank',
+        0,
+        4,
+      );
+      const realTimePopularMovies = [];
       for (const movieId of realTimePopularRankTopFive) {
         const movie = await this.movieRepositry.findOneMovie(Number(movieId));
         realTimePopularMovies.push(movie);
@@ -193,7 +197,7 @@ export class MoviesService {
         };
       });
 
-      return MovieList
+      return MovieList;
     } catch (error) {
       throw new HttpException('인기 리스트 조회에 실패했습니다.', 400);
     }

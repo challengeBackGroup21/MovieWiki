@@ -1,9 +1,9 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import cluster from 'node:cluster';
-import process from 'node:process';
 import config from 'config';
 import cookieParser from 'cookie-parser';
+import cluster from 'node:cluster';
+import process from 'node:process';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/exceptions/http-exception-filter';
 

@@ -1,3 +1,4 @@
+import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -7,7 +8,6 @@ import { Movie } from './movie.entity';
 import { MovieRepository } from './movie.repository';
 import { MoviesController } from './movies.controller';
 import { MoviesService } from './movies.service';
-import { RedisModule } from '@liaoliaots/nestjs-redis';
 
 const redisConfig = config.get('redis');
 
@@ -29,8 +29,8 @@ const redisConfig = config.get('redis');
         host: redisConfig.host,
         port: redisConfig.port,
         password: redisConfig.password,
-      }
-    })
+      },
+    }),
   ],
   controllers: [MoviesController],
   providers: [MoviesService, MovieRepository],
