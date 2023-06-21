@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
-import { AuthUser } from 'src/auth/dto/auth-user.oo';
+import { AuthUser } from '../../auth/dto/auth-user.oo';
 import { QueryRunner } from 'typeorm';
 
 export class CreatePostRecordDto {
