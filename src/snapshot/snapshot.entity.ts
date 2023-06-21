@@ -1,5 +1,5 @@
 import { IsBoolean, IsNumber, IsString } from 'class-validator';
-import { Post } from 'src/posts/post.entity';
+import { Post } from '../posts/post.entity';
 import {
   BaseEntity,
   Column,

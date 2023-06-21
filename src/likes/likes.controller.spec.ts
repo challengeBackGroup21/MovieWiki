@@ -9,6 +9,9 @@ describe('LikesController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [LikesController],
+      providers: [
+        { provide: LikeService, useValue: { updateLike: jest.fn() } },
+      ],
     }).compile();
 
     likeController = module.get<LikesController>(LikesController);

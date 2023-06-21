@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { MovieRepository } from './movie.repository';
 import { MoviesService } from './movies.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 describe('MoviesService', () => {
   let moviesService: MoviesService;
@@ -14,6 +15,13 @@ describe('MoviesService', () => {
         {
           provide: getRepositoryToken(MovieRepository),
           useValue: { find: jest.fn(), findOne: jest.fn() },
+        },
+        {
+          provide: CACHE_MANAGER,
+          useValue: {
+            get: jest.fn(),
+            set: jest.fn(),
+          },
         },
       ],
     }).compile();

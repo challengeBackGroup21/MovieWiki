@@ -14,7 +14,32 @@ describe('LikeService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [LikeService],
+      controllers: [LikesController],
+      providers: [
+        LikesModule,
+        LikeService,
+        {
+          provide: LikeRepository,
+          useValue: {
+            findOneLike: jest.fn(),
+            createLike: jest.fn(),
+            destroyLike: jest.fn(),
+          },
+        },
+        {
+          provide: MovieRepository,
+          useValue: {
+            incrementMovieLike: jest.fn(),
+            decrementMovieLike: jest.fn(),
+          },
+        },
+        {
+          provide: DataSource,
+          useValue: {
+            createQueryRunner: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
     likeService = module.get<LikeService>(LikeService);

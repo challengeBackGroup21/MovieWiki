@@ -11,6 +11,7 @@ describe('PostsController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [PostController],
+      providers: [{ provide: PostService, useValue: {} }],
     }).compile();
 
     postController = module.get<PostController>(PostController);

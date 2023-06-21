@@ -16,7 +16,7 @@ import {
 import { PostService } from './posts.service';
 import { ProcessedPost } from './types/process-post.type';
 
-import { User } from 'src/auth/user.entity';
+import { User } from '../auth/user.entity';
 
 @Controller('post')
 export class PostController {
