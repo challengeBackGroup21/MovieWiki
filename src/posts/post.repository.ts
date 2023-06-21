@@ -127,13 +127,13 @@ export class PostRepository extends Repository<Post> {
       .getOne();
 
     return post;
-  };
+  }
 
   async rollbackVersionDiffCreatePost(
     content: string,
     comment: string,
     userId: number,
-    movieId: number
+    movieId: number,
   ) {
     const latestPost = await this.createQueryBuilder('post')
       .leftJoinAndSelect('post.movie', 'movie')
@@ -150,5 +150,5 @@ export class PostRepository extends Repository<Post> {
 
     console.log(post);
     return await this.manager.save(post);
-  };
+  }
 }
