@@ -1,6 +1,7 @@
 import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
+import { ElasticsearchModule } from '@nestjs/elasticsearch';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import redisStore from 'cache-manager-ioredis';
 import config from 'config';
@@ -30,6 +31,13 @@ const redisConfig = config.get('redis');
         port: redisConfig.port,
         password: redisConfig.password,
       },
+    }),
+    ElasticsearchModule.register({
+      node: 'http://13.124.152.252:9200',
+      // maxRetries: 10,
+      // requestTimeout: 60000,
+      // pingTimeout: 60000,
+      // sniffOnStart: true,
     }),
   ],
   controllers: [MoviesController],
