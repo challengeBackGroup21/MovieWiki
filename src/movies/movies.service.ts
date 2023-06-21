@@ -45,7 +45,7 @@ export class MoviesService {
     const movies = await searchStrategy.search(query);
     if (movies.length === 0) {
       throw new HttpException(
-        `${query}해당하는 영화 목록 조회를 실패했습니다`,
+        `${query}에 해당하는 영화 목록 조회를 실패했습니다`,
         400,
       );
     }
