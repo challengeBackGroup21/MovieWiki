@@ -21,7 +21,7 @@ export class LikesController {
   @UseGuards(AccessTokenGuard)
   async updateLike(
     @Param('movieId', ParseIntPipe) movieId: number,
-    @GetCurrentUser() user: User,
+    @GetCurrentUser() user,
   ) {
     const userId = user.userId;
 

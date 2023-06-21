@@ -26,7 +26,7 @@ export class PostController {
   createPostRecord(
     @Body() createMovieRecordDto: CreatePostRecordDto,
     @Param('movieId') movieId: number,
-    @GetCurrentUser() user: User,
+    @GetCurrentUser() user,
   ) {
     return this.postService.createPostRecord(
       createMovieRecordDto,
