@@ -24,7 +24,7 @@ export class CreatePostOo {
   movieId: number;
 
   @IsOptional()
-  user;
+  user: AuthUser;
 
   @IsOptional()
   queryRunner: QueryRunner;
