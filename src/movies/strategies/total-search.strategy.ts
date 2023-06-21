@@ -1,12 +1,12 @@
 import { ElasticsearchService } from '@nestjs/elasticsearch';
-// import { Movie } from '../movie.entity';
+import { Movie } from '../movie.entity';
 // import { MovieRepository } from '../movie.repository';
 import { SearchStrategy } from './search-strategy.interface';
 
 export class TotalSearch implements SearchStrategy {
   constructor(private readonly elasticSearchService: ElasticsearchService) {}
 
-  async search(query: string): Promise<any> {
+  async search(query: string): Promise<Movie[]> {
     console.log('strategy', query);
 
     const { body } = await this.elasticSearchService.search({
@@ -21,7 +21,7 @@ export class TotalSearch implements SearchStrategy {
                   // 여러개의 필드에서 동일한 query로 검색할 때 사용
                   query: query,
                   fields: [
-                    'directorsData.peopleNm',
+                    'directors.peopleNm',
                     'nationAlt',
                     'genreAlt',
                     'movieNm',

@@ -1,12 +1,12 @@
 import { ElasticsearchService } from '@nestjs/elasticsearch';
-// import { Movie } from '../movie.entity';
+import { Movie } from '../movie.entity';
 // import { MovieRepository } from '../movie.repository';
 import { SearchStrategy } from './search-strategy.interface';
 
 export class OpenSearch implements SearchStrategy {
   constructor(private readonly elasticSearchService: ElasticsearchService) {}
 
-  async search(query: string): Promise<any> {
+  async search(query: string): Promise<Movie[]> {
     const { body } = await this.elasticSearchService.search({
       index: 'new_movies',
       body: {

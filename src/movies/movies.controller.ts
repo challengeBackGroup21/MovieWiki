@@ -21,7 +21,10 @@ export class MoviesController {
 
   // 영화 검색
   @Get('search')
-  search(@Query('option') option: string, @Query('query') query: string) {
+  search(
+    @Query('option') option: string,
+    @Query('query') query: string,
+  ): Promise<Movie[]> {
     return this.moviesService.search(option, query);
   }
 

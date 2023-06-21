@@ -40,7 +40,7 @@ export class MoviesService {
   }
   // option에 따라 검색하기
 
-  async search(option: string, query: string) {
+  async search(option: string, query: string): Promise<Movie[]> {
     const searchStrategy = this.searchStrategies[option];
     const movies = await searchStrategy.search(query);
     if (movies.length === 0) {
