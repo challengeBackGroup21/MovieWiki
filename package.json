@@ -21,10 +21,12 @@
   },
   "dependencies": {
     "@liaoliaots/nestjs-redis": "^9.0.5",
+    "@elastic/elasticsearch": "^7.11.1",
     "@nestjs/cache-manager": "^1.0.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.3.2",
     "@nestjs/core": "^9.0.0",
+    "@nestjs/elasticsearch": "^9.0.0",
     "@nestjs/jwt": "^10.0.3",
     "@nestjs/passport": "^9.0.3",
     "@nestjs/platform-express": "^9.0.0",
