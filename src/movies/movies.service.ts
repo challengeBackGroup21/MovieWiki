@@ -132,7 +132,7 @@ export class MoviesService {
         0,
         4,
       );
-      let realTimePopularMovies = [];
+      const realTimePopularMovies = [];
       for (const movieId of realTimePopularRankTopFive) {
         const movie = await this.movieRepositry.findOneMovie(Number(movieId));
         realTimePopularMovies.push(movie);

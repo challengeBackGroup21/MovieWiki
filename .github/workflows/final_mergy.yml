@@ -1,5 +1,4 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+# main 브랜치와 mergy할 경우 test -> docker image로 build -> aws에 배포
 
 name: nest pull_request submitted
 
@@ -13,6 +12,7 @@ env:
   NAME: moviewiki
 
 jobs:
+  # 각 job들은 각기 다른 runner(container)에서 동작한다.
   # test:
 
   #   runs-on: ubuntu-latest
@@ -34,13 +34,12 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - name: Check out source code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
       - name: Set up docker buildx
         id: buildx
         uses: docker/setup-buildx-action@v2
       - name: Cache docker layers
-        uses: actions/cache@v3
+        uses: actions/cache@v3 # 이전 실행에서 사용된 캐시를 사용한다.
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ env.VERSION }}

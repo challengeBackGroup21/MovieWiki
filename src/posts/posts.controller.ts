@@ -7,13 +7,16 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { GetCurrentUser } from 'src/auth/common/decorators';
-import { AccessTokenGuard } from 'src/auth/guards';
-import { CreatePostRecordDto } from '../posts/dto/create-post-record.dto';
+import { GetCurrentUser } from '../auth/common/decorators';
+import { AccessTokenGuard } from '../auth/guards';
+import {
+  CreatePostRecordDto,
+  CreatePostOo,
+} from '../posts/dto/create-post-record.dto';
 import { PostService } from './posts.service';
 import { ProcessedPost } from './types/process-post.type';
 
-import { User } from 'src/auth/user.entity';
+import { User } from '../auth/user.entity';
 
 @Controller('post')
 export class PostController {
@@ -26,7 +29,7 @@ export class PostController {
   createPostRecord(
     @Body() createMovieRecordDto: CreatePostRecordDto,
     @Param('movieId') movieId: number,
-    @GetCurrentUser() user: User,
+    @GetCurrentUser() user,
   ) {
     return this.postService.createPostRecord(
       createMovieRecordDto,

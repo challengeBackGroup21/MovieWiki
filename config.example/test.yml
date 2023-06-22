@@ -1,0 +1,5 @@
+jwt:
+  atExpiresIn: '2h'
+  rtExpiresIn: '7d'
+  atSecret: 'aa'
+  rtSecret: 'bb'
