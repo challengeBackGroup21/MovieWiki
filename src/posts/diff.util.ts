@@ -1,6 +1,6 @@
 export class DiffUtil {
   // 문장에서 단어 찾기
-  diffLineToWord = (originalText, modifiedText) => {
+  diffLineToWord = (originalText, modifiedText): any[] => {
     const diff = [];
     const dp = [];
     // DP 테이블 초기화
@@ -51,7 +51,6 @@ export class DiffUtil {
           });
           currentRemoval = '';
         }
-        // diff.unshift({ type: "equal", value: originalText[i - 1] });
         i--;
         j--;
       } else if (
@@ -84,6 +83,12 @@ export class DiffUtil {
       }
     }
 
+    const addDiff = () => {
+      if (currentAddition !== '') {
+        diff.unshift({ type: 'add', value: currentAddition, idx: addIdx });
+      }
+    };
+
     // 반복 후 마지막에 첫 문자열에 적용해줌.
     if (currentAddition !== '') {
       diff.unshift({ type: 'add', value: currentAddition, idx: addIdx });
@@ -102,19 +107,14 @@ export class DiffUtil {
       if (type === 'add') {
         modified = modified.slice(0, idx) + value + modified.slice(idx);
         for (let j = i + 1; j < diff.length; j++) {
-          // add는 modifiedText 기준으로 생성된 애들이기 때문에 이미 추가가 진행된 상태의 idx이기 때문에 적용을 안 해준다.
-          if (diff[j].type === 'add') {
-            // diff[j].idx += value.length;
-          } else if (diff[j].type === 'remove') {
+          if (diff[j].type === 'remove') {
             diff[j].idx += value.length;
           }
         }
       } else if (type === 'remove') {
         modified = modified.slice(0, idx) + modified.slice(idx + value.length);
         for (let j = i + 1; j < diff.length; j++) {
-          if (diff[j].type === 'add') {
-            // diff[j].idx -= value.length;
-          } else if (diff[j].type === 'remove') {
+          if (diff[j].type === 'remove') {
             diff[j].idx -= value.length;
           }
         }
@@ -279,7 +279,7 @@ export class DiffUtil {
           dp[i][j] = Math.min(
             dp[i - 1][j] + 1, // 삭제
             dp[i][j - 1] + 1, // 삽입
-            dp[i - 1][j - 1] + 1 // 대체
+            dp[i - 1][j - 1] + 1, // 대체
           );
         }
       }
@@ -289,22 +289,34 @@ export class DiffUtil {
     let i = m;
     let j = n;
     while (i > 0 || j > 0) {
-      if (i > 0 && j > 0 && originalSentences[i - 1] === modifiedSentences[j - 1]) {
+      if (
+        i > 0 &&
+        j > 0 &&
+        originalSentences[i - 1] === modifiedSentences[j - 1]
+      ) {
         i--;
         j--;
       } else {
         if (j > 0 && (i === 0 || dp[i][j - 1] <= dp[i - 1][j])) {
-          diff.push({ type: 'add', value: modifiedSentences[j - 1], idx: j - 1 });
+          diff.push({
+            type: 'add',
+            value: modifiedSentences[j - 1],
+            idx: j - 1,
+          });
           j--;
         } else if (i > 0 && (j === 0 || dp[i][j - 1] > dp[i - 1][j])) {
-          diff.push({ type: 'remove', value: originalSentences[i - 1], idx: i - 1 });
+          diff.push({
+            type: 'remove',
+            value: originalSentences[i - 1],
+            idx: i - 1,
+          });
           i--;
         }
       }
     }
 
     return diff.reverse(); // 역순으로 반환하여 원래 순서대로 출력
-  }
+  };
 
   // 원본 데이터와 문장 단위 변경 사항 데이터 더해서 문서 출력
   generateModifiedArticle = (originalArticle, diff) => {
@@ -317,7 +329,11 @@ export class DiffUtil {
       } else if (change.type === 'add') {
         const sentenceToAdd = change.value;
         const insertIndex = change.idx;
-        modifiedArticle = this.insertSentence(modifiedArticle, sentenceToAdd, insertIndex);
+        modifiedArticle = this.insertSentence(
+          modifiedArticle,
+          sentenceToAdd,
+          insertIndex,
+        );
       }
     }
 
@@ -330,7 +346,7 @@ export class DiffUtil {
     }
 
     return modifiedArticle;
-  }
+  };
 
   // </p> 태그 단위로 나누고 다시 더함
   insertSentence = (article, sentence, index) => {
@@ -338,15 +354,15 @@ export class DiffUtil {
     const modifiedSentences = [
       ...sentences.slice(0, index),
       sentence,
-      ...sentences.slice(index)
+      ...sentences.slice(index),
     ].filter(Boolean);
 
-    return modifiedSentences.join('</p>')+'</p>';
-  }
+    return modifiedSentences.join('</p>') + '</p>';
+  };
 
   // 가공 마지막에 </p> 태그 중복값 제거
   cleanUpConsecutiveTags = (article, tag) => {
     const consecutiveTagsRegex = new RegExp(`${tag}+`, 'g');
     return article.replace(consecutiveTagsRegex, tag);
-  }
+  };
 }

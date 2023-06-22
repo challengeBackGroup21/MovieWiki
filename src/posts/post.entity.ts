@@ -16,7 +16,7 @@ import { User } from '../auth/user.entity';
 import { Like } from '../likes/like.entity';
 import { Movie } from '../movies/movie.entity';
 import { Notification } from '../notifications/notification.entity';
-import { Snapshot } from 'src/snapshot/snapshot.entity';
+import { Snapshot } from '../snapshot/snapshot.entity';
 
 @Entity()
 export class Post extends BaseEntity {
