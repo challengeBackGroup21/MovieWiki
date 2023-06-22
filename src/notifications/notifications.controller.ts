@@ -9,11 +9,11 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { GetCurrentUser } from 'src/auth/common/decorators';
-import { AccessTokenGuard } from 'src/auth/guards';
-import { User } from 'src/auth/user.entity';
-import { Notification } from 'src/notifications/notification.entity';
-import { NotificationsService } from 'src/notifications/notifications.service';
+import { GetCurrentUser } from '../auth/common/decorators';
+import { AccessTokenGuard } from '../auth/guards';
+import { User } from '../auth/user.entity';
+import { Notification } from './notification.entity';
+import { NotificationsService } from './notifications.service';
 import { NotificationStatus } from './notification-status.enum';
 import { NotificationStatusValidationPipe } from './pipe/notification-status-validation.pipe';
 

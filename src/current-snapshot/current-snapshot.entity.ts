@@ -1,5 +1,5 @@
 import { IsNumber, IsString } from 'class-validator';
-import { Movie } from 'src/movies/movie.entity';
+import { Movie } from '../movies/movie.entity';
 import {
   BaseEntity,
   Column,
