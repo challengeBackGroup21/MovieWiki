@@ -202,6 +202,7 @@ export class PostService {
       }
 
       const latestPost = await this.postRepository.getPostRecords(movieId);
+      // console.log(latestPost);
 
       const result = [];
 
@@ -212,8 +213,10 @@ export class PostService {
 
         const diffs = await this.postRepository.findDiffsByVersion(movieId, i);
         // console.log('getPostRecords diffs :', diffs);
+        
         const post = await this.postRepository.findPostByVersion(movieId, i);
         // console.log('getPostRecords post :', post);
+        
         const diffUtil = new DiffUtil();
         let content = original.content;
         for (let j = 0; j < diffs.length; j++) {
@@ -230,11 +233,11 @@ export class PostService {
           diff: JSON.parse(post.content),
         });
       }
-      // console.log(result);
       const end = performance.now();
       const duration = end - start;
 
       console.log(`코드 실행 시간: ${duration}ms`);
+      // console.log(result);
       return result;
     } catch (error) {
       throw new HttpException('수정 기록 조회에 실패했습니다.', 400);
