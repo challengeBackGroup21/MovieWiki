@@ -10,7 +10,7 @@ export class DirectorsSearch implements SearchStrategy {
     console.log('strategy', query);
 
     const { body } = await this.elasticSearchService.search({
-      index: 'ngram_movies',
+      index: 'new_movies',
       body: {
         query: {
           match: {
