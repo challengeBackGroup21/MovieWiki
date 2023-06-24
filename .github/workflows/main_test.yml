@@ -1,5 +1,4 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+# develop branch에 pull_request를 보낸 경우 test 진행함.
 
 name: nest main_test
 
@@ -9,15 +8,36 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    # runs-on 명령어는 github action에서 어떤 환경에서 사용할 것인지 runner의 환경을 설정해주는 구문인 것 같다.
+    runs-on: ubuntu-latest # 이 상태라면 ubuntu의 최신버전을 사용하게 되니까 버전을 맞추는 것이 더 좋을 수도 있을 것 같다.
 
     steps:
+      # uses는 github action의 action을 사용하는 구문이다.
+      # checkout이라는 것은 현재 저장소의 소스 코드를 워크플로우가 실행하는 환경으로 가져온다는 의미이다.
       - uses: actions/checkout@v3
       - name: Setup node.js 18.x
         uses: actions/setup-node@v3
         with:
+          # 이렇게 된다면 node-version이 설정이 안 된 것 같은데?
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
+      - name: Copy Example Config Directory
+        run: |
+          cp -r config.example config
+
+      # - name: Create Config Folder
+      #   run: mkdir config
+
+      # - name: Create File
+      #   run: |
+      #     touch config/test.yml
+      #     echo "ENV_VAR_NAME=example" >> $GITHUB_ENV
+
+      # - name: Set Environment Variables
+      #   run: |
+      #     echo "ENV_VAR_NAME=example" >> $GITHUB_ENV
+      #     echo "ANOTHER_ENV_VAR=12345" >> $GITHUB_ENV
+
       - run: npm ci
       - run: npm run build --if-present # 이거까지 있어야 할까? 한 번 알아보자.
       - run: npm test

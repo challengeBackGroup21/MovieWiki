@@ -1,6 +1,4 @@
 import { IsNumber, IsString } from 'class-validator';
-import { CurrentSnapshot } from 'src/current-snapshot/current-snapshot.entity';
-import { Snapshot } from 'src/snapshot/snapshot.entity';
 import {
   BaseEntity,
   Column,
@@ -14,6 +12,8 @@ import {
 import { Like } from '../likes/like.entity';
 import { Notification } from '../notifications/notification.entity';
 import { Post } from '../posts/post.entity';
+import { Snapshot } from '../snapshot/snapshot.entity';
+import { CurrentSnapshot } from '../current-snapshot/current-snapshot.entity';
 
 @Entity()
 export class Movie extends BaseEntity {
@@ -73,6 +73,10 @@ export class Movie extends BaseEntity {
   @Column({ default: 0 })
   @IsNumber()
   views: number;
+
+  @Column({ nullable: true })
+  @IsString()
+  imageUrl: string;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

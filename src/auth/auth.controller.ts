@@ -29,14 +29,13 @@ export class AuthController {
   }
 
   @Post('/login')
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.OK) // response code를 전달해준다.
   login(
     @Body(ValidationPipe) loginDto: LoginDto,
-    @Res({ passthrough: true }) response: Response,
+    // @Res({ passthrough: true }) response: Response,
   ): Promise<Tokens> {
     const tokens = this.authService.login(loginDto);
-    // res.cookie('', 하하tokens, { httpOnly: true });
-    response.cookie('tokens', tokens); // hello
+    // response.cookie('tokens', tokens);
     return tokens;
   }
 
@@ -57,16 +56,8 @@ export class AuthController {
     return this.authService.refreshAccessToken(userId, refreshToken);
   }
 
-  // @UseGuards 데코레이터를 사용하면 요청에 대해 카시를 카시하겠크뿡 말이고 AuthGuard()는 인가를 똑바로 하는지 후하하지 함수 같음.
-  @Get('/authtest')
-  @UseGuards(AuthGuard())
-  test(@GetCurrentUser() user) {
-    console.log('user', user);
-  }
-  // 형상 관리 어렵당
-
   // thunder client의 Bearer에 토큰을 넣어주고 요청을 보내면
-  // 2. GetCurrentUser()에서 요청(req)에서 user를 추출해서 반환해준다.
+  // GetCurrentUser()에서 요청(req)에서 user를 추출해서 반환해준다.
   @UseGuards(AccessTokenGuard)
   @Get('/test')
   test2(@GetCurrentUser() user) {

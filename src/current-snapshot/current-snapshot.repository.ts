@@ -32,22 +32,9 @@ export class CurrentSnapshotRepository extends Repository<CurrentSnapshot> {
     createPostRecordDto: CreatePostRecordDto,
     manager: EntityManager,
   ): Promise<void> {
-    //   currentSnapshot.version = currentSnapshot.version + 1;
-
-    console.log('여기서는 어때?', currentSnapshot);
-
     currentSnapshot.comment = createPostRecordDto.comment;
     currentSnapshot.content = createPostRecordDto.content;
     await manager.save(currentSnapshot);
-
-    await manager
-      .getRepository(CurrentSnapshot)
-      .createQueryBuilder('currentSnapshot')
-      .setLock('optimistic', currentSnapshot.version)
-      .where('currentSnapshot.movieId  = :movieId', {
-        movieId: currentSnapshot.movieId,
-      })
-      .execute();
   }
   // 현재 스냅샷 조회
   async findOneCurrentSnapshot(movieId: number): Promise<CurrentSnapshot> {
@@ -62,12 +49,12 @@ export class CurrentSnapshotRepository extends Repository<CurrentSnapshot> {
     movieId: number,
     content: string,
     comment: string,
-    version: number
+    version: number,
   ): Promise<void> {
     await this.createQueryBuilder('currentSnapshot')
       .update()
       .set({ content, comment, version })
       .where('movieId = :movieId', { movieId })
       .execute();
-  }  
+  }
 }

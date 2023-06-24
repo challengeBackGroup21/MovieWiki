@@ -16,3 +16,31 @@ export const typeORMConfig: TypeOrmModuleOptions = {
   }, // SSL 옵션을 비활성화
   logging: true,
 };
+
+export const testTypeORMConfig: TypeOrmModuleOptions = {
+  type: dbConfig.type,
+  host: dbConfig.host,
+  port: dbConfig.port,
+  username: dbConfig.username,
+  password: dbConfig.password,
+  database: 'test_db',
+  entities: [__dirname + '/../**/*.entity.{js,ts}'],
+  dropSchema: true,
+  synchronize: true,
+  ssl: false, // SSL 옵션을 비활성화
+  logging: true,
+};
+
+// export const testTypeORMConfig: TypeOrmModuleOptions = {
+//   type: 'postgres',
+//   host: 'localhost',
+//   port: 5432,
+//   username: 'postgres',
+//   password: 'marx1818ch!',
+//   database: 'MovieWikiTest',
+//   entities: [__dirname + '/../**/*.entity.{js,ts}'],
+//   dropSchema: true,
+//   synchronize: true,
+//   ssl: false, // SSL 옵션을 비활성화
+//   logging: true,
+// };

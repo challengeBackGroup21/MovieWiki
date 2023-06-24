@@ -14,11 +14,14 @@ export class UserRepository extends Repository<User> {
     super(User, dataSource.manager);
   }
 
-  async createUser(signUpDto: SignUpDto): Promise<void> {
-    const { email, nickname, password } = signUpDto;
+  async createUser(
+    signUpDto: SignUpDto,
+    hashedPassword: string,
+  ): Promise<void> {
+    const { email, nickname } = signUpDto;
 
-    const salt = await bcrypt.genSalt();
-    const hashedPassword = await bcrypt.hash(password, salt);
+    // const salt = await bcrypt.genSalt();
+    // const hashedPassword = await bcrypt.hash(password, salt);
 
     const user = this.create({ email, nickname, password: hashedPassword });
 

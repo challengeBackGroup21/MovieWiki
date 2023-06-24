@@ -7,66 +7,65 @@ export class MovieRepository extends Repository<Movie> {
   constructor(private dataSource: DataSource) {
     super(Movie, dataSource.createEntityManager());
   }
-  async directorsSearch(query: string): Promise<Movie[]> {
-    const movies = await this.createQueryBuilder('movie')
-      .where('movie.directors ::text ILIKE :directors', {
-        directors: `%${query}%`,
-      })
-      .take(20)
-      .getMany();
-    return movies;
-  }
+  // async directorsSearch(query: string): Promise<Movie[]> {
+  //   const movies = await this.createQueryBuilder('movie')
+  //     .where('movie.directors ::text ILIKE :directors', {
+  //       directors: `%${query}%`,
+  //     })
+  //     .take(10000)
+  //     .getMany();
+  //   return movies;
+  // }
 
-  async genreAltSearch(query: string): Promise<Movie[]> {
-    const movies = await this.createQueryBuilder('movie')
-      .where('movie.genreAlt LIKE :genreAlt', { genreAlt: `%${query}%` })
-      .take(20)
-      .getMany();
+  // async genreAltSearch(query: string): Promise<Movie[]> {
+  //   const movies = await this.createQueryBuilder('movie')
+  //     .where('movie.genreAlt LIKE :genreAlt', { genreAlt: `%${query}%` })
+  //     .take(10)
+  //     .getMany();
 
-    return movies;
-  }
+  //   return movies;
+  // }
 
-  async nationAltSearch(query: string): Promise<Movie[]> {
-    const movies = await this.createQueryBuilder('movie')
-      .where('movie.nationAlt LIKE :nationAlt', { nationAlt: `%${query}%` })
-      .take(20)
-      .getMany();
+  // async nationAltSearch(query: string): Promise<Movie[]> {
+  //   const movies = await this.createQueryBuilder('movie')
+  //     .where('movie.nationAlt LIKE :nationAlt', { nationAlt: `%${query}%` })
+  //     .take(10000)
+  //     .getMany();
 
-    return movies;
-  }
+  //   return movies;
+  // }
 
-  async openDtSearch(query: string): Promise<Movie[]> {
-    const movies = await this.createQueryBuilder('movie')
-      .where('movie.openDt LIKE :openDt', { openDt: `${query}%` })
-      .take(20)
-      .getMany();
+  // async openDtSearch(query: string): Promise<Movie[]> {
+  //   const movies = await this.createQueryBuilder('movie')
+  //     .where('movie.openDt LIKE :openDt', { openDt: `${query}%` })
+  //     .take(10000)
+  //     .getMany();
 
-    return movies;
-  }
+  //   return movies;
+  // }
   // 동일한 제목의 영화 존재할 수 도 있어서 find로 검색
-  async movieNmSearch(query: string): Promise<Movie[]> {
-    const movies = await this.createQueryBuilder('movie')
-      .where('movie.movieNm LIKE :movieNm', { movieNm: `%${query}%` })
-      .take(20)
-      .getMany();
+  // async movieNmSearch(query: string): Promise<any> {
+  //   const movies = await this.createQueryBuilder('movie')
+  //     .where('movie.movieNm LIKE :movieNm', { movieNm: `%${query}%` })
+  //     .take(20)
+  //     .getMany();
 
-    return movies;
-  }
+  //   return movies;
+  // }
 
-  async moviesSearch(query: string): Promise<Movie[]> {
-    const movies = await this.createQueryBuilder('movie')
-      .where('movie.directors ::text ILIKE :directors', {
-        directors: `%${query}%`,
-      })
-      .orWhere('movie.genreAlt LIKE :genreAlt', { genreAlt: `%${query}%` })
-      .orWhere('movie.nationAlt LIKE :nationAlt', { nationAlt: `%${query}%` })
-      .orWhere('movie.openDt LIKE :openDt', { openDt: `${query}%` })
-      .orWhere('movie.movieNm = :movieNm', { movieNm: `%${query}%` })
-      .orderBy('movie.movieId', 'ASC')
-      .take(20)
-      .getMany();
-    return movies;
-  }
+  // async moviesSearch(query: string): Promise<Movie[]> {
+  //   const movies = await this.createQueryBuilder('movie')
+  //     .where('movie.directors ::text ILIKE :directors', {
+  //       directors: `%${query}%`,
+  //     })
+  //     .orWhere('movie.movieNm LIKE :movieNm', { movieNm: `%${query}%` })
+  //     .orWhere('movie.nationAlt LIKE :nationAlt', { nationAlt: `%${query}%` })
+  //     .orWhere('movie.openDt LIKE :openDt', { openDt: `${query}%` })
+  //     .orWhere('movie.genreAlt LIKE :genreAlt', { genreAlt: `%${query}%` })
+  //     .take(10)
+  //     .getMany();
+  //   return movies;
+  // }
 
   // 영화 상세 정보 조회,최신 post 연결
   async getMovieById(movieId: number): Promise<any> {

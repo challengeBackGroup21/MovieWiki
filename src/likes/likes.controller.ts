@@ -5,11 +5,11 @@ import {
   Patch,
   UseGuards,
 } from '@nestjs/common';
-import { GetCurrentUser } from 'src/auth/common/decorators';
-import { AccessTokenGuard } from 'src/auth/guards';
+import { GetCurrentUser } from '../auth/common/decorators';
+import { AccessTokenGuard } from '../auth/guards';
 // import { PostService } from './post.service';
-import { User } from 'src/auth/user.entity';
-import { LikeService } from 'src/likes/likes.service';
+import { User } from '../auth/user.entity';
+import { LikeService } from '../likes/likes.service';
 // import { GetUser } from '../auth/get-user.decorator';
 
 @Controller('movie')
@@ -21,7 +21,7 @@ export class LikesController {
   @UseGuards(AccessTokenGuard)
   async updateLike(
     @Param('movieId', ParseIntPipe) movieId: number,
-    @GetCurrentUser() user: User,
+    @GetCurrentUser() user,
   ) {
     const userId = user.userId;
 
