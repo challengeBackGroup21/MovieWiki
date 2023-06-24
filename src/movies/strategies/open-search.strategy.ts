@@ -17,7 +17,7 @@ export class OpenSearch implements SearchStrategy {
             openDt: query,
           },
         },
-        size: 1000,
+        size: 10,
       },
     });
     const hits = body.hits.hits;

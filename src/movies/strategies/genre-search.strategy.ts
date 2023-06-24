@@ -17,7 +17,7 @@ export class GenreSearch implements SearchStrategy {
             genreAlt: query,
           },
         },
-        size: 1000,
+        size: 10,
       },
     });
     const hits = body.hits.hits;

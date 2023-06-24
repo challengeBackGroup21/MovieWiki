@@ -20,7 +20,7 @@ export class MovieRepository extends Repository<Movie> {
   // async genreAltSearch(query: string): Promise<Movie[]> {
   //   const movies = await this.createQueryBuilder('movie')
   //     .where('movie.genreAlt LIKE :genreAlt', { genreAlt: `%${query}%` })
-  //     .take(100)
+  //     .take(10)
   //     .getMany();
 
   //   return movies;
@@ -43,7 +43,7 @@ export class MovieRepository extends Repository<Movie> {
 
   //   return movies;
   // }
-  // // 동일한 제목의 영화 존재할 수 도 있어서 find로 검색
+  // 동일한 제목의 영화 존재할 수 도 있어서 find로 검색
   // async movieNmSearch(query: string): Promise<any> {
   //   const movies = await this.createQueryBuilder('movie')
   //     .where('movie.movieNm LIKE :movieNm', { movieNm: `%${query}%` })
@@ -58,12 +58,11 @@ export class MovieRepository extends Repository<Movie> {
   //     .where('movie.directors ::text ILIKE :directors', {
   //       directors: `%${query}%`,
   //     })
-  //     .orWhere('movie.genreAlt LIKE :genreAlt', { genreAlt: `%${query}%` })
+  //     .orWhere('movie.movieNm LIKE :movieNm', { movieNm: `%${query}%` })
   //     .orWhere('movie.nationAlt LIKE :nationAlt', { nationAlt: `%${query}%` })
   //     .orWhere('movie.openDt LIKE :openDt', { openDt: `${query}%` })
-  //     .orWhere('movie.movieNm LIKE :movieNm', { movieNm: `%${query}%` })
-  //     .orderBy('movie.movieId', 'ASC')
-  //     .take(10000)
+  //     .orWhere('movie.genreAlt LIKE :genreAlt', { genreAlt: `%${query}%` })
+  //     .take(10)
   //     .getMany();
   //   return movies;
   // }

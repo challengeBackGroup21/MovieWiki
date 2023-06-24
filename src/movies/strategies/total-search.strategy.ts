@@ -1,6 +1,6 @@
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { Movie } from '../movie.entity';
-// import { MovieRepository } from '../movie.repository';
+import { MovieRepository } from '../movie.repository';
 import { SearchStrategy } from './search-strategy.interface';
 
 export class TotalSearch implements SearchStrategy {
@@ -40,7 +40,7 @@ export class TotalSearch implements SearchStrategy {
             minimum_should_match: 1, // 적어도 하나의 조건은 만족해야 한다.
           },
         },
-        size: 1000,
+        size: 10,
       },
     });
     const hits = body.hits.hits;
