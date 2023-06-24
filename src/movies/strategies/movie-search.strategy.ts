@@ -1,6 +1,6 @@
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { Movie } from '../movie.entity';
-// import { MovieRepository } from '../movie.repository';
+import { MovieRepository } from '../movie.repository';
 import { SearchStrategy } from './search-strategy.interface';
 
 export class MovieSearch implements SearchStrategy {
@@ -10,14 +10,14 @@ export class MovieSearch implements SearchStrategy {
     console.log('strategy', query);
 
     const { body } = await this.elasticSearchService.search({
-      index: 'new_movies',
+      index: 'ngram_movies',
       body: {
         query: {
           match: {
             movieNm: query,
           },
         },
-        size: 1000,
+        size: 10,
       },
     });
     const hits = body.hits.hits;

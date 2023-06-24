@@ -23,7 +23,7 @@ export class PostService {
     @InjectRepository(CurrentSnapshotRepository)
     private readonly currentSnapshotRepository: CurrentSnapshotRepository,
     private dataSource: DataSource,
-  ) { }
+  ) {}
 
   async createPostRecord(
     createPostRecordDto: CreatePostRecordDto,
@@ -145,7 +145,8 @@ export class PostService {
     if (!isExistMovie) {
       throw new HttpException('영화가 존재하지 않습니다', 403);
     }
-    const currentSnapshot = await this.currentSnapshotRepository.findOneCurrentSnapshot(movieId);
+    const currentSnapshot =
+      await this.currentSnapshotRepository.findOneCurrentSnapshot(movieId);
     const latestPost = await this.postRepository.getPostRecords(movieId);
 
     if (!latestPost) {
@@ -158,7 +159,7 @@ export class PostService {
       content: currentSnapshot.content,
       version: currentSnapshot.version,
       comment: currentSnapshot.comment,
-      thisVersionDiff: JSON.parse(latestPost.content)
+      thisVersionDiff: JSON.parse(latestPost.content),
     };
     return result;
   }
@@ -206,8 +207,10 @@ export class PostService {
       const result = [];
 
       for (let i = latestPost.version; i >= 1; i--) {
-
-        const original = await this.snapshotRepository.findSnapshotByVersion(movieId, i);
+        const original = await this.snapshotRepository.findSnapshotByVersion(
+          movieId,
+          i,
+        );
         // console.log('getPostRecords original :', original);
 
         const diffs = await this.postRepository.findDiffsByVersion(movieId, i);
@@ -260,10 +263,9 @@ export class PostService {
         version,
       );
 
-
       // 현재 적용되어 있는 전체 스냅샷
-      const currentSnapshot = await this.currentSnapshotRepository.findOneCurrentSnapshot(movieId);
-
+      const currentSnapshot =
+        await this.currentSnapshotRepository.findOneCurrentSnapshot(movieId);
 
       const diffUtil = new DiffUtil();
       // 빈배열이 전달될 경우 원본이 그대로 나옴
@@ -278,16 +280,15 @@ export class PostService {
         diffUtil.diffArticleToSentence(currentSnapshot.content, content),
       );
 
-
       /* 현재 currentsnapshot에 저장되어 있는 스냅샷과 전체 스냅샷과 롤백할 버전의 전체 스냅샷
       변경 사항 데이터 post 테이블에 저장 */
-      const rollbackVersionDiffCreatePost = await this.postRepository.rollbackVersionDiffCreatePost(
-        diff,
-        post.comment,
-        post.userId,
-        movieId
-      );
-
+      const rollbackVersionDiffCreatePost =
+        await this.postRepository.rollbackVersionDiffCreatePost(
+          diff,
+          post.comment,
+          post.userId,
+          movieId,
+        );
 
       if (rollbackVersionDiffCreatePost.version % 10 === 1) {
         this.snapshotRepository.rollbackVersionUpdateSnapshot(

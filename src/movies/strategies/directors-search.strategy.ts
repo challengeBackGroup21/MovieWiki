@@ -10,7 +10,7 @@ export class DirectorsSearch implements SearchStrategy {
     console.log('strategy', query);
 
     const { body } = await this.elasticSearchService.search({
-      index: 'new_movies',
+      index: 'ngram_movies',
       body: {
         query: {
           match: {
@@ -19,7 +19,7 @@ export class DirectorsSearch implements SearchStrategy {
             'directors.peopleNm': query,
           },
         },
-        size: 1000,
+        size: 10,
       },
     });
     const hits = body.hits.hits;

@@ -8,7 +8,7 @@ export class OpenSearch implements SearchStrategy {
 
   async search(query: string): Promise<Movie[]> {
     const { body } = await this.elasticSearchService.search({
-      index: 'new_movies',
+      index: 'ngram_movies',
       body: {
         query: {
           prefix: {
@@ -17,7 +17,7 @@ export class OpenSearch implements SearchStrategy {
             openDt: query,
           },
         },
-        size: 1000,
+        size: 10,
       },
     });
     const hits = body.hits.hits;

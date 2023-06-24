@@ -10,14 +10,14 @@ export class NationSearch implements SearchStrategy {
     console.log('strategy', query);
 
     const { body } = await this.elasticSearchService.search({
-      index: 'new_movies',
+      index: 'ngram_movies',
       body: {
         query: {
           match: {
             nationAlt: query,
           },
         },
-        size: 1000,
+        size: 10,
       },
     });
     const hits = body.hits.hits;
