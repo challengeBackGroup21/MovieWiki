@@ -19,7 +19,7 @@ export class DirectorsSearch implements SearchStrategy {
             'directors.peopleNm': query,
           },
         },
-        size: 1000,
+        size: 10,
       },
     });
     const hits = body.hits.hits;
