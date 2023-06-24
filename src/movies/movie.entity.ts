@@ -74,6 +74,10 @@ export class Movie extends BaseEntity {
   @IsNumber()
   views: number;
 
+  @Column({ nullable: true })
+  @IsString()
+  imageUrl: string;
+
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
