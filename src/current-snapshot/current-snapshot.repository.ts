@@ -32,8 +32,11 @@ export class CurrentSnapshotRepository extends Repository<CurrentSnapshot> {
     createPostRecordDto: CreatePostRecordDto,
     manager: EntityManager,
   ): Promise<void> {
+    console.log('before', currentSnapshot.version);
     currentSnapshot.comment = createPostRecordDto.comment;
     currentSnapshot.content = createPostRecordDto.content;
+    currentSnapshot.version++;
+    console.log('after', currentSnapshot.version);
     await manager.save(currentSnapshot);
   }
   // 현재 스냅샷 조회
