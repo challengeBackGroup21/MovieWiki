@@ -103,10 +103,10 @@ export class PostRepository extends Repository<Post> {
 
   /* 특정 버전으로 롤백할 때 */
   async findDiffsByVersion(movieId: number, version: number) {
-    const snapshotVersion = Math.floor((version - 1) / 10) * 10 + 1;
+    const snapshotVersion = Math.floor(version / 10) * 10 + 1;
 
     const posts = await this.createQueryBuilder('post')
-      .leftJoinAndSelect('post.movie', 'movie', 'movie.movieId = post.movieId')
+      .leftJoinAndSelect('post.movie', 'movie')
       .where('movie.movieId = :movieId', { movieId })
       .andWhere('post.version >= :minVersion AND post.version <= :maxVersion', {
         minVersion: snapshotVersion + 1,
@@ -114,11 +114,8 @@ export class PostRepository extends Repository<Post> {
       })
       .getMany();
 
-    // console.log('postRepo posts :', posts);
-
     const diffs = posts.map((post) => JSON.parse(post.content));
 
-    // console.log('postRepo diffs :', diffs);
     return diffs;
   }
 
