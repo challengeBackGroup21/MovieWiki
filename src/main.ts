@@ -2,7 +2,8 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import config from 'config';
 import cookieParser from 'cookie-parser';
-import { AppClusterService } from './app-cluster.service';
+import cluster from 'node:cluster';
+import process from 'node:process';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/exceptions/http-exception-filter';
 
@@ -30,5 +31,20 @@ async function bootstrap() {
   Logger.log(`Application running on port ${port}`);
 }
 
-// bootstrap();
-AppClusterService.clusterize(bootstrap);
+if (cluster.isPrimary) {
+  const numCPUs = require('os').cpus().length;
+  console.log(`Master ${process.pid} is running`);
+
+  // 워커 프로세스 생성
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork();
+  }
+
+  // 워커가 종료되었을 때 새로운 워커 생성
+  cluster.on('exit', (worker, code, signal) => {
+    console.log(`Worker ${worker.process.pid} died`);
+    cluster.fork();
+  });
+} else {
+  bootstrap().catch((error) => console.error(error));
+}
