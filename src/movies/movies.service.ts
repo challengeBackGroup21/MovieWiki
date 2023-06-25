@@ -96,6 +96,7 @@ export class MoviesService {
       directors: isExistMovie.directors.map((dir) => dir.peopleNm),
       actors: isExistMovie.actors.map((actor) => actor.peopleNm),
       watchGradeNm: isExistMovie.watchGradeNm,
+      imageUrl: isExistMovie.imageUrl,
       likes: isExistMovie.likes,
       views: isExistMovie.views,
     };
@@ -150,6 +151,7 @@ export class MoviesService {
           showTm: movie.showTm,
           actors: actors,
           watchGradeNm: movie.watchGradeNm,
+          imageUrl: movie.imageUrl,
           views: movie.views,
           likes: movie.likes,
         };
