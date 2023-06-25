@@ -1,16 +1,15 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../auth/user.entity';
+import { DataSource, QueryRunner } from 'typeorm';
 import { CurrentSnapshotRepository } from '../current-snapshot/current-snapshot.repository';
 import { MovieRepository } from '../movies/movie.repository';
+import { CreatePostRecordDto } from '../posts/dto/create-post-record.dto';
 import { Snapshot } from '../snapshot/snapshot.entity';
 import { SnapshotRepository } from '../snapshot/snapshot.repository';
-import { DataSource, QueryRunner } from 'typeorm';
-import { CreatePostRecordDto } from '../posts/dto/create-post-record.dto';
 import { DiffUtil } from './diff.util';
+import { Post } from './post.entity';
 import { PostRepository } from './post.repository';
 import { ProcessedPost } from './types/process-post.type';
-import { Post } from './post.entity';
 
 @Injectable()
 export class PostService {
@@ -41,7 +40,6 @@ export class PostService {
       queryRunner,
     );
   }
-
   /** queryRunner를 만들고 db와 연결하고 transaction을 시작 */
   async makeQueryRunner(): Promise<QueryRunner> {
     const queryRunner = this.dataSource.createQueryRunner();
