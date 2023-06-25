@@ -6,7 +6,6 @@ const numCPUs = os.cpus().length;
 
 @Injectable()
 export class AppClusterService {
-  // eslint-disable-next-line @typescript-eslint/ban-types
   static clusterize(callback: Function): void {
     if (cluster.isPrimary) {
       console.log(`Master server started on ${process.pid}`);
