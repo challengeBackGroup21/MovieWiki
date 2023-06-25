@@ -7,6 +7,8 @@ export class AppService {
   public get cacheManager(): Cache {
     return this._cacheManager;
   }
-  constructor(@Inject(CACHE_MANAGER)
-    private readonly _cacheManager: Cache) {}
+  constructor(
+    @Inject(CACHE_MANAGER)
+    private readonly _cacheManager: Cache,
+  ) {}
 }

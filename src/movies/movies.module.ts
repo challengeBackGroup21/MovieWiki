@@ -1,5 +1,7 @@
+import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
+import { ElasticsearchModule } from '@nestjs/elasticsearch';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import redisStore from 'cache-manager-ioredis';
 import config from 'config';
@@ -7,10 +9,8 @@ import { Movie } from './movie.entity';
 import { MovieRepository } from './movie.repository';
 import { MoviesController } from './movies.controller';
 import { MoviesService } from './movies.service';
-import { RedisModule } from '@liaoliaots/nestjs-redis';
 
 const redisConfig = config.get('redis');
-import { ElasticsearchModule } from '@nestjs/elasticsearch';
 
 @Module({
   imports: [

@@ -1,20 +1,20 @@
+import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { HttpException, Inject, Injectable } from '@nestjs/common';
-import { InjectRedis } from '@liaoliaots/nestjs-redis';
+import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cache } from 'cache-manager';
+import Redis from 'ioredis';
 import { UpdateMovieDto } from './dto/update-movie-dto';
 import { Movie } from './movie.entity';
 import { MovieRepository } from './movie.repository';
-import Redis from 'ioredis';
-import { SearchStrategy } from './strategies/search-strategy.interface';
 import { DirectorsSearch } from './strategies/directors-search.strategy';
 import { GenreSearch } from './strategies/genre-search.strategy';
-import { OpenSearch } from './strategies/open-search.strategy';
-import { NationSearch } from './strategies/nation-search.strategy';
-import { TotalSearch } from './strategies/total-search.strategy';
 import { MovieSearch } from './strategies/movie-search.strategy';
-import { ElasticsearchService } from '@nestjs/elasticsearch';
+import { NationSearch } from './strategies/nation-search.strategy';
+import { OpenSearch } from './strategies/open-search.strategy';
+import { SearchStrategy } from './strategies/search-strategy.interface';
+import { TotalSearch } from './strategies/total-search.strategy';
 
 @Injectable()
 export class MoviesService {
@@ -71,7 +71,7 @@ export class MoviesService {
 
       return 'view checked';
     } catch (error) {
-      console.log(error);
+      throw new HttpException('영화 조회 여부 조회에 실패했습니다.', 400);
     }
   }
 
