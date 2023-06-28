@@ -1,4 +1,4 @@
-import { IsDate, IsNumber, IsString } from 'class-validator';
+import { IsBoolean, IsDate, IsNumber, IsString } from 'class-validator';
 import {
   BaseEntity,
   Column,
@@ -38,6 +38,10 @@ export class User extends BaseEntity {
   @Column({ default: 0 })
   @IsNumber()
   banCount: number;
+
+  @Column({ default: false })
+  @IsBoolean()
+  isBanned: boolean;
 
   @Column({ length: 5, default: 'USER' })
   @IsString()
