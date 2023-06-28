@@ -120,6 +120,7 @@ export class NotificationsService {
     auth: string,
     notiId: number,
     status: NotificationStatus,
+    period: number,
   ) {
     const queryRunner = this.dataSource.createQueryRunner();
 
@@ -136,6 +137,15 @@ export class NotificationsService {
           status,
         );
         await this.userRepository.incrementUserBanCount(userId);
+        if (period === -1) {
+          // 영구 정지
+          await this.userRepository.update(userId, { isBanned: true });
+        } else {
+          // 기간 정지
+          await this.userRepository.update(userId, {
+            limitedAt: this.calcLimitPeriod(period),
+          });
+        }
         await queryRunner.commitTransaction();
 
         return '관리자 권한으로 신고 승인이 완료되었습니다.';
@@ -150,6 +160,16 @@ export class NotificationsService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  calcLimitPeriod(period: number): Date {
+    // 하루 단위 * 입력받은 숫자로 제한 시간을 만든다.
+    const suspensionPeriod = 24 * 60 * 60 * 1000 * period;
+
+    const currentDate = new Date(); // 현재 시간
+    const suspendedUntil = new Date(currentDate.getTime() + suspensionPeriod);
+    // const suspendedUntil = new Date(currentDate.getTime());
+    return suspendedUntil;
   }
 
   async rejectNotification(
