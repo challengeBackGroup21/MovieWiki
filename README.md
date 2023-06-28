@@ -16,7 +16,7 @@ MovieWiki는 Movie + Wikipedia의 합성어로 영화와 관련된 모든 정보
 
 ## 📝 Project Architecture
 
-![Architecture](.\readme_images\moviewiki_architecture.png)
+![Architecture](./readme_images/moviewiki_architecture.png)
 
 ## 🛠 Tech Stack
 
