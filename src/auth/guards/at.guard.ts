@@ -1,4 +1,8 @@
-import { ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -34,6 +38,7 @@ export class AccessTokenGuard extends AuthGuard('jwt') {
     }
 
     // 그렇지 않은 경우 부모 클래스의 인증 과정을 수행함
+    // 여기에서 strategy가 사용되는 것 같다.
     return super.canActivate(context);
   }
 }
