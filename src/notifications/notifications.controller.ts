@@ -90,12 +90,19 @@ export class NotificationsController {
     @GetCurrentUser() user: User,
     @Body('status', NotificationStatusValidationPipe)
     status: NotificationStatus,
+    @Body() body,
   ): Promise<any> {
     const auth = user.auth;
+    console.log('body', body);
+    let period = 1;
+    if (body.period !== undefined) {
+      period = body.period;
+    }
     return await this.notificationsService.acceptNotification(
       auth,
       notiId,
       status,
+      period,
     );
   }
 

@@ -90,13 +90,14 @@ export class AuthService {
 
   async getAccessToken(user: User): Promise<string> {
     const jwtConfig = config.get('jwt');
-    const { userId, email, nickname, auth } = user;
+    const { userId, email, nickname, auth, isBanned } = user;
     return await this.jwtService.signAsync(
       {
         userId,
         email,
         nickname,
         auth,
+        isBanned,
       },
       {
         secret: jwtConfig.atSecret,
@@ -107,13 +108,14 @@ export class AuthService {
 
   async getRefreshToken(user: User): Promise<string> {
     const jwtConfig = config.get('jwt');
-    const { userId, email, nickname, auth } = user;
+    const { userId, email, nickname, auth, isBanned } = user;
     return await this.jwtService.signAsync(
       {
         userId,
         email,
         nickname,
         auth,
+        isBanned,
       },
       {
         secret: jwtConfig.rtSecret,
