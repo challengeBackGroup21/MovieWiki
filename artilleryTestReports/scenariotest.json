@@ -1,0 +1,38 @@
+{
+    "config": {
+        "name": "moviewiki scenario test",
+        "target": "http://localhost:3001",
+        "phases": [
+          {
+             "duration": 60,
+             "arrivalRate": 10
+          }
+       ]
+    },
+    "scenarios": [
+       {
+          "flow": [
+            {
+               "get": {
+                  "url": "/movies/like"
+               }
+            },
+            {
+               "get": {
+                  "url": "/movies/search?option=total&query=범죄도시"
+               }
+            },
+            {
+               "get": {
+                  "url": "/post/94/record/latest"
+               }
+            },
+            {
+               "get": {
+                  "url": "/post/94/record"
+               }
+            }
+          ]
+       }
+    ]
+ }

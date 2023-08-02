@@ -41,6 +41,8 @@ export class AccessTokenStrategy extends PassportStrategy(Strategy, 'jwt') {
       throw new UnauthorizedException('정지된 계정입니다.');
     }
 
+    console.log('userData', user);
+
     // 유효한 사용자인지 여부에 따라 반환값을 수정할 수 있음
     return user;
   }
