@@ -5,6 +5,7 @@ name: nest pull_request submitted
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 env:
   DOCKER_IMAGE: ghcr.io/challengebackgroup21/moviewiki
